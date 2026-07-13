@@ -70,8 +70,13 @@
 
 :root {
   --radius: 0.625rem;
+  --navy: oklch(0.24 0.09 275);
+  --navy-foreground: oklch(0.98 0.01 90);
+  --gold: oklch(0.83 0.17 88);
+  --gold-foreground: oklch(0.24 0.09 275);
+  --cream: oklch(0.98 0.015 85);
   --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
+  --foreground: oklch(0.20 0.05 275);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.129 0.042 264.695);
   --popover: oklch(1 0 0);
