@@ -6,7 +6,7 @@ export type OpenProperty = {
   location?: string | null;
   initial_value: number | string;
   images?: string[] | null;
-  status?: string;
+  status: string;
   min_investment?: number | string | null;
   expected_rental_yield?: number | string | null;
   expected_appreciation?: number | string | null;
