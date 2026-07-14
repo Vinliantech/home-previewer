@@ -16,7 +16,7 @@ export const Route = createFileRoute("/blog")({
       {
         name: "description",
         content:
-          "Practical guides from the Kay-Steph team: Abuja district insights, fractional ownership explained, title verification, and buying from the diaspora.",
+          "Practical guides from the Kay-Steph team: Abuja district insights, tokenized ownership explained, title verification, and buying from the diaspora.",
       },
       { property: "og:title", content: "Kay-Steph Blog & Insights" },
       {
