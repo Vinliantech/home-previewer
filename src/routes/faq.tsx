@@ -218,7 +218,7 @@ const categories: FaqCategory[] = [
       {
         question: "What documents do I receive as an investor?",
         answer:
-          "Depending on the model: an allocation letter or sale agreement for direct purchases; SPV interest records and an ownership certificate for fractional and group investments; and unit records for tokenized holdings. All documents live in your portal, alongside title information, risk disclosures and contribution terms shown before you committed.",
+          "Depending on the route: an allocation letter or sale agreement for Full Purchase; SPV interest records and an ownership certificate for Group Buy participation; and unit records for Tokenized Ownership. All documents live in your portal, alongside title information, risk disclosures and contribution terms shown before you committed.",
       },
       {
         question: "Can I verify my ownership certificate independently?",
@@ -318,7 +318,7 @@ function FaqPage() {
             <span className="block text-gold">before you decide.</span>
           </>
         }
-        description={`${totalItems} detailed answers covering ownership, fractional investment, SPVs, tokenization, returns, withdrawals, documentation, payments and security. If yours isn't here, ask us directly.`}
+        description={`${totalItems} detailed answers covering full purchase, Group Buy, Tokenized Ownership, SPV protection, returns, withdrawals, documentation, payments and security. If yours isn't here, ask us directly.`}
       >
         <div className="relative mt-8 max-w-xl">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-navy/50" />
