@@ -267,6 +267,23 @@ export function SiteHeader() {
               </a>
             ))}
 
+            <div className="border-b border-white/10 py-1">
+              <div className="py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-white/50">
+                Invest
+              </div>
+              {investMenu.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  onClick={closeMenu}
+                  className="block py-2 text-sm text-white/85"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+
+
             <button
               type="button"
               onClick={() => setWhyOpen((value) => !value)}
