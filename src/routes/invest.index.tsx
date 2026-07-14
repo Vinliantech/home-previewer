@@ -11,7 +11,6 @@ import {
   Landmark,
   LineChart,
   Lock,
-  PiggyBank,
   Scale,
   ShieldCheck,
   TrendingUp,
@@ -28,12 +27,12 @@ export const Route = createFileRoute("/invest/")({
     meta: [
       {
         title:
-          "Invest with Kay-Steph | Fractional, Group & SPV Property Investment in Abuja",
+          "Invest with Kay-Steph | Full Purchase, Group Buy & Tokenized Property in Abuja",
       },
       {
         name: "description",
         content:
-          "Invest in verified Abuja property through full purchase, group purchase, fractional ownership, SPV arrangements or tokenized units. Clear steps, documented returns, transparent risks.",
+          "Three structured routes into premium Abuja real estate: buy outright, join a group buy, or hold tokenized ownership from ₦1M. Every shared-ownership deal is protected by a dedicated SPV.",
       },
       {
         property: "og:title",
@@ -42,7 +41,7 @@ export const Route = createFileRoute("/invest/")({
       {
         property: "og:description",
         content:
-          "Five structured routes into premium Abuja real estate — from ₦5M fractional contributions to full purchase.",
+          "Three routes into premium Abuja real estate — Full Purchase, Group Buy or Tokenized Ownership from ₦1M. Protected by dedicated SPVs.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -51,11 +50,21 @@ export const Route = createFileRoute("/invest/")({
   component: InvestPage,
 });
 
-const investmentModels = [
+type ModelCard = {
+  icon: typeof Building2;
+  title: string;
+  tagline: string;
+  body?: string;
+  beats?: { label: string; text: string }[];
+  points: string[];
+  minimum: string;
+};
+
+const investmentModels: ModelCard[] = [
   {
     icon: Building2,
-    title: "Full purchase",
-    tagline: "Own a property outright",
+    title: "Full Purchase",
+    tagline: "Own it outright",
     body: "Buy a home, terrace, apartment or plot in your own name (or your company's). You receive the full title, keep all rental income and control resale timing entirely.",
     points: [
       "100% ownership and title",
@@ -66,51 +75,68 @@ const investmentModels = [
   },
   {
     icon: Users,
-    title: "Group purchase",
+    title: "Group Buy",
     tagline: "Buy together, at scale",
     body: "A coordinated pool of verified buyers targets a specific development or bulk allocation. Everyone sees the same milestones, contribution status and documents — no fragmented chats or spreadsheets.",
     points: [
       "Private or open project pools",
       "Contribution milestones and reminders",
       "Admin approval and audit history",
+      "Shared outcomes are held in a dedicated SPV (see below)",
     ],
     minimum: "Set per pool (typically from ₦10M)",
   },
   {
-    icon: PiggyBank,
-    title: "Fractional ownership",
-    tagline: "Own a documented share",
-    body: "Contribute what you can toward a selected property and receive a proportional ownership interest. Track your share's value, rental income and returns from your investor dashboard.",
+    icon: Coins,
+    title: "Tokenized Ownership",
+    tagline: "Own a documented fraction, from ₦1M",
+    beats: [
+      {
+        label: "What you own",
+        text: "Contribute what you can toward a selected property and receive a proportional ownership interest — ₦14M into a ₦140M asset is 10%, in writing.",
+      },
+      {
+        label: "How it's counted",
+        text: "Your fraction is issued as fixed-value units (tokens). Start from one unit, receive income per unit, and list units for resale to other verified investors when you want liquidity.",
+      },
+      {
+        label: "What you get",
+        text: "Share of rental income and appreciation, portfolio dashboard, statements and a documented resale route.",
+      },
+    ],
     points: [
       "Proportional ownership units",
-      "Share of rental income and appreciation",
-      "Portfolio dashboard and statements",
-    ],
-    minimum: "From ₦5M per property",
-  },
-  {
-    icon: Landmark,
-    title: "SPV arrangement",
-    tagline: "Institutional-grade structure",
-    body: "Each co-owned property is held by a dedicated Special Purpose Vehicle — a separate legal entity whose only asset is that property. Your interest is recorded against the SPV, ring-fenced from any other business.",
-    points: [
-      "Dedicated legal entity per property",
-      "Ring-fenced from company liabilities",
-      "Formal shareholder / trust records",
-    ],
-    minimum: "Included in group & fractional deals",
-  },
-  {
-    icon: Coins,
-    title: "Property tokenization",
-    tagline: "Digital units, small tickets",
-    body: "Selected properties are divided into fixed-value digital units. Buy the number of units you can afford, receive income per unit, and list units for resale to other verified investors when you want liquidity.",
-    points: [
-      "Fixed-value ownership units",
       "Per-unit income distributions",
       "Unit resale to verified investors",
     ],
-    minimum: "From ₦1M per unit (per project)",
+    minimum:
+      "From ₦1M per unit; larger contributions from ₦5M work the same way — just more units",
+  },
+];
+
+const comparisonRows: { label: string; values: [string, string, string] }[] = [
+  {
+    label: "You own",
+    values: ["The whole asset", "Your allocation/share of a target", "Units of a fraction"],
+  },
+  { label: "Entry", values: ["₦32.5M+", "~₦10M+", "₦1M per unit"] },
+  { label: "Held via", values: ["Direct title", "Direct or SPV", "SPV"] },
+  { label: "Income", values: ["All of it", "Per allocation", "Per unit"] },
+  {
+    label: "Liquidity",
+    values: [
+      "Sell whenever",
+      "Per pool terms",
+      "Unit resale to verified investors",
+    ],
+  },
+  {
+    label: "Best for",
+    values: [
+      "Owner-occupiers, HNW buyers",
+      "Families, diaspora groups, syndicates",
+      "First-time and diversifying investors",
+    ],
   },
 ];
 
