@@ -21,19 +21,12 @@ export const OFFICE_HOURS = [
   { days: "Sunday & public holidays", hours: "By appointment only" },
 ];
 
-export type InvestmentModel =
-  | "full_purchase"
-  | "group_purchase"
-  | "fractional"
-  | "spv"
-  | "tokenized";
+export type InvestmentModel = "full_purchase" | "group_buy" | "tokenized";
 
 export const INVESTMENT_MODEL_LABEL: Record<InvestmentModel, string> = {
   full_purchase: "Full purchase",
-  group_purchase: "Group purchase",
-  fractional: "Fractional ownership",
-  spv: "SPV co-ownership",
-  tokenized: "Tokenized units",
+  group_buy: "Group buy",
+  tokenized: "Tokenized ownership",
 };
 
 export type PropertyType = "Detached home" | "Apartment" | "Terrace" | "Estate land";
@@ -97,7 +90,7 @@ export const properties: Property[] = [
     ],
     units: [{ label: "5-Bedroom Fully Detached Residence", price: "₦500,000,000" }],
     propertyType: "Detached home",
-    investmentModels: ["full_purchase", "group_purchase", "spv"],
+    investmentModels: ["full_purchase", "group_buy"],
     priceValue: 500_000_000,
     expectedReturnPct: 18,
     fundingStatus: "available",
@@ -129,7 +122,7 @@ export const properties: Property[] = [
       { label: "3-Bedroom Apartment · Lower Floor", price: "₦140,000,000" },
     ],
     propertyType: "Apartment",
-    investmentModels: ["full_purchase", "fractional", "spv", "tokenized"],
+    investmentModels: ["full_purchase", "tokenized"],
     priceValue: 140_000_000,
     expectedReturnPct: 15,
     fundingStatus: "funding_open",
@@ -158,7 +151,7 @@ export const properties: Property[] = [
     ],
     units: [{ label: "4-Bedroom Terrace", price: "₦250,000,000" }],
     propertyType: "Terrace",
-    investmentModels: ["full_purchase", "group_purchase", "fractional"],
+    investmentModels: ["full_purchase", "group_buy", "tokenized"],
     priceValue: 250_000_000,
     expectedReturnPct: 16,
     fundingStatus: "selling",
@@ -192,7 +185,7 @@ export const properties: Property[] = [
       { label: "4-Bedroom Detached + BQ · Type D", price: "₦90,000,000" },
     ],
     propertyType: "Detached home",
-    investmentModels: ["full_purchase", "group_purchase", "spv"],
+    investmentModels: ["full_purchase", "group_buy"],
     priceValue: 90_000_000,
     expectedReturnPct: 17,
     fundingStatus: "selling",
@@ -221,7 +214,7 @@ export const properties: Property[] = [
     ],
     units: [{ label: "Estate Plot · Phase II", price: "₦65,000 / sqm" }],
     propertyType: "Estate land",
-    investmentModels: ["full_purchase", "group_purchase", "tokenized"],
+    investmentModels: ["full_purchase", "group_buy", "tokenized"],
     priceValue: 32_500_000,
     expectedReturnPct: 22,
     fundingStatus: "available",

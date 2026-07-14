@@ -65,7 +65,7 @@ export const Route = createFileRoute("/contact")({
 
 const SUBJECT_OPTIONS = [
   { value: "buy_property", label: "Buying a property" },
-  { value: "invest", label: "Fractional / group investment" },
+  { value: "invest", label: "Group buy or tokenized ownership" },
   { value: "site_inspection", label: "Booking a site inspection" },
   { value: "existing_investment", label: "My existing investment" },
   { value: "partnership", label: "Partnership or affiliate" },
@@ -114,7 +114,7 @@ function ContactPage() {
             <span className="block text-gold">We respond within one business day.</span>
           </>
         }
-        description="Whether you are buying a home, exploring fractional investment or booking a private inspection, the team at our Guzape office is ready to guide your next step."
+        description="Whether you are buying a home, exploring group buy or tokenized ownership, or booking a private inspection, the team at our Guzape office is ready to guide your next step."
       >
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <a
@@ -265,7 +265,7 @@ function ContactPage() {
             <SupportCard
               icon={Users}
               title="Investor relations"
-              body="Fractional ownership, group purchases, SPV terms, contributions and payout questions."
+              body="Group buys, tokenized ownership, SPV protection, contributions and payout questions."
               action={
                 <Link
                   to="/invest"

@@ -16,7 +16,7 @@ export const Route = createFileRoute("/blog")({
       {
         name: "description",
         content:
-          "Practical guides from the Kay-Steph team: Abuja district insights, fractional ownership explained, title verification, and buying from the diaspora.",
+          "Practical guides from the Kay-Steph team: Abuja district insights, tokenized ownership explained, title verification, and buying from the diaspora.",
       },
       { property: "og:title", content: "Kay-Steph Blog & Insights" },
       {
@@ -71,28 +71,28 @@ const posts: Post[] = [
     ],
   },
   {
-    id: "fractional-ownership-explained",
+    id: "tokenized-ownership-explained",
     category: "Investing",
     readTime: "5 min read",
-    title: "Fractional property ownership, explained without the jargon",
+    title: "Tokenized property ownership, explained without the jargon",
     excerpt:
-      "What you actually own, how SPVs protect you, what returns look like, and the honest limits of liquidity — everything a first-time co-investor should know.",
+      "What a fraction actually is, how SPVs protect you, what returns look like, and the honest limits of liquidity — everything a first-time co-investor should know.",
     sections: [
       {
         heading: "What you actually own",
-        body: "When you contribute to a fractional deal, a dedicated legal entity (an SPV) holds the property and your contribution buys a recorded interest in that entity. ₦14M into a ₦140M property is a 10% interest — in writing, verifiable, and visible in your dashboard.",
+        body: "When you buy tokenized units, a dedicated legal entity (an SPV) holds the property and your units record a proportional interest in that entity. ₦14M into a ₦140M property is a 10% interest — in writing, verifiable, and visible in your dashboard.",
       },
       {
         heading: "How you earn",
-        body: "Two ways: your share of net rental income, distributed on the schedule stated per project, and your share of the property's appreciation, realised when the asset or your interest is sold. Projections are stated per property and are never guarantees.",
+        body: "Two ways: your per-unit share of net rental income, distributed on the schedule stated per project, and your share of the property's appreciation, realised when the asset or your units are sold. Projections are stated per property and are never guarantees.",
       },
       {
         heading: "The honest part: liquidity",
-        body: "Real estate is not a savings account. Exits follow a documented process and depend on matching your interest with a verified buyer. If you may need the money at short notice, fractional property is the wrong pocket for it.",
+        body: "Real estate is not a savings account. Unit resale follows a documented process and depends on matching your units with a verified buyer. If you may need the money at short notice, tokenized property is the wrong pocket for it.",
       },
       {
         heading: "Why the SPV matters",
-        body: "The SPV ring-fences the property: liabilities from other projects or company operations cannot touch it. It is the same structure institutional investors insist on — scaled down to ₦5M tickets.",
+        body: "The SPV ring-fences the property: liabilities from other projects or company operations cannot touch it. It is the same structure institutional investors insist on — scaled down to ₦1M unit tickets.",
       },
     ],
   },

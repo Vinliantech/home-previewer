@@ -310,7 +310,7 @@ function PropertiesPage() {
           <SectionHeading
             eyebrow="Can't buy outright?"
             title="Own a share instead."
-            description="Most listed properties are also open to group purchase, fractional ownership or tokenized units — starting from ₦1M. Same verified assets, smaller ticket."
+            description="Most listed properties are also open to Group Buy pools or Tokenized Ownership — starting from ₦1M per unit. Same verified assets, smaller ticket, protected by a dedicated SPV."
           />
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link

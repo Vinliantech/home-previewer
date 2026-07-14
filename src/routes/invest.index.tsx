@@ -11,7 +11,6 @@ import {
   Landmark,
   LineChart,
   Lock,
-  PiggyBank,
   Scale,
   ShieldCheck,
   TrendingUp,
@@ -28,12 +27,12 @@ export const Route = createFileRoute("/invest/")({
     meta: [
       {
         title:
-          "Invest with Kay-Steph | Fractional, Group & SPV Property Investment in Abuja",
+          "Invest with Kay-Steph | Full Purchase, Group Buy & Tokenized Property in Abuja",
       },
       {
         name: "description",
         content:
-          "Invest in verified Abuja property through full purchase, group purchase, fractional ownership, SPV arrangements or tokenized units. Clear steps, documented returns, transparent risks.",
+          "Three structured routes into premium Abuja real estate: buy outright, join a group buy, or hold tokenized ownership from ₦1M. Every shared-ownership deal is protected by a dedicated SPV.",
       },
       {
         property: "og:title",
@@ -42,7 +41,7 @@ export const Route = createFileRoute("/invest/")({
       {
         property: "og:description",
         content:
-          "Five structured routes into premium Abuja real estate — from ₦5M fractional contributions to full purchase.",
+          "Three routes into premium Abuja real estate — Full Purchase, Group Buy or Tokenized Ownership from ₦1M. Protected by dedicated SPVs.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -51,11 +50,21 @@ export const Route = createFileRoute("/invest/")({
   component: InvestPage,
 });
 
-const investmentModels = [
+type ModelCard = {
+  icon: typeof Building2;
+  title: string;
+  tagline: string;
+  body?: string;
+  beats?: { label: string; text: string }[];
+  points: string[];
+  minimum: string;
+};
+
+const investmentModels: ModelCard[] = [
   {
     icon: Building2,
-    title: "Full purchase",
-    tagline: "Own a property outright",
+    title: "Full Purchase",
+    tagline: "Own it outright",
     body: "Buy a home, terrace, apartment or plot in your own name (or your company's). You receive the full title, keep all rental income and control resale timing entirely.",
     points: [
       "100% ownership and title",
@@ -66,51 +75,68 @@ const investmentModels = [
   },
   {
     icon: Users,
-    title: "Group purchase",
+    title: "Group Buy",
     tagline: "Buy together, at scale",
     body: "A coordinated pool of verified buyers targets a specific development or bulk allocation. Everyone sees the same milestones, contribution status and documents — no fragmented chats or spreadsheets.",
     points: [
       "Private or open project pools",
       "Contribution milestones and reminders",
       "Admin approval and audit history",
+      "Shared outcomes are held in a dedicated SPV (see below)",
     ],
     minimum: "Set per pool (typically from ₦10M)",
   },
   {
-    icon: PiggyBank,
-    title: "Fractional ownership",
-    tagline: "Own a documented share",
-    body: "Contribute what you can toward a selected property and receive a proportional ownership interest. Track your share's value, rental income and returns from your investor dashboard.",
+    icon: Coins,
+    title: "Tokenized Ownership",
+    tagline: "Own a documented fraction, from ₦1M",
+    beats: [
+      {
+        label: "What you own",
+        text: "Contribute what you can toward a selected property and receive a proportional ownership interest — ₦14M into a ₦140M asset is 10%, in writing.",
+      },
+      {
+        label: "How it's counted",
+        text: "Your fraction is issued as fixed-value units (tokens). Start from one unit, receive income per unit, and list units for resale to other verified investors when you want liquidity.",
+      },
+      {
+        label: "What you get",
+        text: "Share of rental income and appreciation, portfolio dashboard, statements and a documented resale route.",
+      },
+    ],
     points: [
       "Proportional ownership units",
-      "Share of rental income and appreciation",
-      "Portfolio dashboard and statements",
-    ],
-    minimum: "From ₦5M per property",
-  },
-  {
-    icon: Landmark,
-    title: "SPV arrangement",
-    tagline: "Institutional-grade structure",
-    body: "Each co-owned property is held by a dedicated Special Purpose Vehicle — a separate legal entity whose only asset is that property. Your interest is recorded against the SPV, ring-fenced from any other business.",
-    points: [
-      "Dedicated legal entity per property",
-      "Ring-fenced from company liabilities",
-      "Formal shareholder / trust records",
-    ],
-    minimum: "Included in group & fractional deals",
-  },
-  {
-    icon: Coins,
-    title: "Property tokenization",
-    tagline: "Digital units, small tickets",
-    body: "Selected properties are divided into fixed-value digital units. Buy the number of units you can afford, receive income per unit, and list units for resale to other verified investors when you want liquidity.",
-    points: [
-      "Fixed-value ownership units",
       "Per-unit income distributions",
       "Unit resale to verified investors",
     ],
-    minimum: "From ₦1M per unit (per project)",
+    minimum:
+      "From ₦1M per unit; larger contributions from ₦5M work the same way — just more units",
+  },
+];
+
+const comparisonRows: { label: string; values: [string, string, string] }[] = [
+  {
+    label: "You own",
+    values: ["The whole asset", "Your allocation/share of a target", "Units of a fraction"],
+  },
+  { label: "Entry", values: ["₦32.5M+", "~₦10M+", "₦1M per unit"] },
+  { label: "Held via", values: ["Direct title", "Direct or SPV", "SPV"] },
+  { label: "Income", values: ["All of it", "Per allocation", "Per unit"] },
+  {
+    label: "Liquidity",
+    values: [
+      "Sell whenever",
+      "Per pool terms",
+      "Unit resale to verified investors",
+    ],
+  },
+  {
+    label: "Best for",
+    values: [
+      "Owner-occupiers, HNW buyers",
+      "Families, diaspora groups, syndicates",
+      "First-time and diversifying investors",
+    ],
   },
 ];
 
@@ -257,7 +283,7 @@ function InvestPage() {
             <span className="block text-gold">made more accessible.</span>
           </>
         }
-        description="Five structured routes into premium Abuja real estate — buy outright, join a group purchase, own a documented fraction, invest through a dedicated SPV, or hold tokenized units. Every route is verified, documented and tracked in one investor portal."
+        description="Three structured routes into premium Abuja real estate — buy outright, join a group buy, or hold tokenized units from ₦1M. Every route is verified, documented and — for shared ownership — protected by a dedicated SPV."
       >
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <a
@@ -295,8 +321,8 @@ function InvestPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <SectionHeading
             eyebrow="Ways to invest"
-            title="Choose the route that fits your capital."
-            description="Every model gives you verified documentation, portal tracking and direct access to the Kay-Steph team. The difference is how much you contribute and how ownership is structured."
+            title="Three routes. One capital ladder."
+            description="Every route gives you verified documentation, portal tracking and direct access to the Kay-Steph team. Enter at ₦1M, step up at ₦10M, or buy outright from ₦32.5M."
           />
           <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {investmentModels.map((model) => (
@@ -306,7 +332,21 @@ function InvestPage() {
                 </div>
                 <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-gold">{model.tagline}</p>
                 <h3 className="mt-1 font-serif text-2xl font-bold text-navy">{model.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">{model.body}</p>
+                {model.body && (
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">{model.body}</p>
+                )}
+                {model.beats && (
+                  <div className="mt-3 space-y-3">
+                    {model.beats.map((beat) => (
+                      <div key={beat.label}>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-navy">
+                          {beat.label}
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-muted-foreground">{beat.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <ul className="mt-4 flex-1 space-y-2">
                   {model.points.map((point) => (
                     <li key={point} className="flex items-start gap-2 text-sm text-navy">
@@ -334,8 +374,89 @@ function InvestPage() {
               </a>
             </div>
           </div>
+
+          {/* SPV protection strip */}
+          <div className="mt-10 overflow-hidden rounded-md border border-gold/30 bg-navy text-white shadow-sm">
+            <div className="grid gap-6 p-8 sm:p-10 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-10">
+              <div className="flex items-center gap-4 lg:flex-col lg:items-start">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-gold/10 text-gold">
+                  <ShieldCheck className="h-7 w-7" />
+                </div>
+                <div className="lg:mt-2">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-gold">
+                    Protection layer
+                  </p>
+                  <p className="mt-1 text-xs text-white/60 lg:max-w-[9rem]">
+                    Not a product — the legal wrapper behind every shared deal.
+                  </p>
+                </div>
+              </div>
+              <div className="border-t border-white/10 pt-6 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0">
+                <h3 className="font-serif text-2xl font-bold sm:text-3xl">
+                  How shared ownership is protected: the SPV
+                </h3>
+                <p className="mt-4 text-sm leading-7 text-white/80 sm:text-[15px]">
+                  Every co-owned property — whether you joined through a group buy or bought
+                  tokenized units — is held by a dedicated Special Purpose Vehicle: a separate
+                  legal entity whose only asset is that property. Your interest is recorded
+                  against the SPV, ring-fenced from every other project and from Kay-Steph's
+                  own liabilities, with formal shareholder/trust records you can verify.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Comparison table */}
+          <div className="mt-10 overflow-hidden rounded-md border border-border bg-white shadow-sm">
+            <div className="border-b border-border bg-cream px-6 py-4">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-gold">
+                Side by side
+              </p>
+              <h3 className="mt-1 font-serif text-xl font-bold text-navy">
+                Compare the three routes at a glance
+              </h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px] text-left text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-white">
+                    <th className="px-6 py-4 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                      &nbsp;
+                    </th>
+                    {["Full Purchase", "Group Buy", "Tokenized Ownership"].map((h) => (
+                      <th
+                        key={h}
+                        className="px-6 py-4 font-serif text-base font-bold text-navy"
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparisonRows.map((row) => (
+                    <tr key={row.label} className="border-b border-border last:border-0">
+                      <th
+                        scope="row"
+                        className="bg-cream/60 px-6 py-4 text-xs font-bold uppercase tracking-[0.12em] text-navy"
+                      >
+                        {row.label}
+                      </th>
+                      {row.values.map((value, i) => (
+                        <td key={i} className="px-6 py-4 text-sm leading-6 text-navy">
+                          {value}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </section>
+
+
 
       {/* How it works */}
       <section className="bg-navy py-20 text-white">
