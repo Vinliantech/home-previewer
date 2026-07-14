@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
-import { Eye, EyeOff, Mail, Lock, Shield, ShieldCheck, Award, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, Shield, ShieldCheck, Award, Sparkles, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { ensureDemoUser } from "@/lib/demo-auth.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
