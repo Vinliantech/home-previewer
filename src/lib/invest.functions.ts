@@ -7,7 +7,11 @@ export type OpenProperty = {
   initial_value: number | string;
   images?: string[] | null;
   status?: string;
+  min_investment?: number | string | null;
+  expected_rental_yield?: number | string | null;
+  expected_appreciation?: number | string | null;
 };
+
 
 export type FundingSummary = {
   approved: number;
