@@ -16,8 +16,14 @@ import logoImg from "@/assets/logo.png";
 const mainNav = [
   { label: "Home", href: "/" },
   { label: "Properties", href: "/properties" },
-  { label: "Invest", href: "/invest" },
 ] as const;
+
+const investMenu = [
+  { label: "Full Purchase", href: "/invest" },
+  { label: "Group Buy", href: "/invest" },
+  { label: "Tokenized Ownership", href: "/invest/tokenized" },
+] as const;
+
 
 const whyKayStephMenu = [
   { label: "About Kay-Steph", href: "/about" },
