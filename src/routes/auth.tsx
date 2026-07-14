@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState, type FormEvent } from "react";
 import { toast } from "sonner";
-import { Eye, EyeOff, Mail, Lock, Shield, ShieldCheck, Award, Sparkles } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, Shield, ShieldCheck, Award, Sparkles, Zap } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import { ensureDemoUser } from "@/lib/demo-auth.functions";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -55,6 +56,25 @@ function AuthPage() {
       navigate({ to: "/dashboard", replace: true });
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Google sign-in failed");
+      setBusy(false);
+    }
+  };
+
+  const handleDemo = async () => {
+    setBusy(true);
+    setMessage(null);
+    try {
+      const creds = await ensureDemoUser();
+      const { error } = await supabase.auth.signInWithPassword({
+        email: creds.email,
+        password: creds.password,
+      });
+      if (error) throw error;
+      toast.success("Signed in as Demo Investor");
+    } catch (e) {
+      const text = e instanceof Error ? e.message : "Demo login failed";
+      setMessage({ tone: "error", text });
+      toast.error(text);
       setBusy(false);
     }
   };
@@ -182,6 +202,29 @@ function AuthPage() {
             {heading}
           </h2>
           <p className="mb-7 mt-2.5 text-center text-[15px] text-muted-foreground">{subheading}</p>
+
+          {mode !== "forgot" && (
+            <div className="mb-6 rounded-xl border border-gold/40 bg-gradient-to-r from-[#fff8e1] to-[#fffdf5] p-4">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 text-[13px] font-extrabold uppercase tracking-[0.14em] text-navy">
+                    <Zap className="h-4 w-4 text-gold" /> Explore the portal
+                  </div>
+                  <p className="mt-1 text-[13px] leading-snug text-navy/70">
+                    Skip the form and preview the investor dashboard with a sandbox account.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleDemo}
+                  disabled={busy}
+                  className="shrink-0 rounded-lg bg-navy px-4 py-2.5 text-[13px] font-bold text-white shadow-sm transition hover:bg-navy/90 disabled:opacity-60"
+                >
+                  {busy ? "Loading…" : "Demo login →"}
+                </button>
+              </div>
+            </div>
+          )}
 
           {mode !== "forgot" && (
             <>
