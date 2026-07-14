@@ -21,19 +21,12 @@ export const OFFICE_HOURS = [
   { days: "Sunday & public holidays", hours: "By appointment only" },
 ];
 
-export type InvestmentModel =
-  | "full_purchase"
-  | "group_purchase"
-  | "fractional"
-  | "spv"
-  | "tokenized";
+export type InvestmentModel = "full_purchase" | "group_buy" | "tokenized";
 
 export const INVESTMENT_MODEL_LABEL: Record<InvestmentModel, string> = {
   full_purchase: "Full purchase",
-  group_purchase: "Group purchase",
-  fractional: "Fractional ownership",
-  spv: "SPV co-ownership",
-  tokenized: "Tokenized units",
+  group_buy: "Group buy",
+  tokenized: "Tokenized ownership",
 };
 
 export type PropertyType = "Detached home" | "Apartment" | "Terrace" | "Estate land";
