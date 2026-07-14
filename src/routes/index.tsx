@@ -335,7 +335,7 @@ function Home() {
                   Property ownership, made more accessible.
                 </h2>
                 <p className="mt-5 max-w-2xl leading-7 text-white/72">
-                  Explore verified group-buy and fractional opportunities, complete KYC securely,
+                  Explore verified group buy and tokenized ownership opportunities, complete KYC securely,
                   review risk disclosures and monitor your ownership through one investor portal.
                 </p>
               </div>
