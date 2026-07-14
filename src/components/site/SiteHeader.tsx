@@ -1,6 +1,6 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { ChevronDown, Handshake, LayoutDashboard, Menu, X } from "lucide-react";
+import { ChevronDown, Handshake, LayoutDashboard, LogOut, Menu, User, X } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +9,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useSession } from "@/hooks/useSession";
+import { supabase } from "@/integrations/supabase/client";
 import logoImg from "@/assets/logo.png";
 
 const mainNav = [
@@ -32,11 +34,19 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
+  const { user } = useSession();
+  const navigate = useNavigate();
 
   const closeMenu = () => {
     setOpen(false);
     setWhyOpen(false);
     setSignInOpen(false);
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    closeMenu();
+    navigate({ to: "/", replace: true });
   };
 
   return (
@@ -95,77 +105,107 @@ export function SiteHeader() {
         </nav>
 
         <div className="hidden items-center gap-3 lg:flex">
-          <DropdownMenu>
-            <DropdownMenuTrigger className="group inline-flex items-center gap-1.5 rounded-full bg-gold px-5 py-2.5 text-sm font-bold text-gold-foreground outline-none transition-colors hover:bg-gold/90">
-              Sign In
-              <ChevronDown className="h-3.5 w-3.5 transition-transform group-data-[state=open]:rotate-180" />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              sideOffset={14}
-              className="w-[340px] border-navy/10 bg-white p-2 text-navy shadow-xl"
-            >
-              <DropdownMenuLabel className="px-3 pb-1 pt-2 text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
-                Choose your portal
-              </DropdownMenuLabel>
-
-              <DropdownMenuItem asChild>
-                <a
-                  href="/auth"
-                  className="flex w-full cursor-pointer items-start gap-3 rounded-md p-3 focus:bg-cream"
+          {user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="group inline-flex items-center gap-2 rounded-full bg-gold px-4 py-2 text-sm font-bold text-gold-foreground outline-none transition-colors hover:bg-gold/90">
+                <User className="h-4 w-4" />
+                <span className="max-w-[140px] truncate">{user.email}</span>
+                <ChevronDown className="h-3.5 w-3.5 transition-transform group-data-[state=open]:rotate-180" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                sideOffset={14}
+                className="w-56 border-navy/10 bg-white p-1.5 text-navy shadow-xl"
+              >
+                <DropdownMenuLabel className="px-3 pt-2 text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                  Signed in
+                </DropdownMenuLabel>
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/dashboard"
+                    className="w-full cursor-pointer rounded-sm px-3 py-2.5 text-sm font-semibold focus:bg-cream focus:text-navy"
+                  >
+                    <LayoutDashboard className="mr-2 inline h-4 w-4" /> Dashboard
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-navy/10" />
+                <DropdownMenuItem
+                  onSelect={handleSignOut}
+                  className="cursor-pointer rounded-sm px-3 py-2.5 text-sm font-medium text-rose-600 focus:bg-rose-50 focus:text-rose-700"
                 >
-                  <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy text-gold">
-                    <LayoutDashboard className="h-5 w-5" />
-                  </span>
-                  <span className="flex-1">
-                    <span className="block font-serif text-base font-bold text-navy">
-                      Client Portal
-                    </span>
-                    <span className="mt-0.5 block text-xs leading-5 text-muted-foreground">
-                      For property buyers and investors to manage their portfolio, documents,
-                      returns, and transactions.
-                    </span>
-                    <span className="mt-2 inline-flex items-center rounded-full bg-gold px-4 py-1.5 text-xs font-bold text-gold-foreground">
-                      Sign in as Client
-                    </span>
-                  </span>
-                </a>
-              </DropdownMenuItem>
+                  <LogOut className="mr-2 inline h-4 w-4" /> Sign out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger className="group inline-flex items-center gap-1.5 rounded-full bg-gold px-5 py-2.5 text-sm font-bold text-gold-foreground outline-none transition-colors hover:bg-gold/90">
+                Sign In
+                <ChevronDown className="h-3.5 w-3.5 transition-transform group-data-[state=open]:rotate-180" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                sideOffset={14}
+                className="w-[340px] border-navy/10 bg-white p-2 text-navy shadow-xl"
+              >
+                <DropdownMenuLabel className="px-3 pb-1 pt-2 text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">
+                  Choose your portal
+                </DropdownMenuLabel>
 
-              <DropdownMenuSeparator className="bg-navy/10" />
+                <DropdownMenuItem asChild>
+                  <Link
+                    to="/auth"
+                    className="flex w-full cursor-pointer items-start gap-3 rounded-md p-3 focus:bg-cream"
+                  >
+                    <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-navy text-gold">
+                      <LayoutDashboard className="h-5 w-5" />
+                    </span>
+                    <span className="flex-1">
+                      <span className="block font-serif text-base font-bold text-navy">
+                        Client Portal
+                      </span>
+                      <span className="mt-0.5 block text-xs leading-5 text-muted-foreground">
+                        For property buyers and investors to manage their portfolio, documents,
+                        returns, and transactions.
+                      </span>
+                      <span className="mt-2 inline-flex items-center rounded-full bg-gold px-4 py-1.5 text-xs font-bold text-gold-foreground">
+                        Sign in as Client
+                      </span>
+                    </span>
+                  </Link>
+                </DropdownMenuItem>
 
-              <DropdownMenuItem asChild>
-                <a
-                  href="/affiliate/auth"
-                  className="flex w-full cursor-pointer items-start gap-3 rounded-md p-3 focus:bg-cream"
-                >
-                  <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold text-gold-foreground">
-                    <Handshake className="h-5 w-5" />
-                  </span>
-                  <span className="flex-1">
-                    <span className="block font-serif text-base font-bold text-navy">
-                      Affiliate Portal
-                    </span>
-                    <span className="mt-0.5 block text-xs leading-5 text-muted-foreground">
-                      For referral partners and marketers to manage leads, commissions, links, and
-                      promotional materials.
-                    </span>
-                    <span className="mt-2 inline-flex items-center rounded-full border border-navy/30 px-4 py-1.5 text-xs font-bold text-navy">
-                      Sign in as Affiliate
-                    </span>
-                  </span>
-                </a>
-              </DropdownMenuItem>
+                <DropdownMenuSeparator className="bg-navy/10" />
 
-              <DropdownMenuSeparator className="bg-navy/10" />
-              <div className="px-3 py-2 text-center text-xs text-muted-foreground">
-                New to Kay-Steph?{" "}
-                <a href="/register" className="font-bold text-navy hover:text-gold">
-                  Create a client account
-                </a>
-              </div>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuItem asChild>
+                  <a
+                    href="/contact"
+                    className="flex w-full cursor-pointer items-start gap-3 rounded-md p-3 focus:bg-cream"
+                  >
+                    <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gold text-gold-foreground">
+                      <Handshake className="h-5 w-5" />
+                    </span>
+                    <span className="flex-1">
+                      <span className="block font-serif text-base font-bold text-navy">
+                        Affiliate Portal
+                      </span>
+                      <span className="mt-0.5 block text-xs leading-5 text-muted-foreground">
+                        For referral partners. Coming soon — contact us to join early.
+                      </span>
+                    </span>
+                  </a>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator className="bg-navy/10" />
+                <div className="px-3 py-2 text-center text-xs text-muted-foreground">
+                  New to Kay-Steph?{" "}
+                  <Link to="/auth" className="font-bold text-navy hover:text-gold">
+                    Create a client account
+                  </Link>
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
 
         <button
@@ -230,50 +270,71 @@ export function SiteHeader() {
               </div>
             )}
 
-            <button
-              type="button"
-              onClick={() => setSignInOpen((value) => !value)}
-              className="flex items-center justify-between py-3 text-sm font-bold text-gold"
-              aria-expanded={signInOpen}
-            >
-              Sign In
-              <ChevronDown
-                className={`h-4 w-4 transition-transform ${signInOpen ? "rotate-180" : ""}`}
-              />
-            </button>
-            {signInOpen && (
-              <div className="space-y-3 pb-2">
+            {user ? (
+              <div className="mt-2 space-y-2">
                 <a
-                  href="/auth"
+                  href="/dashboard"
                   onClick={closeMenu}
-                  className="flex items-start gap-3 rounded-md border border-white/15 bg-white/5 p-4"
+                  className="flex items-center gap-2 rounded-md bg-gold px-4 py-3 text-sm font-bold text-gold-foreground"
                 >
-                  <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold text-gold-foreground">
-                    <LayoutDashboard className="h-4 w-4" />
-                  </span>
-                  <span>
-                    <span className="block font-serif text-sm font-bold">Client Portal</span>
-                    <span className="mt-0.5 block text-xs leading-5 text-white/60">
-                      Manage your portfolio, documents, returns and transactions.
-                    </span>
-                  </span>
+                  <LayoutDashboard className="h-4 w-4" /> Dashboard ({user.email})
                 </a>
-                <a
-                  href="/affiliate/auth"
-                  onClick={closeMenu}
-                  className="flex items-start gap-3 rounded-md border border-white/15 bg-white/5 p-4"
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="flex w-full items-center gap-2 rounded-md border border-white/15 px-4 py-3 text-sm font-semibold text-white/85"
                 >
-                  <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold text-gold-foreground">
-                    <Handshake className="h-4 w-4" />
-                  </span>
-                  <span>
-                    <span className="block font-serif text-sm font-bold">Affiliate Portal</span>
-                    <span className="mt-0.5 block text-xs leading-5 text-white/60">
-                      Manage leads, commissions, referral links and materials.
-                    </span>
-                  </span>
-                </a>
+                  <LogOut className="h-4 w-4" /> Sign out
+                </button>
               </div>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setSignInOpen((value) => !value)}
+                  className="flex items-center justify-between py-3 text-sm font-bold text-gold"
+                  aria-expanded={signInOpen}
+                >
+                  Sign In
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform ${signInOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {signInOpen && (
+                  <div className="space-y-3 pb-2">
+                    <a
+                      href="/auth"
+                      onClick={closeMenu}
+                      className="flex items-start gap-3 rounded-md border border-white/15 bg-white/5 p-4"
+                    >
+                      <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold text-gold-foreground">
+                        <LayoutDashboard className="h-4 w-4" />
+                      </span>
+                      <span>
+                        <span className="block font-serif text-sm font-bold">Client Portal</span>
+                        <span className="mt-0.5 block text-xs leading-5 text-white/60">
+                          Manage your portfolio, documents, returns and transactions.
+                        </span>
+                      </span>
+                    </a>
+                    <a
+                      href="/contact"
+                      onClick={closeMenu}
+                      className="flex items-start gap-3 rounded-md border border-white/15 bg-white/5 p-4"
+                    >
+                      <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold text-gold-foreground">
+                        <Handshake className="h-4 w-4" />
+                      </span>
+                      <span>
+                        <span className="block font-serif text-sm font-bold">Affiliate Portal</span>
+                        <span className="mt-0.5 block text-xs leading-5 text-white/60">
+                          Coming soon — contact us to join early.
+                        </span>
+                      </span>
+                    </a>
+                  </div>
+                )}
+              </>
             )}
           </nav>
         </div>
