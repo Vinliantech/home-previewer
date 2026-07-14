@@ -62,11 +62,11 @@ const services = [
   {
     icon: PiggyBank,
     title: "Structured co-investment",
-    body: "Group purchase pools, fractional ownership, SPV arrangements and tokenized units — verified routes into premium property from ₦1M.",
+    body: "Group Buy pools and Tokenized Ownership — verified routes into premium property from ₦1M, each held in a dedicated SPV.",
     points: [
-      "Group-buy pool coordination",
-      "Fractional and tokenized ownership",
-      "SPV structuring and records",
+      "Group Buy pool coordination",
+      "Tokenized Ownership from ₦1M per unit",
+      "SPV protection and records",
     ],
     cta: { label: "How investing works", to: "/invest" as const },
   },
