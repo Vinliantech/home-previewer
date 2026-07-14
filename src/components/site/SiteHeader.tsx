@@ -270,50 +270,71 @@ export function SiteHeader() {
               </div>
             )}
 
-            <button
-              type="button"
-              onClick={() => setSignInOpen((value) => !value)}
-              className="flex items-center justify-between py-3 text-sm font-bold text-gold"
-              aria-expanded={signInOpen}
-            >
-              Sign In
-              <ChevronDown
-                className={`h-4 w-4 transition-transform ${signInOpen ? "rotate-180" : ""}`}
-              />
-            </button>
-            {signInOpen && (
-              <div className="space-y-3 pb-2">
+            {user ? (
+              <div className="mt-2 space-y-2">
                 <a
-                  href="/auth"
+                  href="/dashboard"
                   onClick={closeMenu}
-                  className="flex items-start gap-3 rounded-md border border-white/15 bg-white/5 p-4"
+                  className="flex items-center gap-2 rounded-md bg-gold px-4 py-3 text-sm font-bold text-gold-foreground"
                 >
-                  <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold text-gold-foreground">
-                    <LayoutDashboard className="h-4 w-4" />
-                  </span>
-                  <span>
-                    <span className="block font-serif text-sm font-bold">Client Portal</span>
-                    <span className="mt-0.5 block text-xs leading-5 text-white/60">
-                      Manage your portfolio, documents, returns and transactions.
-                    </span>
-                  </span>
+                  <LayoutDashboard className="h-4 w-4" /> Dashboard ({user.email})
                 </a>
-                <a
-                  href="/affiliate/auth"
-                  onClick={closeMenu}
-                  className="flex items-start gap-3 rounded-md border border-white/15 bg-white/5 p-4"
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="flex w-full items-center gap-2 rounded-md border border-white/15 px-4 py-3 text-sm font-semibold text-white/85"
                 >
-                  <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold text-gold-foreground">
-                    <Handshake className="h-4 w-4" />
-                  </span>
-                  <span>
-                    <span className="block font-serif text-sm font-bold">Affiliate Portal</span>
-                    <span className="mt-0.5 block text-xs leading-5 text-white/60">
-                      Manage leads, commissions, referral links and materials.
-                    </span>
-                  </span>
-                </a>
+                  <LogOut className="h-4 w-4" /> Sign out
+                </button>
               </div>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setSignInOpen((value) => !value)}
+                  className="flex items-center justify-between py-3 text-sm font-bold text-gold"
+                  aria-expanded={signInOpen}
+                >
+                  Sign In
+                  <ChevronDown
+                    className={`h-4 w-4 transition-transform ${signInOpen ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {signInOpen && (
+                  <div className="space-y-3 pb-2">
+                    <a
+                      href="/auth"
+                      onClick={closeMenu}
+                      className="flex items-start gap-3 rounded-md border border-white/15 bg-white/5 p-4"
+                    >
+                      <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold text-gold-foreground">
+                        <LayoutDashboard className="h-4 w-4" />
+                      </span>
+                      <span>
+                        <span className="block font-serif text-sm font-bold">Client Portal</span>
+                        <span className="mt-0.5 block text-xs leading-5 text-white/60">
+                          Manage your portfolio, documents, returns and transactions.
+                        </span>
+                      </span>
+                    </a>
+                    <a
+                      href="/contact"
+                      onClick={closeMenu}
+                      className="flex items-start gap-3 rounded-md border border-white/15 bg-white/5 p-4"
+                    >
+                      <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gold text-gold-foreground">
+                        <Handshake className="h-4 w-4" />
+                      </span>
+                      <span>
+                        <span className="block font-serif text-sm font-bold">Affiliate Portal</span>
+                        <span className="mt-0.5 block text-xs leading-5 text-white/60">
+                          Coming soon — contact us to join early.
+                        </span>
+                      </span>
+                    </a>
+                  </div>
+                )}
+              </>
             )}
           </nav>
         </div>
