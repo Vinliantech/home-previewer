@@ -34,11 +34,19 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   const [whyOpen, setWhyOpen] = useState(false);
   const [signInOpen, setSignInOpen] = useState(false);
+  const { user } = useSession();
+  const navigate = useNavigate();
 
   const closeMenu = () => {
     setOpen(false);
     setWhyOpen(false);
     setSignInOpen(false);
+  };
+
+  const handleSignOut = async () => {
+    await supabase.auth.signOut();
+    closeMenu();
+    navigate({ to: "/", replace: true });
   };
 
   return (
