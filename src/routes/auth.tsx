@@ -60,6 +60,25 @@ function AuthPage() {
     }
   };
 
+  const handleDemo = async () => {
+    setBusy(true);
+    setMessage(null);
+    try {
+      const creds = await ensureDemoUser();
+      const { error } = await supabase.auth.signInWithPassword({
+        email: creds.email,
+        password: creds.password,
+      });
+      if (error) throw error;
+      toast.success("Signed in as Demo Investor");
+    } catch (e) {
+      const text = e instanceof Error ? e.message : "Demo login failed";
+      setMessage({ tone: "error", text });
+      toast.error(text);
+      setBusy(false);
+    }
+  };
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setMessage(null);
