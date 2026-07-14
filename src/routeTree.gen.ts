@@ -25,7 +25,20 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PropertiesIndexRouteImport } from './routes/properties.index'
 import { Route as InvestIndexRouteImport } from './routes/invest.index'
 import { Route as PropertiesIdRouteImport } from './routes/properties.$id'
+import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
+import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated/transactions'
+import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
+import { Route as AuthenticatedStatementsRouteImport } from './routes/_authenticated/statements'
+import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
+import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedOpportunitiesRouteImport } from './routes/_authenticated/opportunities'
+import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
+import { Route as AuthenticatedMyTokensRouteImport } from './routes/_authenticated/my-tokens'
+import { Route as AuthenticatedMyPropertiesRouteImport } from './routes/_authenticated/my-properties'
+import { Route as AuthenticatedKycRouteImport } from './routes/_authenticated/kyc'
+import { Route as AuthenticatedExitRequestsRouteImport } from './routes/_authenticated/exit-requests'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedCertificatesRouteImport } from './routes/_authenticated/certificates'
 
 const WhyKaystephRoute = WhyKaystephRouteImport.update({
   id: '/why-kaysteph',
@@ -106,11 +119,82 @@ const PropertiesIdRoute = PropertiesIdRouteImport.update({
   path: '/properties/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
+  id: '/wallet',
+  path: '/wallet',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTransactionsRoute =
+  AuthenticatedTransactionsRouteImport.update({
+    id: '/transactions',
+    path: '/transactions',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSupportRoute = AuthenticatedSupportRouteImport.update({
+  id: '/support',
+  path: '/support',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedStatementsRoute = AuthenticatedStatementsRouteImport.update({
+  id: '/statements',
+  path: '/statements',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedReturnsRoute = AuthenticatedReturnsRouteImport.update({
+  id: '/returns',
+  path: '/returns',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOpportunitiesRoute =
+  AuthenticatedOpportunitiesRouteImport.update({
+    id: '/opportunities',
+    path: '/opportunities',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedNotificationsRoute =
+  AuthenticatedNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMyTokensRoute = AuthenticatedMyTokensRouteImport.update({
+  id: '/my-tokens',
+  path: '/my-tokens',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMyPropertiesRoute =
+  AuthenticatedMyPropertiesRouteImport.update({
+    id: '/my-properties',
+    path: '/my-properties',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedKycRoute = AuthenticatedKycRouteImport.update({
+  id: '/kyc',
+  path: '/kyc',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedExitRequestsRoute =
+  AuthenticatedExitRequestsRouteImport.update({
+    id: '/exit-requests',
+    path: '/exit-requests',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCertificatesRoute =
+  AuthenticatedCertificatesRouteImport.update({
+    id: '/certificates',
+    path: '/certificates',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -125,7 +209,20 @@ export interface FileRoutesByFullPath {
   '/services': typeof ServicesRoute
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
+  '/certificates': typeof AuthenticatedCertificatesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/exit-requests': typeof AuthenticatedExitRequestsRoute
+  '/kyc': typeof AuthenticatedKycRoute
+  '/my-properties': typeof AuthenticatedMyPropertiesRoute
+  '/my-tokens': typeof AuthenticatedMyTokensRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/opportunities': typeof AuthenticatedOpportunitiesRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/returns': typeof AuthenticatedReturnsRoute
+  '/statements': typeof AuthenticatedStatementsRoute
+  '/support': typeof AuthenticatedSupportRoute
+  '/transactions': typeof AuthenticatedTransactionsRoute
+  '/wallet': typeof AuthenticatedWalletRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/invest/': typeof InvestIndexRoute
   '/properties/': typeof PropertiesIndexRoute
@@ -143,7 +240,20 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesRoute
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
+  '/certificates': typeof AuthenticatedCertificatesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/exit-requests': typeof AuthenticatedExitRequestsRoute
+  '/kyc': typeof AuthenticatedKycRoute
+  '/my-properties': typeof AuthenticatedMyPropertiesRoute
+  '/my-tokens': typeof AuthenticatedMyTokensRoute
+  '/notifications': typeof AuthenticatedNotificationsRoute
+  '/opportunities': typeof AuthenticatedOpportunitiesRoute
+  '/profile': typeof AuthenticatedProfileRoute
+  '/returns': typeof AuthenticatedReturnsRoute
+  '/statements': typeof AuthenticatedStatementsRoute
+  '/support': typeof AuthenticatedSupportRoute
+  '/transactions': typeof AuthenticatedTransactionsRoute
+  '/wallet': typeof AuthenticatedWalletRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/invest': typeof InvestIndexRoute
   '/properties': typeof PropertiesIndexRoute
@@ -163,7 +273,20 @@ export interface FileRoutesById {
   '/services': typeof ServicesRoute
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
+  '/_authenticated/certificates': typeof AuthenticatedCertificatesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/exit-requests': typeof AuthenticatedExitRequestsRoute
+  '/_authenticated/kyc': typeof AuthenticatedKycRoute
+  '/_authenticated/my-properties': typeof AuthenticatedMyPropertiesRoute
+  '/_authenticated/my-tokens': typeof AuthenticatedMyTokensRoute
+  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
+  '/_authenticated/opportunities': typeof AuthenticatedOpportunitiesRoute
+  '/_authenticated/profile': typeof AuthenticatedProfileRoute
+  '/_authenticated/returns': typeof AuthenticatedReturnsRoute
+  '/_authenticated/statements': typeof AuthenticatedStatementsRoute
+  '/_authenticated/support': typeof AuthenticatedSupportRoute
+  '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
+  '/_authenticated/wallet': typeof AuthenticatedWalletRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/invest/': typeof InvestIndexRoute
   '/properties/': typeof PropertiesIndexRoute
@@ -183,7 +306,20 @@ export interface FileRouteTypes {
     | '/services'
     | '/team'
     | '/why-kaysteph'
+    | '/certificates'
     | '/dashboard'
+    | '/exit-requests'
+    | '/kyc'
+    | '/my-properties'
+    | '/my-tokens'
+    | '/notifications'
+    | '/opportunities'
+    | '/profile'
+    | '/returns'
+    | '/statements'
+    | '/support'
+    | '/transactions'
+    | '/wallet'
     | '/properties/$id'
     | '/invest/'
     | '/properties/'
@@ -201,7 +337,20 @@ export interface FileRouteTypes {
     | '/services'
     | '/team'
     | '/why-kaysteph'
+    | '/certificates'
     | '/dashboard'
+    | '/exit-requests'
+    | '/kyc'
+    | '/my-properties'
+    | '/my-tokens'
+    | '/notifications'
+    | '/opportunities'
+    | '/profile'
+    | '/returns'
+    | '/statements'
+    | '/support'
+    | '/transactions'
+    | '/wallet'
     | '/properties/$id'
     | '/invest'
     | '/properties'
@@ -220,7 +369,20 @@ export interface FileRouteTypes {
     | '/services'
     | '/team'
     | '/why-kaysteph'
+    | '/_authenticated/certificates'
     | '/_authenticated/dashboard'
+    | '/_authenticated/exit-requests'
+    | '/_authenticated/kyc'
+    | '/_authenticated/my-properties'
+    | '/_authenticated/my-tokens'
+    | '/_authenticated/notifications'
+    | '/_authenticated/opportunities'
+    | '/_authenticated/profile'
+    | '/_authenticated/returns'
+    | '/_authenticated/statements'
+    | '/_authenticated/support'
+    | '/_authenticated/transactions'
+    | '/_authenticated/wallet'
     | '/properties/$id'
     | '/invest/'
     | '/properties/'
@@ -359,6 +521,90 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PropertiesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/wallet': {
+      id: '/_authenticated/wallet'
+      path: '/wallet'
+      fullPath: '/wallet'
+      preLoaderRoute: typeof AuthenticatedWalletRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/transactions': {
+      id: '/_authenticated/transactions'
+      path: '/transactions'
+      fullPath: '/transactions'
+      preLoaderRoute: typeof AuthenticatedTransactionsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/support': {
+      id: '/_authenticated/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof AuthenticatedSupportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/statements': {
+      id: '/_authenticated/statements'
+      path: '/statements'
+      fullPath: '/statements'
+      preLoaderRoute: typeof AuthenticatedStatementsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/returns': {
+      id: '/_authenticated/returns'
+      path: '/returns'
+      fullPath: '/returns'
+      preLoaderRoute: typeof AuthenticatedReturnsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/profile': {
+      id: '/_authenticated/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AuthenticatedProfileRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/opportunities': {
+      id: '/_authenticated/opportunities'
+      path: '/opportunities'
+      fullPath: '/opportunities'
+      preLoaderRoute: typeof AuthenticatedOpportunitiesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/notifications': {
+      id: '/_authenticated/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-tokens': {
+      id: '/_authenticated/my-tokens'
+      path: '/my-tokens'
+      fullPath: '/my-tokens'
+      preLoaderRoute: typeof AuthenticatedMyTokensRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/my-properties': {
+      id: '/_authenticated/my-properties'
+      path: '/my-properties'
+      fullPath: '/my-properties'
+      preLoaderRoute: typeof AuthenticatedMyPropertiesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/kyc': {
+      id: '/_authenticated/kyc'
+      path: '/kyc'
+      fullPath: '/kyc'
+      preLoaderRoute: typeof AuthenticatedKycRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/exit-requests': {
+      id: '/_authenticated/exit-requests'
+      path: '/exit-requests'
+      fullPath: '/exit-requests'
+      preLoaderRoute: typeof AuthenticatedExitRequestsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
       path: '/dashboard'
@@ -366,15 +612,48 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/certificates': {
+      id: '/_authenticated/certificates'
+      path: '/certificates'
+      fullPath: '/certificates'
+      preLoaderRoute: typeof AuthenticatedCertificatesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCertificatesRoute: typeof AuthenticatedCertificatesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedExitRequestsRoute: typeof AuthenticatedExitRequestsRoute
+  AuthenticatedKycRoute: typeof AuthenticatedKycRoute
+  AuthenticatedMyPropertiesRoute: typeof AuthenticatedMyPropertiesRoute
+  AuthenticatedMyTokensRoute: typeof AuthenticatedMyTokensRoute
+  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
+  AuthenticatedOpportunitiesRoute: typeof AuthenticatedOpportunitiesRoute
+  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
+  AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
+  AuthenticatedStatementsRoute: typeof AuthenticatedStatementsRoute
+  AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
+  AuthenticatedTransactionsRoute: typeof AuthenticatedTransactionsRoute
+  AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCertificatesRoute: AuthenticatedCertificatesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedExitRequestsRoute: AuthenticatedExitRequestsRoute,
+  AuthenticatedKycRoute: AuthenticatedKycRoute,
+  AuthenticatedMyPropertiesRoute: AuthenticatedMyPropertiesRoute,
+  AuthenticatedMyTokensRoute: AuthenticatedMyTokensRoute,
+  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
+  AuthenticatedOpportunitiesRoute: AuthenticatedOpportunitiesRoute,
+  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
+  AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
+  AuthenticatedStatementsRoute: AuthenticatedStatementsRoute,
+  AuthenticatedSupportRoute: AuthenticatedSupportRoute,
+  AuthenticatedTransactionsRoute: AuthenticatedTransactionsRoute,
+  AuthenticatedWalletRoute: AuthenticatedWalletRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
