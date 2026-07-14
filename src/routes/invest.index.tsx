@@ -283,7 +283,7 @@ function InvestPage() {
             <span className="block text-gold">made more accessible.</span>
           </>
         }
-        description="Five structured routes into premium Abuja real estate — buy outright, join a group purchase, own a documented fraction, invest through a dedicated SPV, or hold tokenized units. Every route is verified, documented and tracked in one investor portal."
+        description="Three structured routes into premium Abuja real estate — buy outright, join a group buy, or hold tokenized units from ₦1M. Every route is verified, documented and — for shared ownership — protected by a dedicated SPV."
       >
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <a
@@ -321,8 +321,8 @@ function InvestPage() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <SectionHeading
             eyebrow="Ways to invest"
-            title="Choose the route that fits your capital."
-            description="Every model gives you verified documentation, portal tracking and direct access to the Kay-Steph team. The difference is how much you contribute and how ownership is structured."
+            title="Three routes. One capital ladder."
+            description="Every route gives you verified documentation, portal tracking and direct access to the Kay-Steph team. Enter at ₦1M, step up at ₦10M, or buy outright from ₦32.5M."
           />
           <div className="mt-14 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {investmentModels.map((model) => (
@@ -332,7 +332,21 @@ function InvestPage() {
                 </div>
                 <p className="mt-5 text-xs font-bold uppercase tracking-[0.18em] text-gold">{model.tagline}</p>
                 <h3 className="mt-1 font-serif text-2xl font-bold text-navy">{model.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-muted-foreground">{model.body}</p>
+                {model.body && (
+                  <p className="mt-3 text-sm leading-6 text-muted-foreground">{model.body}</p>
+                )}
+                {model.beats && (
+                  <div className="mt-3 space-y-3">
+                    {model.beats.map((beat) => (
+                      <div key={beat.label}>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-navy">
+                          {beat.label}
+                        </p>
+                        <p className="mt-1 text-sm leading-6 text-muted-foreground">{beat.text}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <ul className="mt-4 flex-1 space-y-2">
                   {model.points.map((point) => (
                     <li key={point} className="flex items-start gap-2 text-sm text-navy">
@@ -360,8 +374,89 @@ function InvestPage() {
               </a>
             </div>
           </div>
+
+          {/* SPV protection strip */}
+          <div className="mt-10 overflow-hidden rounded-md border border-gold/30 bg-navy text-white shadow-sm">
+            <div className="grid gap-6 p-8 sm:p-10 lg:grid-cols-[auto_1fr] lg:items-center lg:gap-10">
+              <div className="flex items-center gap-4 lg:flex-col lg:items-start">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full border border-gold/40 bg-gold/10 text-gold">
+                  <ShieldCheck className="h-7 w-7" />
+                </div>
+                <div className="lg:mt-2">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-gold">
+                    Protection layer
+                  </p>
+                  <p className="mt-1 text-xs text-white/60 lg:max-w-[9rem]">
+                    Not a product — the legal wrapper behind every shared deal.
+                  </p>
+                </div>
+              </div>
+              <div className="border-t border-white/10 pt-6 lg:border-l lg:border-t-0 lg:pl-10 lg:pt-0">
+                <h3 className="font-serif text-2xl font-bold sm:text-3xl">
+                  How shared ownership is protected: the SPV
+                </h3>
+                <p className="mt-4 text-sm leading-7 text-white/80 sm:text-[15px]">
+                  Every co-owned property — whether you joined through a group buy or bought
+                  tokenized units — is held by a dedicated Special Purpose Vehicle: a separate
+                  legal entity whose only asset is that property. Your interest is recorded
+                  against the SPV, ring-fenced from every other project and from Kay-Steph's
+                  own liabilities, with formal shareholder/trust records you can verify.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Comparison table */}
+          <div className="mt-10 overflow-hidden rounded-md border border-border bg-white shadow-sm">
+            <div className="border-b border-border bg-cream px-6 py-4">
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-gold">
+                Side by side
+              </p>
+              <h3 className="mt-1 font-serif text-xl font-bold text-navy">
+                Compare the three routes at a glance
+              </h3>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px] text-left text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-white">
+                    <th className="px-6 py-4 text-xs font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                      &nbsp;
+                    </th>
+                    {["Full Purchase", "Group Buy", "Tokenized Ownership"].map((h) => (
+                      <th
+                        key={h}
+                        className="px-6 py-4 font-serif text-base font-bold text-navy"
+                      >
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparisonRows.map((row) => (
+                    <tr key={row.label} className="border-b border-border last:border-0">
+                      <th
+                        scope="row"
+                        className="bg-cream/60 px-6 py-4 text-xs font-bold uppercase tracking-[0.12em] text-navy"
+                      >
+                        {row.label}
+                      </th>
+                      {row.values.map((value, i) => (
+                        <td key={i} className="px-6 py-4 text-sm leading-6 text-navy">
+                          {value}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </section>
+
+
 
       {/* How it works */}
       <section className="bg-navy py-20 text-white">
