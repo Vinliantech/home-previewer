@@ -1,32 +1,36 @@
-import { createFileRoute, Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
-  ArrowDownLeft,
-  ArrowUpRight,
+  Award,
   Bell,
   Building2,
-  ChevronRight,
-  CircleDollarSign,
-  Eye,
-  EyeOff,
+  ChevronDown,
+  Download,
   FileCheck2,
-  HelpCircle,
+  Landmark,
   LayoutDashboard,
   LifeBuoy,
+  LineChart,
   LogOut,
-  PieChart,
+  type LucideIcon,
   Plus,
   Receipt,
   ScrollText,
-  Search,
-  Settings,
   ShieldCheck,
   Sparkles,
   TrendingUp,
+  UserCircle2,
   Wallet,
+  Home,
+  Coins,
+  Briefcase,
+  DoorOpen,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import logoImg from "@/assets/logo.png";
+import rubysImg from "@/assets/rubys-apartment.jpg";
+import terraceImg from "@/assets/lillycrest-terrace.jpg";
+import plotsImg from "@/assets/estate-plots.jpg";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -38,29 +42,107 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: DashboardPage,
 });
 
-/* ─────────────── Nav config ─────────────── */
+/* ─────────────── Nav ─────────────── */
 
-const primaryNav = [
-  { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Portfolio", href: "/dashboard", icon: PieChart, soon: true },
-  { label: "Wallet", href: "/dashboard", icon: Wallet, soon: true },
-  { label: "Transactions", href: "/dashboard", icon: Receipt, soon: true },
-  { label: "Properties", href: "/properties", icon: Building2 },
-  { label: "Invest", href: "/invest", icon: TrendingUp },
+type NavItem = { label: string; icon: LucideIcon; badge?: number; active?: boolean };
+type NavSection = { title?: string; items: NavItem[] };
+
+const navSections: NavSection[] = [
+  { items: [{ label: "Overview", icon: LayoutDashboard, active: true }] },
+  {
+    title: "Invest",
+    items: [
+      { label: "Opportunities", icon: Briefcase },
+      { label: "My Properties", icon: Home },
+      { label: "My Tokens", icon: Coins },
+    ],
+  },
+  {
+    title: "Money",
+    items: [
+      { label: "Returns", icon: TrendingUp },
+      { label: "Wallet", icon: Wallet },
+      { label: "Transactions", icon: Receipt },
+      { label: "Statements", icon: ScrollText },
+    ],
+  },
+  {
+    title: "Documents",
+    items: [
+      { label: "Certificates", icon: Award },
+      { label: "Exit Requests", icon: DoorOpen },
+    ],
+  },
+  {
+    title: "Account",
+    items: [
+      { label: "KYC Verification", icon: ShieldCheck },
+      { label: "Profile & Security", icon: UserCircle2 },
+      { label: "Notifications", icon: Bell, badge: 2 },
+      { label: "Support", icon: LifeBuoy },
+    ],
+  },
 ];
 
-const secondaryNav = [
-  { label: "KYC & Verification", href: "/dashboard", icon: FileCheck2, soon: true },
-  { label: "Statements", href: "/dashboard", icon: ScrollText, soon: true },
-  { label: "Certificates", href: "/dashboard", icon: ShieldCheck, soon: true },
-  { label: "Settings", href: "/dashboard", icon: Settings, soon: true },
-  { label: "Help & Support", href: "/contact", icon: LifeBuoy },
+/* ─────────────── Demo data ─────────────── */
+
+const fmt = (n: number, opts?: { sign?: boolean }) => {
+  const s = new Intl.NumberFormat("en-NG", {
+    style: "currency",
+    currency: "NGN",
+    maximumFractionDigits: 0,
+  }).format(Math.abs(n));
+  if (opts?.sign) return `${n < 0 ? "-" : "+"}${s}`;
+  return `${n < 0 ? "-" : ""}${s}`;
+};
+
+const holdings = [
+  {
+    name: "Ruby's Apartment",
+    img: rubysImg,
+    contributed: 14_000_000,
+    ownership: "10.00%",
+    shareValue: 15_400_000,
+    status: "approved" as const,
+  },
+  {
+    name: "Lillycrest Terrace",
+    img: terraceImg,
+    contributed: 12_500_000,
+    ownership: "5.00%",
+    shareValue: 13_125_000,
+    status: "approved" as const,
+  },
+  {
+    name: "Estate Plots — Phase II",
+    img: plotsImg,
+    contributed: 4_000_000,
+    ownership: "0.00%",
+    shareValue: 0,
+    status: "pending" as const,
+  },
 ];
 
-/* ─────────────── Helpers ─────────────── */
+const activity = [
+  { kind: "Contribution", property: "Ruby's Apartment", date: "04 Nov 2025", amount: -14_000_000 },
+  { kind: "Contribution", property: "Lillycrest Terrace", date: "09 Feb 2026", amount: -12_500_000 },
+  { kind: "Rental Distribution", property: "Ruby's Apartment", date: "28 Jun 2026", amount: 220_000 },
+  { kind: "Rental Distribution", property: "Ruby's Apartment", date: "28 May 2026", amount: 235_000 },
+  { kind: "Rental Distribution", property: "Ruby's Apartment", date: "28 Apr 2026", amount: 205_000 },
+];
 
-const fmt = (n: number) =>
-  new Intl.NumberFormat("en-NG", { style: "currency", currency: "NGN", maximumFractionDigits: 0 }).format(n);
+const rentalBars = [
+  { m: "Feb 26", v: 210_000 },
+  { m: "Mar 26", v: 205_000 },
+  { m: "Apr 26", v: 195_000 },
+  { m: "May 26", v: 235_000 },
+  { m: "Jun 26", v: 220_000 },
+];
+
+const allocation = [
+  { name: "Ruby's Apartment", value: 15_400_000, color: "#03132f" },
+  { name: "Lillycrest Terrace", value: 13_125_000, color: "#f7bd17" },
+];
 
 /* ─────────────── Page ─────────────── */
 
@@ -68,7 +150,6 @@ function DashboardPage() {
   const navigate = useNavigate();
   const [name, setName] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
-  const [showBalance, setShowBalance] = useState(true);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -88,320 +169,313 @@ function DashboardPage() {
     navigate({ to: "/", replace: true });
   };
 
-  const firstName = useMemo(() => (name ? name.split(" ")[0] : email?.split("@")[0] ?? "Investor"), [name, email]);
+  const displayName = name ?? "Demo Client";
+  const firstName = useMemo(
+    () => (name ? name.split(" ")[0] : email?.split("@")[0] ?? "Demo"),
+    [name, email],
+  );
   const initials = useMemo(() => {
-    const src = name ?? email ?? "K S";
+    const src = displayName;
     return src
       .split(/[\s@._-]+/)
       .filter(Boolean)
       .slice(0, 2)
       .map((p) => p[0]?.toUpperCase())
       .join("");
-  }, [name, email]);
+  }, [displayName]);
 
-  // Placeholder financials — will be wired in Phase 3/4
-  const portfolioValue = 0;
-  const walletBalance = 0;
-  const totalInvested = 0;
-  const totalReturns = 0;
-  const activeInvestments = 0;
+  const dateStr = new Date().toLocaleDateString("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+
+  const totalInvested = 26_500_000;
+  const currentValue = 28_525_000;
+  const wallet = 745_000;
+  const rentalEarned = 1_115_000;
+  const gain = currentValue - totalInvested;
+  const gainPct = (gain / totalInvested) * 100;
 
   return (
-    <div className="min-h-screen bg-[oklch(0.97_0.005_260)] text-foreground">
+    <div className="min-h-screen bg-[oklch(0.98_0.006_260)] text-navy">
       {/* ───── Sidebar ───── */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-navy/10 bg-navy text-white lg:flex">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-navy/10 bg-white lg:flex">
         <Link to="/" className="flex items-center gap-3 px-6 pb-5 pt-6">
           <img src={logoImg} alt="" className="h-10 w-10" width={40} height={40} />
           <div className="leading-tight">
-            <div className="font-serif text-lg font-bold">Kay-Steph</div>
-            <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-gold">
-              Investor Portal
+            <div className="font-serif text-lg font-bold text-navy">Kay-Steph</div>
+            <div className="text-[10px] font-bold uppercase tracking-[0.28em] text-navy/50">
+              Client Portal
             </div>
           </div>
         </Link>
 
-        <nav className="flex-1 overflow-y-auto px-3 pb-6">
-          <p className="mt-4 px-3 text-[10px] font-bold uppercase tracking-[0.24em] text-white/40">
-            Banking
-          </p>
-          <ul className="mt-2 space-y-0.5">
-            {primaryNav.map((item) => (
-              <NavRow key={item.label} {...item} />
-            ))}
-          </ul>
-
-          <p className="mt-6 px-3 text-[10px] font-bold uppercase tracking-[0.24em] text-white/40">
-            Account
-          </p>
-          <ul className="mt-2 space-y-0.5">
-            {secondaryNav.map((item) => (
-              <NavRow key={item.label} {...item} />
-            ))}
-          </ul>
+        <nav className="flex-1 overflow-y-auto px-3 pb-4">
+          {navSections.map((section, i) => (
+            <div key={i} className={i === 0 ? "" : "mt-5"}>
+              {section.title && (
+                <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[0.22em] text-navy/40">
+                  {section.title}
+                </p>
+              )}
+              <ul className="space-y-0.5">
+                {section.items.map((item) => (
+                  <li key={item.label}>
+                    <button
+                      type="button"
+                      className={`group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition ${
+                        item.active
+                          ? "bg-navy text-white shadow-sm"
+                          : "text-navy/75 hover:bg-cream"
+                      }`}
+                    >
+                      <item.icon
+                        className={`h-4 w-4 ${
+                          item.active ? "text-gold" : "text-navy/50 group-hover:text-navy"
+                        }`}
+                      />
+                      <span className="flex-1 text-left">{item.label}</span>
+                      {item.badge && (
+                        <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-gold px-1.5 text-[10px] font-bold text-gold-foreground">
+                          {item.badge}
+                        </span>
+                      )}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </nav>
 
-        <div className="m-3 rounded-xl bg-gradient-to-br from-gold/15 to-white/5 p-4 ring-1 ring-white/10">
-          <div className="flex items-center gap-2 text-gold">
-            <Sparkles className="h-4 w-4" />
-            <span className="text-[10px] font-bold uppercase tracking-[0.2em]">Concierge</span>
-          </div>
-          <p className="mt-2 text-xs leading-5 text-white/75">
-            Speak with a Kay-Steph advisor for tailored investment strategy.
-          </p>
-          <a
-            href="/contact"
-            className="mt-3 inline-flex w-full items-center justify-center rounded-md bg-gold px-3 py-2 text-xs font-bold text-gold-foreground hover:bg-gold/90"
-          >
-            Book a call
-          </a>
-        </div>
+        <button
+          onClick={handleSignOut}
+          className="mx-3 mb-4 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold text-navy/70 hover:bg-cream"
+        >
+          <LogOut className="h-4 w-4" /> Sign out
+        </button>
       </aside>
 
-      {/* ───── Main column ───── */}
+      {/* ───── Main ───── */}
       <div className="lg:pl-64">
         {/* Top bar */}
-        <header className="sticky top-0 z-30 border-b border-navy/10 bg-white/80 backdrop-blur-xl">
+        <header className="sticky top-0 z-30 border-b border-navy/10 bg-white/90 backdrop-blur-xl">
           <div className="flex h-16 items-center gap-3 px-4 sm:px-6 lg:px-8">
             <Link to="/" className="flex items-center gap-2 lg:hidden">
               <img src={logoImg} alt="" className="h-8 w-8" />
               <span className="font-serif text-base font-bold text-navy">Kay-Steph</span>
             </Link>
+            <p className="hidden text-sm font-semibold text-navy/70 sm:block">{dateStr}</p>
 
-            <div className="hidden max-w-md flex-1 md:block">
-              <label className="flex items-center gap-2 rounded-full border border-navy/10 bg-cream/60 px-4 py-2">
-                <Search className="h-4 w-4 text-navy/50" />
-                <input
-                  className="w-full bg-transparent text-sm outline-none placeholder:text-navy/40"
-                  placeholder="Search properties, transactions, statements…"
-                />
-                <kbd className="rounded border border-navy/10 bg-white px-1.5 py-0.5 text-[10px] font-semibold text-navy/60">
-                  ⌘K
-                </kbd>
-              </label>
-            </div>
-
-            <div className="ml-auto flex items-center gap-2">
+            <div className="ml-auto flex items-center gap-3">
               <button
                 type="button"
                 className="relative flex h-10 w-10 items-center justify-center rounded-full border border-navy/10 bg-white text-navy hover:bg-cream"
                 aria-label="Notifications"
               >
                 <Bell className="h-4 w-4" />
-                <span className="absolute right-2 top-2 h-2 w-2 rounded-full bg-gold ring-2 ring-white" />
-              </button>
-              <button
-                type="button"
-                className="hidden h-10 items-center gap-2 rounded-full border border-navy/10 bg-white px-3 text-sm font-semibold text-navy hover:bg-cream sm:inline-flex"
-              >
-                <HelpCircle className="h-4 w-4" /> Help
-              </button>
-              <div className="ml-1 flex items-center gap-3 rounded-full border border-navy/10 bg-white py-1 pl-1 pr-3">
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-navy text-xs font-bold text-gold">
-                  {initials || "KS"}
+                <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-gold px-1 text-[9px] font-bold text-gold-foreground">
+                  2
                 </span>
-                <div className="hidden text-left leading-tight sm:block">
-                  <div className="text-xs font-semibold text-navy">{firstName}</div>
-                  <div className="text-[10px] text-navy/50">Investor · Tier 1</div>
-                </div>
-                <button
-                  onClick={handleSignOut}
-                  className="ml-2 hidden text-navy/50 hover:text-navy sm:block"
-                  title="Sign out"
-                  aria-label="Sign out"
-                >
-                  <LogOut className="h-4 w-4" />
-                </button>
+              </button>
+              <div className="flex items-center gap-2 rounded-full border border-navy/10 bg-white py-1 pl-1 pr-3">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-navy text-xs font-bold text-gold">
+                  {initials || "DC"}
+                </span>
+                <span className="text-sm font-bold text-navy">{displayName}</span>
+                <ChevronDown className="h-3.5 w-3.5 text-navy/50" />
               </div>
             </div>
           </div>
         </header>
 
-        <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-          {/* Greeting + KYC alert */}
-          <div className="flex flex-wrap items-end justify-between gap-4">
+        <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          {/* Greeting */}
+          <div className="flex flex-wrap items-start justify-between gap-4">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-gold">
-                Overview
-              </p>
-              <h1 className="mt-1 font-serif text-3xl font-bold text-navy sm:text-4xl">
-                Good day, {firstName}
+              <h1 className="font-serif text-3xl font-bold text-navy sm:text-4xl">
+                Welcome back, {firstName}
               </h1>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Here's the current position of your Kay-Steph investments.
+              <p className="mt-1 text-sm text-navy/60">
+                Your portfolio at a glance — balances, holdings and recent activity.
               </p>
             </div>
-            <div className="flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-navy shadow-sm ring-1 ring-navy/10">
-              <span className="h-2 w-2 rounded-full bg-emerald-500" /> Portal secure · TLS 1.3
+            <div className="flex gap-2">
+              <button className="inline-flex items-center gap-1.5 rounded-md bg-navy px-4 py-2.5 text-sm font-bold text-white hover:bg-navy/90">
+                <Plus className="h-4 w-4" /> New investment
+              </button>
+              <button className="inline-flex items-center gap-1.5 rounded-md border border-navy/15 bg-white px-4 py-2.5 text-sm font-bold text-navy hover:bg-cream">
+                <Download className="h-4 w-4" /> Statement
+              </button>
             </div>
           </div>
 
-          {/* KYC banner */}
-          <div className="mt-5 flex flex-wrap items-center gap-4 rounded-2xl border border-gold/40 bg-gradient-to-r from-gold/15 via-gold/5 to-white p-4 sm:p-5">
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gold text-gold-foreground">
-              <FileCheck2 className="h-5 w-5" />
+          {/* KPIs */}
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <KpiCard label="Total Invested" value={fmt(totalInvested)} icon={Home} />
+            <KpiCard
+              label="Current Value"
+              value={fmt(currentValue)}
+              icon={TrendingUp}
+              foot={
+                <span className="text-xs font-semibold text-emerald-600">
+                  {fmt(gain, { sign: true })} (+{gainPct.toFixed(1)}%)
+                </span>
+              }
+            />
+            <KpiCard label="Wallet Balance" value={fmt(wallet)} icon={Wallet} />
+            <KpiCard
+              label="Rental Earned"
+              value={fmt(rentalEarned)}
+              icon={Landmark}
+              foot={<span className="text-xs text-navy/60">2 active holdings</span>}
+            />
+          </div>
+
+          {/* Charts */}
+          <div className="mt-5 grid gap-5 lg:grid-cols-2">
+            {/* Allocation */}
+            <div className="rounded-2xl border border-navy/10 bg-white p-6 shadow-sm">
+              <h2 className="font-serif text-lg font-bold text-navy">Portfolio allocation</h2>
+              <p className="text-xs text-navy/60">Current share value by property</p>
+              <div className="mt-6 flex items-center gap-8">
+                <Donut data={allocation} />
+                <ul className="flex-1 space-y-3 text-sm">
+                  {allocation.map((a) => (
+                    <li key={a.name} className="flex items-center gap-3">
+                      <span
+                        className="h-2.5 w-2.5 rounded-full"
+                        style={{ background: a.color }}
+                      />
+                      <span className="flex-1 font-semibold text-navy">{a.name}</span>
+                      <span className="font-bold text-navy">{fmt(a.value)}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Bars */}
+            <div className="rounded-2xl border border-navy/10 bg-white p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="font-serif text-lg font-bold text-navy">Rental income</h2>
+                  <p className="text-xs text-navy/60">Paid distributions by month</p>
+                </div>
+                <LineChart className="h-4 w-4 text-navy/40" />
+              </div>
+              <div className="mt-6 flex h-44 items-end gap-4 px-2">
+                {rentalBars.map((b) => {
+                  const max = Math.max(...rentalBars.map((x) => x.v));
+                  const h = (b.v / max) * 100;
+                  return (
+                    <div key={b.m} className="flex flex-1 flex-col items-center gap-2">
+                      <div
+                        className="w-full rounded-t-md bg-gold"
+                        style={{ height: `${h}%` }}
+                        title={fmt(b.v)}
+                      />
+                      <span className="text-[10px] font-semibold text-navy/60">{b.m}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Holdings */}
+          <div className="mt-5 rounded-2xl border border-navy/10 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="font-serif text-lg font-bold text-navy">My holdings</h2>
+                <p className="text-xs text-navy/60">Every investment and its current position</p>
+              </div>
+              <button className="text-xs font-bold text-navy hover:text-gold">View all →</button>
+            </div>
+            <ul className="mt-4 divide-y divide-navy/5">
+              {holdings.map((h) => (
+                <li key={h.name} className="flex flex-wrap items-center gap-4 py-4">
+                  <img
+                    src={h.img}
+                    alt=""
+                    className="h-14 w-16 rounded-md object-cover ring-1 ring-navy/10"
+                  />
+                  <div className="min-w-[200px] flex-1">
+                    <p className="font-bold text-navy">{h.name}</p>
+                    <p className="mt-0.5 text-xs text-navy/60">
+                      Contributed <span className="font-bold text-navy">{fmt(h.contributed)}</span>
+                      <span className="mx-2 text-navy/25">·</span>
+                      Ownership <span className="font-bold text-navy">{h.ownership}</span>
+                      <span className="mx-2 text-navy/25">·</span>
+                      Share value <span className="font-bold text-navy">{fmt(h.shareValue)}</span>
+                    </p>
+                  </div>
+                  {h.status === "approved" ? (
+                    <span className="rounded-full bg-emerald-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700 ring-1 ring-emerald-200">
+                      Approved
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-amber-50 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-700 ring-1 ring-amber-200">
+                      Awaiting company approval
+                    </span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Recent activity */}
+          <div className="mt-5 rounded-2xl border border-navy/10 bg-white p-6 shadow-sm">
+            <div className="flex items-center justify-between">
+              <h2 className="font-serif text-lg font-bold text-navy">Recent activity</h2>
+              <button className="text-xs font-bold text-navy hover:text-gold">
+                All transactions →
+              </button>
+            </div>
+            <ul className="mt-4 divide-y divide-navy/5">
+              {activity.map((a, i) => (
+                <li key={i} className="flex items-center justify-between py-4">
+                  <div>
+                    <p className="font-bold text-navy">{a.kind}</p>
+                    <p className="text-xs text-navy/60">
+                      {a.property} · {a.date}
+                    </p>
+                  </div>
+                  <span
+                    className={`font-bold ${
+                      a.amount < 0 ? "text-rose-600" : "text-emerald-600"
+                    }`}
+                  >
+                    {fmt(a.amount, { sign: true })}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Concierge strip */}
+          <div className="mt-6 flex flex-wrap items-center gap-4 rounded-2xl bg-navy p-5 text-white">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-gold/15 text-gold">
+              <Sparkles className="h-5 w-5" />
             </span>
             <div className="flex-1 min-w-[240px]">
-              <p className="text-sm font-bold text-navy">Complete your KYC to unlock investing</p>
-              <p className="text-xs text-navy/70">
-                Verify your identity and address to fund your wallet and subscribe to properties.
+              <p className="font-serif text-base font-bold">Speak with your Kay-Steph advisor</p>
+              <p className="text-xs text-white/70">
+                Tailored strategy across full purchase, group buy and tokenized ownership.
               </p>
             </div>
-            <button className="inline-flex items-center gap-1.5 rounded-full bg-navy px-4 py-2 text-xs font-bold text-white hover:bg-navy/90">
-              Start verification <ChevronRight className="h-3.5 w-3.5" />
-            </button>
-          </div>
-
-          {/* Hero + stats row */}
-          <div className="mt-6 grid gap-5 lg:grid-cols-3">
-            {/* Portfolio value card */}
-            <div className="relative overflow-hidden rounded-2xl bg-navy p-6 text-white shadow-xl lg:col-span-2">
-              <div className="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-gold/20 blur-3xl" />
-              <div className="pointer-events-none absolute right-6 top-6 opacity-10">
-                <img src={logoImg} alt="" className="h-24 w-24" />
-              </div>
-              <div className="relative">
-                <div className="flex items-center gap-2">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-gold">
-                    Total Portfolio Value
-                  </p>
-                  <button
-                    onClick={() => setShowBalance((v) => !v)}
-                    className="text-white/60 hover:text-white"
-                    aria-label={showBalance ? "Hide balance" : "Show balance"}
-                  >
-                    {showBalance ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
-                  </button>
-                </div>
-                <div className="mt-3 flex items-end gap-3">
-                  <span className="font-serif text-4xl font-bold sm:text-5xl">
-                    {showBalance ? fmt(portfolioValue) : "₦ ••••••"}
-                  </span>
-                  <span className="mb-1.5 inline-flex items-center gap-1 rounded-full bg-emerald-400/15 px-2 py-1 text-[11px] font-bold text-emerald-300">
-                    <TrendingUp className="h-3 w-3" /> +0.00%
-                  </span>
-                </div>
-                <p className="mt-1 text-xs text-white/60">Updated just now · NGN</p>
-
-                <div className="mt-6 grid grid-cols-2 gap-4 border-t border-white/10 pt-5 sm:grid-cols-3">
-                  <MiniStat label="Invested" value={showBalance ? fmt(totalInvested) : "₦ •••"} />
-                  <MiniStat label="Returns" value={showBalance ? fmt(totalReturns) : "₦ •••"} accent />
-                  <MiniStat label="Active deals" value={String(activeInvestments)} />
-                </div>
-
-                <div className="mt-6 flex flex-wrap gap-2">
-                  <ActionBtn icon={Plus} label="Top up wallet" primary />
-                  <ActionBtn icon={ArrowUpRight} label="Withdraw" />
-                  <ActionBtn icon={CircleDollarSign} label="Invest" />
-                  <ActionBtn icon={ScrollText} label="Statements" />
-                </div>
-              </div>
-            </div>
-
-            {/* Wallet card */}
-            <div className="rounded-2xl border border-navy/10 bg-white p-6 shadow-sm">
-              <div className="flex items-center justify-between">
-                <p className="text-[10px] font-bold uppercase tracking-[0.24em] text-navy/50">
-                  Wallet balance
-                </p>
-                <Wallet className="h-4 w-4 text-navy/40" />
-              </div>
-              <p className="mt-3 font-serif text-3xl font-bold text-navy">
-                {showBalance ? fmt(walletBalance) : "₦ ••••••"}
-              </p>
-              <p className="mt-1 text-xs text-muted-foreground">Available to invest</p>
-
-              <div className="mt-5 grid grid-cols-2 gap-2">
-                <button className="flex items-center justify-center gap-1.5 rounded-md bg-navy px-3 py-2.5 text-xs font-bold text-white hover:bg-navy/90">
-                  <ArrowDownLeft className="h-3.5 w-3.5" /> Deposit
-                </button>
-                <button className="flex items-center justify-center gap-1.5 rounded-md border border-navy/15 bg-white px-3 py-2.5 text-xs font-bold text-navy hover:bg-cream">
-                  <ArrowUpRight className="h-3.5 w-3.5" /> Withdraw
-                </button>
-              </div>
-
-              <div className="mt-5 rounded-lg bg-cream p-3 text-xs text-navy/70">
-                <div className="flex items-center gap-2 font-semibold text-navy">
-                  <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" /> NDIC-inspired safeguard
-                </div>
-                <p className="mt-1 leading-5">
-                  Client funds are held in a segregated trust account, ring-fenced from operational
-                  capital.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Portfolio + activity */}
-          <div className="mt-6 grid gap-5 lg:grid-cols-3">
-            <div className="rounded-2xl border border-navy/10 bg-white p-6 shadow-sm lg:col-span-2">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="font-serif text-lg font-bold text-navy">Holdings</h2>
-                  <p className="text-xs text-muted-foreground">Property-backed tokens you own</p>
-                </div>
-                <Link to="/properties" className="text-xs font-bold text-navy hover:text-gold">
-                  Browse properties →
-                </Link>
-              </div>
-
-              <EmptyState
-                icon={Building2}
-                title="No holdings yet"
-                body="Once you subscribe to a property, your tokens, ownership %, and valuation will appear here."
-                cta={{ label: "Explore opportunities", href: "/invest" }}
-              />
-            </div>
-
-            <div className="rounded-2xl border border-navy/10 bg-white p-6 shadow-sm">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="font-serif text-lg font-bold text-navy">Recent activity</h2>
-                  <p className="text-xs text-muted-foreground">Deposits, allocations, payouts</p>
-                </div>
-              </div>
-              <EmptyState
-                icon={Receipt}
-                title="Nothing yet"
-                body="Your transaction history will appear here."
-                compact
-              />
-            </div>
-          </div>
-
-          {/* Modules grid */}
-          <div className="mt-6">
-            <h2 className="font-serif text-lg font-bold text-navy">Portal modules</h2>
-            <p className="text-xs text-muted-foreground">Everything you need to manage your investments.</p>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                { title: "KYC verification", desc: "Submit ID and address to unlock investing.", icon: FileCheck2, tag: "Next up" },
-                { title: "Portfolio analytics", desc: "Token allocation, ownership %, valuation.", icon: PieChart, tag: "Phase 3" },
-                { title: "Wallet & payouts", desc: "Deposits, withdrawals, distributions.", icon: Wallet, tag: "Phase 4" },
-                { title: "Transaction ledger", desc: "Immutable history of every movement.", icon: Receipt, tag: "Phase 3" },
-                { title: "Statements", desc: "Quarterly PDF statements, tax-ready.", icon: ScrollText, tag: "Phase 4" },
-                { title: "Ownership certificates", desc: "Digital certificates per holding.", icon: ShieldCheck, tag: "Phase 4" },
-              ].map((m) => (
-                <div
-                  key={m.title}
-                  className="group rounded-xl border border-navy/10 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  <div className="flex items-start justify-between">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-lg bg-navy text-gold">
-                      <m.icon className="h-4 w-4" />
-                    </span>
-                    <span className="rounded-full bg-cream px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-navy/70">
-                      {m.tag}
-                    </span>
-                  </div>
-                  <h3 className="mt-4 font-serif text-base font-bold text-navy">{m.title}</h3>
-                  <p className="mt-1 text-xs leading-5 text-muted-foreground">{m.desc}</p>
-                </div>
-              ))}
-            </div>
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-1.5 rounded-md bg-gold px-4 py-2 text-xs font-bold text-gold-foreground hover:bg-gold/90"
+            >
+              Book a call
+            </Link>
           </div>
 
           <p className="mt-10 text-center text-[11px] text-navy/40">
-            © {new Date().getFullYear()} Kay-Steph Group · Investor Portal · v1.0
+            © {new Date().getFullYear()} Kay-Steph Group · Client Portal · v1.0
           </p>
         </main>
       </div>
@@ -409,108 +483,60 @@ function DashboardPage() {
   );
 }
 
-/* ─────────────── Subcomponents ─────────────── */
+/* ─────────────── Bits ─────────────── */
 
-function NavRow({
+function KpiCard({
   label,
-  href,
+  value,
   icon: Icon,
-  soon,
+  foot,
 }: {
   label: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  soon?: boolean;
+  value: string;
+  icon: LucideIcon;
+  foot?: React.ReactNode;
 }) {
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const active = pathname === href && label === "Overview";
   return (
-    <li>
-      <Link
-        to={href}
-        className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
-          active
-            ? "bg-white/10 text-white ring-1 ring-white/10"
-            : "text-white/70 hover:bg-white/5 hover:text-white"
-        }`}
-      >
-        <Icon className={`h-4 w-4 ${active ? "text-gold" : "text-white/50 group-hover:text-gold"}`} />
-        <span className="flex-1">{label}</span>
-        {soon && (
-          <span className="rounded-full bg-white/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white/60">
-            Soon
-          </span>
-        )}
-      </Link>
-    </li>
-  );
-}
-
-function MiniStat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
-  return (
-    <div>
-      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/50">{label}</p>
-      <p className={`mt-1 font-serif text-lg font-bold ${accent ? "text-gold" : "text-white"}`}>
-        {value}
-      </p>
+    <div className="rounded-2xl border border-navy/10 bg-white p-5 shadow-sm">
+      <div className="flex items-start justify-between">
+        <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-navy/50">{label}</p>
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-cream text-navy">
+          <Icon className="h-4 w-4" />
+        </span>
+      </div>
+      <p className="mt-3 font-serif text-2xl font-bold text-navy">{value}</p>
+      {foot && <div className="mt-2">{foot}</div>}
     </div>
   );
 }
 
-function ActionBtn({
-  icon: Icon,
-  label,
-  primary,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  label: string;
-  primary?: boolean;
-}) {
+function Donut({ data }: { data: { name: string; value: number; color: string }[] }) {
+  const total = data.reduce((s, d) => s + d.value, 0);
+  const R = 60;
+  const C = 2 * Math.PI * R;
+  let offset = 0;
   return (
-    <button
-      className={`inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-bold transition ${
-        primary
-          ? "bg-gold text-gold-foreground hover:bg-gold/90"
-          : "border border-white/15 bg-white/5 text-white hover:bg-white/10"
-      }`}
-    >
-      <Icon className="h-3.5 w-3.5" /> {label}
-    </button>
-  );
-}
-
-function EmptyState({
-  icon: Icon,
-  title,
-  body,
-  cta,
-  compact,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  body: string;
-  cta?: { label: string; href: string };
-  compact?: boolean;
-}) {
-  return (
-    <div
-      className={`mt-4 flex flex-col items-center justify-center rounded-xl border border-dashed border-navy/15 bg-cream/40 text-center ${
-        compact ? "p-6" : "p-10"
-      }`}
-    >
-      <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-navy shadow-sm ring-1 ring-navy/10">
-        <Icon className="h-5 w-5" />
-      </span>
-      <p className="mt-3 font-serif text-base font-bold text-navy">{title}</p>
-      <p className="mt-1 max-w-sm text-xs leading-5 text-muted-foreground">{body}</p>
-      {cta && (
-        <Link
-          to={cta.href}
-          className="mt-4 inline-flex items-center gap-1 rounded-full bg-navy px-4 py-2 text-xs font-bold text-white hover:bg-navy/90"
-        >
-          {cta.label} <ChevronRight className="h-3.5 w-3.5" />
-        </Link>
-      )}
-    </div>
+    <svg viewBox="0 0 160 160" className="h-40 w-40 -rotate-90">
+      <circle cx="80" cy="80" r={R} fill="none" stroke="oklch(0.94 0.01 260)" strokeWidth="22" />
+      {data.map((d, i) => {
+        const frac = d.value / total;
+        const len = C * frac;
+        const el = (
+          <circle
+            key={i}
+            cx="80"
+            cy="80"
+            r={R}
+            fill="none"
+            stroke={d.color}
+            strokeWidth="22"
+            strokeDasharray={`${len} ${C - len}`}
+            strokeDashoffset={-offset}
+          />
+        );
+        offset += len;
+        return el;
+      })}
+    </svg>
   );
 }
