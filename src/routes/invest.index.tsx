@@ -3,7 +3,7 @@ import { ArrowRight, FileCheck2, MessageCircle, ShieldCheck, TrendingUp, Users, 
 import { PageHero, PageShell, SectionHeading } from "@/components/site/PageShell";
 import { WHATSAPP_URL, properties } from "@/lib/properties";
 
-export const Route = createFileRoute("/invest")({
+export const Route = createFileRoute("/invest/")({
   head: () => ({
     meta: [
       { title: "Kay-Steph Invest | Group & Fractional Property Ownership" },

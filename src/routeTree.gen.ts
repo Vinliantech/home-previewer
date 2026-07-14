@@ -20,6 +20,7 @@ import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PropertiesIndexRouteImport } from './routes/properties.index'
+import { Route as InvestIndexRouteImport } from './routes/invest.index'
 import { Route as PropertiesIdRouteImport } from './routes/properties.$id'
 
 const WhyKaystephRoute = WhyKaystephRouteImport.update({
@@ -77,6 +78,11 @@ const PropertiesIndexRoute = PropertiesIndexRouteImport.update({
   path: '/properties/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InvestIndexRoute = InvestIndexRouteImport.update({
+  id: '/invest/',
+  path: '/invest/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PropertiesIdRoute = PropertiesIdRouteImport.update({
   id: '/properties/$id',
   path: '/properties/$id',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
   '/properties/$id': typeof PropertiesIdRoute
+  '/invest/': typeof InvestIndexRoute
   '/properties/': typeof PropertiesIndexRoute
 }
 export interface FileRoutesByTo {
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
   '/properties/$id': typeof PropertiesIdRoute
+  '/invest': typeof InvestIndexRoute
   '/properties': typeof PropertiesIndexRoute
 }
 export interface FileRoutesById {
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
   '/properties/$id': typeof PropertiesIdRoute
+  '/invest/': typeof InvestIndexRoute
   '/properties/': typeof PropertiesIndexRoute
 }
 export interface FileRouteTypes {
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/team'
     | '/why-kaysteph'
     | '/properties/$id'
+    | '/invest/'
     | '/properties/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/team'
     | '/why-kaysteph'
     | '/properties/$id'
+    | '/invest'
     | '/properties'
   id:
     | '__root__'
@@ -168,6 +179,7 @@ export interface FileRouteTypes {
     | '/team'
     | '/why-kaysteph'
     | '/properties/$id'
+    | '/invest/'
     | '/properties/'
   fileRoutesById: FileRoutesById
 }
@@ -183,6 +195,7 @@ export interface RootRouteChildren {
   TeamRoute: typeof TeamRoute
   WhyKaystephRoute: typeof WhyKaystephRoute
   PropertiesIdRoute: typeof PropertiesIdRoute
+  InvestIndexRoute: typeof InvestIndexRoute
   PropertiesIndexRoute: typeof PropertiesIndexRoute
 }
 
@@ -265,6 +278,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PropertiesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/invest/': {
+      id: '/invest/'
+      path: '/invest'
+      fullPath: '/invest/'
+      preLoaderRoute: typeof InvestIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/properties/$id': {
       id: '/properties/$id'
       path: '/properties/$id'
@@ -287,6 +307,7 @@ const rootRouteChildren: RootRouteChildren = {
   TeamRoute: TeamRoute,
   WhyKaystephRoute: WhyKaystephRoute,
   PropertiesIdRoute: PropertiesIdRoute,
+  InvestIndexRoute: InvestIndexRoute,
   PropertiesIndexRoute: PropertiesIndexRoute,
 }
 export const routeTree = rootRouteImport
