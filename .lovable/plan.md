@@ -1,81 +1,40 @@
-## Goal
+# Redesign investor dashboard to match reference
 
-Reframe the investor story from five parallel models to **three product categories** (Full Purchase, Group Buy, Tokenized Ownership) with the SPV shown as protective infrastructure — not a fourth option — across the marketing site.
+Rework `src/routes/_authenticated/dashboard.tsx` so the client portal matches the two uploaded screenshots — a light, bank-style layout with a full-height left sidebar, top date bar, KPI row, charts row, holdings list, and recent activity.
 
-## 1. Data model — `src/lib/properties.ts`
+## Layout changes
 
-- Narrow `InvestmentModel` to `"full_purchase" | "group_buy" | "tokenized"`.
-- Update `INVESTMENT_MODEL_LABEL` to: Full purchase / Group buy / Tokenized ownership.
-- Migrate each property's `investmentModels` array with the mapping:
-  - `group_purchase` → `group_buy`
-  - `fractional`, `spv`, `tokenized` → `tokenized`
-  - deduplicate.
-- Result per property (all include `full_purchase` today):
-  - Guzape Dream Homes: full_purchase, group_buy
-  - Ruby's Apartment: full_purchase, tokenized
-  - Lillycrest Terrace: full_purchase, group_buy, tokenized
-  - Lillycrest Residence: full_purchase, group_buy
-  - Estate Plots Phase II: full_purchase, group_buy, tokenized
+1. **Sidebar** (left, white, full height, `KSS` logo + "Kay-Steph / CLIENT PORTAL"):
+   - Overview (active, navy pill w/ gold icon)
+   - Section: **INVEST** — Opportunities, My Properties, My Tokens
+   - Section: **MONEY** — Returns, Wallet, Transactions, Statements
+   - Section: **DOCUMENTS** — Certificates, Exit Requests
+   - Section: **ACCOUNT** — KYC Verification, Profile & Security, Notifications (badge 2), Support
+   - Bottom: Sign out
+   - All non-implemented links route to `/dashboard` for now (no new routes).
 
-## 2. Invest page — `src/routes/invest.index.tsx`
+2. **Top bar**: light, shows "Tuesday, 14 July 2026" left; right side notification bell with badge + user chip (initials circle navy/gold + "Demo Client" + chevron). Removes search.
 
-Replace the "Ways to invest" section with:
+3. **Main content** on `bg-[oklch(0.98_0.005_260)]`:
+   - Header row: "Welcome back, {firstName}" + subtitle; right: **+ New investment** (navy) and **Statement** (white outline) buttons.
+   - **KPI cards** (4-up): Total Invested ₦26,500,000 · Current Value ₦28,525,000 (+₦2,025,000 +7.6% green) · Wallet Balance ₦745,000 · Rental Earned ₦1,115,000 (2 active holdings). Each with small icon chip top-right.
+   - **Charts row** (2-up):
+     - *Portfolio allocation* — donut (SVG) navy + gold, legend rows Ruby's Apartment ₦15,400,000 / Lillycrest Terrace ₦13,125,000.
+     - *Rental income* — 5 gold bar chart (Feb–Jun 26).
+   - **My holdings** card: thumbnail + name + Contributed / Ownership / Share value + status pill (APPROVED green, AWAITING COMPANY APPROVAL amber). Rows: Ruby's Apartment, Lillycrest Terrace, Estate Plots — Phase II. "View all →" top-right.
+   - **Recent activity** card: rows for Contribution (red negative) and Rental Distribution (green positive) with property + date. "All transactions →" top-right.
 
-**(a) Three cards** (same visual template as today — icon, tagline, title, body, bullets, entry line) in this order:
+## Data
 
-- **Full Purchase** (Building2) — "Own it outright". Entry: From ₦32.5M (estate plots).
-- **Group Buy** (Users) — "Buy together, at scale". Four bullets including "Shared outcomes are held in a dedicated SPV (see below)". Entry: Set per pool (typically from ₦10M).
-- **Tokenized Ownership** (Coins) — "Own a documented fraction, from ₦1M". Body rendered as three labelled beats (What you own / How it's counted / What you get). Bullets: Proportional ownership units · Per-unit income distributions · Unit resale to verified investors. Entry: From ₦1M per unit; larger contributions from ₦5M work the same way — just more units.
+All values are hardcoded demo data inside the dashboard file (matches current placeholder approach — no DB wiring). Uses existing property images from `src/lib/properties.ts` where available; falls back to a colored tile.
 
-The "Not sure which fits?" adviser card stays as the fourth slot on the grid.
+## Scope
 
-**(b) Full-width SPV protection strip** immediately below the cards — navy background, gold accent, shield/landmark icon, titled *"How shared ownership is protected: the SPV"*, containing the exact copy provided. Styled as a horizontal band spanning the container, not a card.
+- Only edits `src/routes/_authenticated/dashboard.tsx`.
+- Uses existing tokens (`navy`, `gold`, `cream`) — no new CSS variables.
+- Donut + bars rendered as inline SVG (no chart library added).
+- No new routes, no schema/auth changes, no changes to other pages.
 
-**(c) Comparison table** below the strip, with rows: You own / Entry / Held via / Income / Liquidity / Best for and the three model columns. Responsive: horizontal scroll on small screens, standard table on ≥md.
+## Verification
 
-**(d) Copy sweep on the same page:**
-- Hero description: rewrite to "Three structured routes into premium Abuja real estate — buy outright, join a group buy, or hold tokenized units from ₦1M. Every route is verified, documented and protected by a dedicated SPV."
-- Ensure the capital ladder **₦1M → ₦10M → ₦32.5M+** appears explicitly (in the hero or intro under the three cards).
-- Route `head()`: retitle to "Invest with Kay-Steph | Full Purchase, Group Buy & Tokenized Property in Abuja" and rewrite meta description / og:description to the three-category framing.
-- Any remaining "SPV arrangement" / "fractional" copy on this page is retired.
-
-## 3. Properties listing — `src/routes/properties.index.tsx`
-
-- Investment-model filter offers exactly three options: Full purchase, Group buy, Tokenized ownership (source from updated `INVESTMENT_MODEL_LABEL`).
-- Card badges pick up the new labels automatically.
-- Any hard-coded model strings replaced with the new enum values.
-
-## 4. FAQ — `src/routes/faq.tsx`
-
-- Rename the "SPVs & tokenization" category description so the SPV reads as the protective wrapper behind **all** shared ownership (group buys included), not a product.
-- In the "Fractional & group investment" category, rewrite copy so fractional ownership is described as the same product as tokenized units — a fraction counted in units — not a separate route. Keep the "Is tokenization the same as cryptocurrency? — No" Q&A prominent (front of its category).
-
-## 5. Consistency sweep (presentation only)
-
-Files touched from a grep for `fractional`, `SPV arrangement`, `Five routes/models`, `group_purchase`, `tokeniz`:
-
-- `src/routes/index.tsx` (home)
-- `src/routes/why-kaysteph.tsx`
-- `src/routes/services.tsx`
-- `src/routes/about.tsx`
-- `src/routes/team.tsx`
-- `src/routes/contact.tsx`
-- `src/routes/blog.tsx`
-- `src/routes/market-report.tsx` (if referenced)
-- Any login/capability list mentioning the five models
-
-Rules for the sweep:
-- Replace product-name uses of "Fractional ownership" and "SPV arrangement" with the three-category names.
-- Where "five models/routes" appears, change to "three routes".
-- Keep SPV mentions only where they describe **protection** of shared ownership.
-- Do not touch dashboards' internal data or the database schema.
-
-## 6. Verification
-
-- `bunx tsgo --noEmit` clean.
-- Manual visual check of `/invest`, `/properties`, `/faq` — 3 cards + SPV strip + table; filter shows 3 options; FAQ wording updated.
-
-## Out of scope
-
-- Authenticated dashboard content and any DB schema changes.
-- Redesign of unrelated sections (hero visuals, steps, risks, eligibility, contribution examples).
+Visual check at `/dashboard` after sign-in against both reference screenshots; `tsgo --noEmit` clean.
