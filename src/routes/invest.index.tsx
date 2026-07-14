@@ -666,7 +666,7 @@ function InvestPage() {
             </p>
           )}
           <div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {data.properties.map((p: any) => {
+            {data.properties.map((p) => {
               const f = data.funding[p.id] ?? { approved: 0, pending: 0, investors: 0 };
               const pct = Math.min(100, Math.round((f.approved / Number(p.initial_value)) * 100));
               return (

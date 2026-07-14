@@ -16,8 +16,14 @@ import logoImg from "@/assets/logo.png";
 const mainNav = [
   { label: "Home", href: "/" },
   { label: "Properties", href: "/properties" },
-  { label: "Invest", href: "/invest" },
 ] as const;
+
+const investMenu = [
+  { label: "Full Purchase", href: "/invest" },
+  { label: "Group Buy", href: "/invest" },
+  { label: "Tokenized Ownership", href: "/invest/tokenized" },
+] as const;
+
 
 const whyKayStephMenu = [
   { label: "About Kay-Steph", href: "/about" },
@@ -73,9 +79,33 @@ export function SiteHeader() {
 
           <DropdownMenu>
             <DropdownMenuTrigger className="group flex items-center gap-1 text-sm font-medium text-white/75 outline-none transition-colors hover:text-gold data-[state=open]:text-gold">
+              Invest
+              <ChevronDown className="h-3.5 w-3.5 transition-transform group-data-[state=open]:rotate-180" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent
+              align="start"
+              sideOffset={14}
+              className="w-56 border-navy/10 bg-white p-1.5 text-navy shadow-xl"
+            >
+              {investMenu.map((item) => (
+                <DropdownMenuItem key={item.label} asChild>
+                  <a
+                    href={item.href}
+                    className="w-full cursor-pointer rounded-sm px-3 py-2.5 text-sm font-medium focus:bg-cream focus:text-navy"
+                  >
+                    {item.label}
+                  </a>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger className="group flex items-center gap-1 text-sm font-medium text-white/75 outline-none transition-colors hover:text-gold data-[state=open]:text-gold">
               Why Kay-Steph
               <ChevronDown className="h-3.5 w-3.5 transition-transform group-data-[state=open]:rotate-180" />
             </DropdownMenuTrigger>
+
             <DropdownMenuContent
               align="start"
               sideOffset={14}
@@ -236,6 +266,23 @@ export function SiteHeader() {
                 {item.label}
               </a>
             ))}
+
+            <div className="border-b border-white/10 py-1">
+              <div className="py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-white/50">
+                Invest
+              </div>
+              {investMenu.map((item) => (
+                <a
+                  key={item.label}
+                  href={item.href}
+                  onClick={closeMenu}
+                  className="block py-2 text-sm text-white/85"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+
 
             <button
               type="button"

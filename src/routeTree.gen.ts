@@ -25,6 +25,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as PropertiesIndexRouteImport } from './routes/properties.index'
 import { Route as InvestIndexRouteImport } from './routes/invest.index'
 import { Route as PropertiesIdRouteImport } from './routes/properties.$id'
+import { Route as InvestTokenizedRouteImport } from './routes/invest.tokenized'
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated/transactions'
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
@@ -117,6 +118,11 @@ const InvestIndexRoute = InvestIndexRouteImport.update({
 const PropertiesIdRoute = PropertiesIdRouteImport.update({
   id: '/properties/$id',
   path: '/properties/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvestTokenizedRoute = InvestTokenizedRouteImport.update({
+  id: '/invest/tokenized',
+  path: '/invest/tokenized',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
@@ -223,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/support': typeof AuthenticatedSupportRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/wallet': typeof AuthenticatedWalletRoute
+  '/invest/tokenized': typeof InvestTokenizedRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/invest/': typeof InvestIndexRoute
   '/properties/': typeof PropertiesIndexRoute
@@ -254,6 +261,7 @@ export interface FileRoutesByTo {
   '/support': typeof AuthenticatedSupportRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/wallet': typeof AuthenticatedWalletRoute
+  '/invest/tokenized': typeof InvestTokenizedRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/invest': typeof InvestIndexRoute
   '/properties': typeof PropertiesIndexRoute
@@ -287,6 +295,7 @@ export interface FileRoutesById {
   '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
+  '/invest/tokenized': typeof InvestTokenizedRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/invest/': typeof InvestIndexRoute
   '/properties/': typeof PropertiesIndexRoute
@@ -320,6 +329,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/transactions'
     | '/wallet'
+    | '/invest/tokenized'
     | '/properties/$id'
     | '/invest/'
     | '/properties/'
@@ -351,6 +361,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/transactions'
     | '/wallet'
+    | '/invest/tokenized'
     | '/properties/$id'
     | '/invest'
     | '/properties'
@@ -383,6 +394,7 @@ export interface FileRouteTypes {
     | '/_authenticated/support'
     | '/_authenticated/transactions'
     | '/_authenticated/wallet'
+    | '/invest/tokenized'
     | '/properties/$id'
     | '/invest/'
     | '/properties/'
@@ -402,6 +414,7 @@ export interface RootRouteChildren {
   ServicesRoute: typeof ServicesRoute
   TeamRoute: typeof TeamRoute
   WhyKaystephRoute: typeof WhyKaystephRoute
+  InvestTokenizedRoute: typeof InvestTokenizedRoute
   PropertiesIdRoute: typeof PropertiesIdRoute
   InvestIndexRoute: typeof InvestIndexRoute
   PropertiesIndexRoute: typeof PropertiesIndexRoute
@@ -519,6 +532,13 @@ declare module '@tanstack/react-router' {
       path: '/properties/$id'
       fullPath: '/properties/$id'
       preLoaderRoute: typeof PropertiesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invest/tokenized': {
+      id: '/invest/tokenized'
+      path: '/invest/tokenized'
+      fullPath: '/invest/tokenized'
+      preLoaderRoute: typeof InvestTokenizedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/wallet': {
@@ -673,6 +693,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesRoute: ServicesRoute,
   TeamRoute: TeamRoute,
   WhyKaystephRoute: WhyKaystephRoute,
+  InvestTokenizedRoute: InvestTokenizedRoute,
   PropertiesIdRoute: PropertiesIdRoute,
   InvestIndexRoute: InvestIndexRoute,
   PropertiesIndexRoute: PropertiesIndexRoute,
