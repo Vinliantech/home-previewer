@@ -6,11 +6,19 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PortalShell, PageHeader, Card } from "@/components/portal/PortalShell";
 import { StatusBadge, fmtDate } from "@/components/portfolio/kit";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { adminListPools, adminReviewPool } from "@/lib/pools.functions";
 import { POOL_STATUS_LABEL, poolProgressPct, type PoolStatus } from "@/lib/pools";
 import { fmtNGN } from "@/lib/invest";
+import {
+  AllocationsModule,
+  ApplicationsModule,
+  EstatesModule,
+  PlotsModule,
+  ReservationsModule,
+} from "@/components/admin/estate-ops";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
@@ -30,6 +38,47 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 function AdminPage() {
+  return (
+    <PortalShell>
+      <PageHeader
+        title="Admin"
+        subtitle="Manage pools, estates, plots, allocations, applications and reservations."
+      />
+
+      <Tabs defaultValue="pools" className="mt-6">
+        <TabsList className="flex w-full flex-wrap justify-start gap-1 bg-cream">
+          <TabsTrigger value="pools">Group pools</TabsTrigger>
+          <TabsTrigger value="estates">Estates</TabsTrigger>
+          <TabsTrigger value="plots">Plots</TabsTrigger>
+          <TabsTrigger value="allocations">Allocations</TabsTrigger>
+          <TabsTrigger value="applications">Applications</TabsTrigger>
+          <TabsTrigger value="reservations">Reservations</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="pools" className="mt-6 space-y-6">
+          <PoolsSection />
+        </TabsContent>
+        <TabsContent value="estates" className="mt-6">
+          <EstatesModule />
+        </TabsContent>
+        <TabsContent value="plots" className="mt-6">
+          <PlotsModule />
+        </TabsContent>
+        <TabsContent value="allocations" className="mt-6">
+          <AllocationsModule />
+        </TabsContent>
+        <TabsContent value="applications" className="mt-6">
+          <ApplicationsModule />
+        </TabsContent>
+        <TabsContent value="reservations" className="mt-6">
+          <ReservationsModule />
+        </TabsContent>
+      </Tabs>
+    </PortalShell>
+  );
+}
+
+function PoolsSection() {
   const qc = useQueryClient();
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "pools"],
@@ -52,13 +101,8 @@ function AdminPage() {
   const other = pools.filter((p) => p.status !== "pending_approval");
 
   return (
-    <PortalShell>
-      <PageHeader
-        title="Admin"
-        subtitle="Review and approve group buy pools submitted by clients."
-      />
-
-      <Card className="mt-6">
+    <>
+      <Card>
         <h2 className="font-serif text-lg font-bold text-navy">
           Pending approval ({pending.length})
         </h2>
@@ -83,7 +127,7 @@ function AdminPage() {
         )}
       </Card>
 
-      <Card className="mt-6 p-0">
+      <Card className="p-0">
         <div className="flex items-center justify-between p-6">
           <h2 className="font-serif text-lg font-bold text-navy">All pools</h2>
           <span className="text-xs text-slate-500">{other.length} recorded</span>
@@ -139,7 +183,7 @@ function AdminPage() {
           </tbody>
         </table>
       </Card>
-    </PortalShell>
+    </>
   );
 }
 
