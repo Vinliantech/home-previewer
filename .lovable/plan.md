@@ -1,40 +1,40 @@
-# Redesign investor dashboard to match reference
+## Add Phase 2 — Group Buy Pools
 
-Rework `src/routes/_authenticated/dashboard.tsx` so the client portal matches the two uploaded screenshots — a light, bank-style layout with a full-height left sidebar, top date bar, KPI row, charts row, holdings list, and recent activity.
+Wire the uploaded `phase2-group-pools` package into the app: DB schema, server functions, and 4 new authenticated routes (pools list, pool detail, portfolio wrapper, admin console).
 
-## Layout changes
+### What ships
 
-1. **Sidebar** (left, white, full height, `KSS` logo + "Kay-Steph / CLIENT PORTAL"):
-   - Overview (active, navy pill w/ gold icon)
-   - Section: **INVEST** — Opportunities, My Properties, My Tokens
-   - Section: **MONEY** — Returns, Wallet, Transactions, Statements
-   - Section: **DOCUMENTS** — Certificates, Exit Requests
-   - Section: **ACCOUNT** — KYC Verification, Profile & Security, Notifications (badge 2), Support
-   - Bottom: Sign out
-   - All non-implemented links route to `/dashboard` for now (no new routes).
+**1. Database migration** (`supabase/migrations/<new>_group_pools.sql`)
+Use the uploaded SQL, with two small edits so it applies cleanly on the current schema:
+- Drop the FK to `public.tokenized_properties` (that table doesn't exist yet); keep `property_id uuid` as a loose reference plus `property_name text`.
+- Replace calls to `public.is_admin(auth.uid())` with `public.has_role(auth.uid(), 'admin'::public.app_role)` since the project already ships `has_role` and no `is_admin`.
 
-2. **Top bar**: light, shows "Tuesday, 14 July 2026" left; right side notification bell with badge + user chip (initials circle navy/gold + "Demo Client" + chevron). Removes search.
+Creates: enums (`pool_visibility`, `pool_status`, `pool_member_status`), tables `group_pools` and `pool_members`, `SECURITY DEFINER` helpers `is_pool_member` / `is_pool_founder`, RLS + GRANTs for `authenticated` and `service_role`, and admin RPCs `admin_review_pool` / `admin_set_pool_member_status`.
 
-3. **Main content** on `bg-[oklch(0.98_0.005_260)]`:
-   - Header row: "Welcome back, {firstName}" + subtitle; right: **+ New investment** (navy) and **Statement** (white outline) buttons.
-   - **KPI cards** (4-up): Total Invested ₦26,500,000 · Current Value ₦28,525,000 (+₦2,025,000 +7.6% green) · Wallet Balance ₦745,000 · Rental Earned ₦1,115,000 (2 active holdings). Each with small icon chip top-right.
-   - **Charts row** (2-up):
-     - *Portfolio allocation* — donut (SVG) navy + gold, legend rows Ruby's Apartment ₦15,400,000 / Lillycrest Terrace ₦13,125,000.
-     - *Rental income* — 5 gold bar chart (Feb–Jun 26).
-   - **My holdings** card: thumbnail + name + Contributed / Ownership / Share value + status pill (APPROVED green, AWAITING COMPANY APPROVAL amber). Rows: Ruby's Apartment, Lillycrest Terrace, Estate Plots — Phase II. "View all →" top-right.
-   - **Recent activity** card: rows for Contribution (red negative) and Rental Distribution (green positive) with property + date. "All transactions →" top-right.
+**2. Library files (copied verbatim from the zip)**
+- `src/lib/pools.ts` — shared types & labels.
+- `src/lib/pools.functions.ts` — server functions (list, detail, create, join, admin actions) with `requireSupabaseAuth` middleware.
+- `src/lib/demo.ts` — demo/seed helpers used by the routes.
 
-## Data
+Adjust only if TypeScript compile fails against current `Database` types; otherwise leave untouched per the "do not restructure" convention we've followed.
 
-All values are hardcoded demo data inside the dashboard file (matches current placeholder approach — no DB wiring). Uses existing property images from `src/lib/properties.ts` where available; falls back to a colored tile.
+**3. New authenticated routes** (copied from the zip)
+- `src/routes/_authenticated/portfolio.tsx` — portfolio layout with `<Outlet />`.
+- `src/routes/_authenticated/portfolio.pools.index.tsx` — `/portfolio/pools` list.
+- `src/routes/_authenticated/portfolio.pools.$id.tsx` — `/portfolio/pools/:id` detail.
+- `src/routes/_authenticated/admin.tsx` — `/admin` console (gated by `has_role admin`).
 
-## Scope
+**4. Sidebar wiring**
+Add "Group Pools" (→ `/portfolio/pools`) and "Admin" (→ `/admin`, admin-only) links inside `src/components/portal/PortalShell.tsx`.
 
-- Only edits `src/routes/_authenticated/dashboard.tsx`.
-- Uses existing tokens (`navy`, `gold`, `cream`) — no new CSS variables.
-- Donut + bars rendered as inline SVG (no chart library added).
-- No new routes, no schema/auth changes, no changes to other pages.
+### Out of scope
+- The loose `script.js` / `styles.css` uploads (plain-HTML template snippets) — not integrated; the app already has its own header/nav/reveal logic.
+- Creating a `tokenized_properties` table (Phase 3 work).
+- Any change to the public marketing site or existing Group Buy landing form.
 
-## Verification
+### Technical notes
+- All new server fns use `createServerFn().middleware([requireSupabaseAuth])`, matching `server-functions-modern`.
+- `routeTree.gen.ts` will regenerate automatically from the new route files.
+- After migration approval, `src/integrations/supabase/types.ts` regenerates and the copied `pools.functions.ts` will typecheck against the new tables.
 
-Visual check at `/dashboard` after sign-in against both reference screenshots; `tsgo --noEmit` clean.
+Confirm and I'll implement.
