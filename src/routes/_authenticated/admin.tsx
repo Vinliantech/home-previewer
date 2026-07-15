@@ -49,7 +49,7 @@ function AdminPage() {
     <PortalShell>
       <PageHeader
         title="Admin"
-        subtitle="Manage pools, estates, plots, allocations, applications and reservations."
+        subtitle="Manage pools, estates, plots, allocations, applications, reservations, receipts, payment plans and company accounts."
       />
 
       <Tabs defaultValue="pools" className="mt-6">
@@ -60,6 +60,9 @@ function AdminPage() {
           <TabsTrigger value="allocations">Allocations</TabsTrigger>
           <TabsTrigger value="applications">Applications</TabsTrigger>
           <TabsTrigger value="reservations">Reservations</TabsTrigger>
+          <TabsTrigger value="receipts">Receipts</TabsTrigger>
+          <TabsTrigger value="plans">Payment plans</TabsTrigger>
+          <TabsTrigger value="accounts">Company accounts</TabsTrigger>
         </TabsList>
 
         <TabsContent value="pools" className="mt-6 space-y-6">
@@ -80,7 +83,17 @@ function AdminPage() {
         <TabsContent value="reservations" className="mt-6">
           <ReservationsModule />
         </TabsContent>
+        <TabsContent value="receipts" className="mt-6">
+          <ReceiptsModule />
+        </TabsContent>
+        <TabsContent value="plans" className="mt-6">
+          <PaymentPlansModule />
+        </TabsContent>
+        <TabsContent value="accounts" className="mt-6">
+          <CompanyAccountsModule />
+        </TabsContent>
       </Tabs>
+
     </PortalShell>
   );
 }
