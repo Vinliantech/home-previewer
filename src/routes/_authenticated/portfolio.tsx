@@ -9,6 +9,7 @@ import {
   Coins,
   DoorOpen,
   FileBarChart2,
+  FileText,
   Headset,
   Home,
   LayoutDashboard,
