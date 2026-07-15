@@ -1,5 +1,5 @@
 /* Client → Documents: assigned documents delivered by the admin team. */
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, Download, Eye, FileText, Loader2 } from "lucide-react";
