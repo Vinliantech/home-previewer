@@ -27,12 +27,14 @@ export function DashCard({
   children,
   className = "",
   noPadding = false,
+  action,
 }: {
   title?: string;
   description?: string;
   children: ReactNode;
   className?: string;
   noPadding?: boolean;
+  action?: ReactNode;
 }) {
   return (
     <section
@@ -40,13 +42,20 @@ export function DashCard({
         noPadding ? "" : "p-5 sm:p-6"
       } ${className}`}
     >
-      {(title || description) && (
-        <header className={noPadding ? "border-b border-slate-100 p-5 sm:p-6" : "mb-4"}>
-          {title && <h2 className="font-serif text-lg font-bold text-navy">{title}</h2>}
-          {description && <p className="mt-0.5 text-sm text-slate-500">{description}</p>}
+      {(title || description || action) && (
+        <header
+          className={`flex flex-wrap items-start justify-between gap-3 ${
+            noPadding ? "border-b border-slate-100 p-5 sm:p-6" : "mb-4"
+          }`}
+        >
+          <div className="min-w-0">
+            {title && <h2 className="font-serif text-lg font-bold text-navy">{title}</h2>}
+            {description && <p className="mt-0.5 text-sm text-slate-500">{description}</p>}
+          </div>
+          {action}
         </header>
       )}
-      <div className={noPadding ? "" : ""}>{children}</div>
+      <div>{children}</div>
     </section>
   );
 }
@@ -89,13 +98,14 @@ const STATUS_TONE: Record<string, string> = {
   removed: "bg-slate-100 text-slate-600 ring-slate-200",
 };
 
-export function StatusBadge({ status, label }: { status: string; label: string }) {
+export function StatusBadge({ status, label }: { status: string; label?: string }) {
   const tone = STATUS_TONE[status] ?? "bg-slate-100 text-slate-600 ring-slate-200";
+  const text = label ?? String(status).replace(/_/g, " ");
   return (
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ${tone}`}
     >
-      {label}
+      {text}
     </span>
   );
 }
