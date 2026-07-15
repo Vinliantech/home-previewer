@@ -102,6 +102,16 @@ function AdminPage() {
         <TabsContent value="accounts" className="mt-6">
           <CompanyAccountsModule />
         </TabsContent>
+        <TabsContent value="support" className="mt-6">
+          <SupportModule />
+        </TabsContent>
+        <TabsContent value="documents" className="mt-6">
+          <DocumentsModule />
+        </TabsContent>
+        <TabsContent value="roles" className="mt-6">
+          <UserRolesModule />
+        </TabsContent>
+
       </Tabs>
 
     </PortalShell>
