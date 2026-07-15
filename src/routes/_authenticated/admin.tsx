@@ -18,7 +18,19 @@ import {
   EstatesModule,
   PlotsModule,
   ReservationsModule,
+import {
+  AllocationsModule,
+  ApplicationsModule,
+  EstatesModule,
+  PlotsModule,
+  ReservationsModule,
 } from "@/components/admin/estate-ops";
+import {
+  CompanyAccountsModule,
+  PaymentPlansModule,
+  ReceiptsModule,
+} from "@/components/admin/finance-ops";
+
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
