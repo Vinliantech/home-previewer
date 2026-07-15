@@ -195,7 +195,7 @@ function Kyc() {
                   : "Complete every section below, then submit for verification."}
             </div>
             {kyc?.kyc_notes && (
-              <div className="mt-1 text-xs font-medium text-amber-700">Note: {kyc.kyc_notes}</div>
+              <div className="mt-1 text-xs font-medium text-amber-700">Note: {kyc?.admin_notes}</div>
             )}
           </div>
         </div>
