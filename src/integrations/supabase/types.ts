@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      group_pools: {
+        Row: {
+          admin_notes: string | null
+          closing_date: string | null
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          member_cap: number | null
+          min_contribution: number
+          name: string
+          property_id: string | null
+          property_name: string | null
+          status: Database["public"]["Enums"]["pool_status"]
+          target_amount: number
+          updated_at: string
+          visibility: Database["public"]["Enums"]["pool_visibility"]
+        }
+        Insert: {
+          admin_notes?: string | null
+          closing_date?: string | null
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          member_cap?: number | null
+          min_contribution?: number
+          name: string
+          property_id?: string | null
+          property_name?: string | null
+          status?: Database["public"]["Enums"]["pool_status"]
+          target_amount: number
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["pool_visibility"]
+        }
+        Update: {
+          admin_notes?: string | null
+          closing_date?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          member_cap?: number | null
+          min_contribution?: number
+          name?: string
+          property_id?: string | null
+          property_name?: string | null
+          status?: Database["public"]["Enums"]["pool_status"]
+          target_amount?: number
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["pool_visibility"]
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           created_at: string
@@ -49,6 +103,53 @@ export type Database = {
           raw_payload?: Json | null
         }
         Relationships: []
+      }
+      pool_members: {
+        Row: {
+          committed_amount: number
+          created_at: string
+          id: string
+          invited_email: string | null
+          is_founder: boolean
+          joined_at: string | null
+          pool_id: string
+          status: Database["public"]["Enums"]["pool_member_status"]
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          committed_amount?: number
+          created_at?: string
+          id?: string
+          invited_email?: string | null
+          is_founder?: boolean
+          joined_at?: string | null
+          pool_id: string
+          status?: Database["public"]["Enums"]["pool_member_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          committed_amount?: number
+          created_at?: string
+          id?: string
+          invited_email?: string | null
+          is_founder?: boolean
+          joined_at?: string | null
+          pool_id?: string
+          status?: Database["public"]["Enums"]["pool_member_status"]
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pool_members_pool_id_fkey"
+            columns: ["pool_id"]
+            isOneToOne: false
+            referencedRelation: "group_pools"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -103,6 +204,42 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_review_pool: {
+        Args: { _approve: boolean; _notes: string; _pool_id: string }
+        Returns: undefined
+      }
+      admin_set_pool_member_status: {
+        Args: {
+          _member_id: string
+          _status: Database["public"]["Enums"]["pool_member_status"]
+        }
+        Returns: undefined
+      }
+      create_group_pool: {
+        Args: {
+          _closing_date: string
+          _description: string
+          _founder_commitment: number
+          _member_cap: number
+          _min_contribution: number
+          _name: string
+          _property_id: string
+          _property_name: string
+          _target_amount: number
+          _visibility: Database["public"]["Enums"]["pool_visibility"]
+        }
+        Returns: string
+      }
+      get_pool_summaries: {
+        Args: { _pool_ids: string[] }
+        Returns: {
+          approved: number
+          approved_members: number
+          committed: number
+          members: number
+          pool_id: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -110,9 +247,41 @@ export type Database = {
         }
         Returns: boolean
       }
+      invite_pool_member: {
+        Args: { _email: string; _pool_id: string }
+        Returns: undefined
+      }
+      is_pool_founder: {
+        Args: { _pool_id: string; _user_id: string }
+        Returns: boolean
+      }
+      is_pool_member: {
+        Args: { _pool_id: string; _user_id: string }
+        Returns: boolean
+      }
+      join_group_pool: {
+        Args: { _amount: number; _pool_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "investor"
+      pool_member_status:
+        | "invited"
+        | "pending"
+        | "committed"
+        | "approved"
+        | "declined"
+        | "removed"
+      pool_status:
+        | "pending_approval"
+        | "open"
+        | "threshold_met"
+        | "closing"
+        | "completed"
+        | "cancelled"
+        | "rejected"
+      pool_visibility: "private" | "open"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -241,6 +410,24 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "investor"],
+      pool_member_status: [
+        "invited",
+        "pending",
+        "committed",
+        "approved",
+        "declined",
+        "removed",
+      ],
+      pool_status: [
+        "pending_approval",
+        "open",
+        "threshold_met",
+        "closing",
+        "completed",
+        "cancelled",
+        "rejected",
+      ],
+      pool_visibility: ["private", "open"],
     },
   },
 } as const
