@@ -44,6 +44,7 @@ import { Route as AuthenticatedPortfolioOpportunitiesRouteImport } from './route
 import { Route as AuthenticatedPortfolioNotificationsRouteImport } from './routes/_authenticated/portfolio.notifications'
 import { Route as AuthenticatedPortfolioKycRouteImport } from './routes/_authenticated/portfolio.kyc'
 import { Route as AuthenticatedPortfolioExitRequestsRouteImport } from './routes/_authenticated/portfolio.exit-requests'
+import { Route as AuthenticatedPortfolioDocumentsRouteImport } from './routes/_authenticated/portfolio.documents'
 import { Route as AuthenticatedPortfolioCertificatesRouteImport } from './routes/_authenticated/portfolio.certificates'
 import { Route as AuthenticatedAffiliatePortalRouteImport } from './routes/_authenticated/affiliate.portal'
 import { Route as AuthenticatedPortfolioPoolsIndexRouteImport } from './routes/_authenticated/portfolio.pools.index'
@@ -236,6 +237,12 @@ const AuthenticatedPortfolioExitRequestsRoute =
     path: '/exit-requests',
     getParentRoute: () => AuthenticatedPortfolioRoute,
   } as any)
+const AuthenticatedPortfolioDocumentsRoute =
+  AuthenticatedPortfolioDocumentsRouteImport.update({
+    id: '/documents',
+    path: '/documents',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
 const AuthenticatedPortfolioCertificatesRoute =
   AuthenticatedPortfolioCertificatesRouteImport.update({
     id: '/certificates',
@@ -285,6 +292,7 @@ export interface FileRoutesByFullPath {
   '/properties/': typeof PropertiesIndexRoute
   '/affiliate/portal': typeof AuthenticatedAffiliatePortalRoute
   '/portfolio/certificates': typeof AuthenticatedPortfolioCertificatesRoute
+  '/portfolio/documents': typeof AuthenticatedPortfolioDocumentsRoute
   '/portfolio/exit-requests': typeof AuthenticatedPortfolioExitRequestsRoute
   '/portfolio/kyc': typeof AuthenticatedPortfolioKycRoute
   '/portfolio/notifications': typeof AuthenticatedPortfolioNotificationsRoute
@@ -324,6 +332,7 @@ export interface FileRoutesByTo {
   '/properties': typeof PropertiesIndexRoute
   '/affiliate/portal': typeof AuthenticatedAffiliatePortalRoute
   '/portfolio/certificates': typeof AuthenticatedPortfolioCertificatesRoute
+  '/portfolio/documents': typeof AuthenticatedPortfolioDocumentsRoute
   '/portfolio/exit-requests': typeof AuthenticatedPortfolioExitRequestsRoute
   '/portfolio/kyc': typeof AuthenticatedPortfolioKycRoute
   '/portfolio/notifications': typeof AuthenticatedPortfolioNotificationsRoute
@@ -366,6 +375,7 @@ export interface FileRoutesById {
   '/properties/': typeof PropertiesIndexRoute
   '/_authenticated/affiliate/portal': typeof AuthenticatedAffiliatePortalRoute
   '/_authenticated/portfolio/certificates': typeof AuthenticatedPortfolioCertificatesRoute
+  '/_authenticated/portfolio/documents': typeof AuthenticatedPortfolioDocumentsRoute
   '/_authenticated/portfolio/exit-requests': typeof AuthenticatedPortfolioExitRequestsRoute
   '/_authenticated/portfolio/kyc': typeof AuthenticatedPortfolioKycRoute
   '/_authenticated/portfolio/notifications': typeof AuthenticatedPortfolioNotificationsRoute
@@ -408,6 +418,7 @@ export interface FileRouteTypes {
     | '/properties/'
     | '/affiliate/portal'
     | '/portfolio/certificates'
+    | '/portfolio/documents'
     | '/portfolio/exit-requests'
     | '/portfolio/kyc'
     | '/portfolio/notifications'
@@ -447,6 +458,7 @@ export interface FileRouteTypes {
     | '/properties'
     | '/affiliate/portal'
     | '/portfolio/certificates'
+    | '/portfolio/documents'
     | '/portfolio/exit-requests'
     | '/portfolio/kyc'
     | '/portfolio/notifications'
@@ -488,6 +500,7 @@ export interface FileRouteTypes {
     | '/properties/'
     | '/_authenticated/affiliate/portal'
     | '/_authenticated/portfolio/certificates'
+    | '/_authenticated/portfolio/documents'
     | '/_authenticated/portfolio/exit-requests'
     | '/_authenticated/portfolio/kyc'
     | '/_authenticated/portfolio/notifications'
@@ -775,6 +788,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortfolioExitRequestsRouteImport
       parentRoute: typeof AuthenticatedPortfolioRoute
     }
+    '/_authenticated/portfolio/documents': {
+      id: '/_authenticated/portfolio/documents'
+      path: '/documents'
+      fullPath: '/portfolio/documents'
+      preLoaderRoute: typeof AuthenticatedPortfolioDocumentsRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
     '/_authenticated/portfolio/certificates': {
       id: '/_authenticated/portfolio/certificates'
       path: '/certificates'
@@ -808,6 +828,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedPortfolioRouteChildren {
   AuthenticatedPortfolioCertificatesRoute: typeof AuthenticatedPortfolioCertificatesRoute
+  AuthenticatedPortfolioDocumentsRoute: typeof AuthenticatedPortfolioDocumentsRoute
   AuthenticatedPortfolioExitRequestsRoute: typeof AuthenticatedPortfolioExitRequestsRoute
   AuthenticatedPortfolioKycRoute: typeof AuthenticatedPortfolioKycRoute
   AuthenticatedPortfolioNotificationsRoute: typeof AuthenticatedPortfolioNotificationsRoute
@@ -829,6 +850,7 @@ const AuthenticatedPortfolioRouteChildren: AuthenticatedPortfolioRouteChildren =
   {
     AuthenticatedPortfolioCertificatesRoute:
       AuthenticatedPortfolioCertificatesRoute,
+    AuthenticatedPortfolioDocumentsRoute: AuthenticatedPortfolioDocumentsRoute,
     AuthenticatedPortfolioExitRequestsRoute:
       AuthenticatedPortfolioExitRequestsRoute,
     AuthenticatedPortfolioKycRoute: AuthenticatedPortfolioKycRoute,
