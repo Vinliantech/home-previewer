@@ -801,3 +801,217 @@ export function seedDemoData(queryClient: QueryClient) {
     queryClient.setQueryData(key, data);
   }
 }
+/* ------------------------------------------------------------------ */
+/* Estate operations (sales-ops) sample data                          */
+/* ------------------------------------------------------------------ */
+
+const estE1 = {
+  id: "demo-est-1",
+  name: "Guzape Heights Estate",
+  location: "Guzape, Abuja",
+  total_land_size: "12 hectares",
+  description: "Flagship residential estate on Kenneth Minimah Crescent.",
+  created_at: monthsAgo(10, 3),
+};
+const estE2 = {
+  id: "demo-est-2",
+  name: "Karsana Green Estate",
+  location: "Karsana, Abuja",
+  total_land_size: "8 hectares",
+  description: "Value-tier family plots with completed road network.",
+  created_at: monthsAgo(6, 8),
+};
+const estE3 = {
+  id: "demo-est-3",
+  name: "Abacha Barracks Phase II",
+  location: "Behind Abacha Barracks, Abuja",
+  total_land_size: "20 hectares",
+  description: "Surveyed estate land, title-verified.",
+  created_at: monthsAgo(3, 12),
+};
+
+const demoProfiles = [
+  {
+    id: "demo-pf-1",
+    user_id: "demo-user",
+    full_name: DEMO_NAME,
+    email: DEMO_EMAIL,
+    phone: "0816 000 0000",
+  },
+  {
+    id: "demo-pf-2",
+    user_id: "demo-u2",
+    full_name: "Chidi Okafor",
+    email: "chidi.demo@example.com",
+    phone: "0803 111 2222",
+  },
+  {
+    id: "demo-pf-3",
+    user_id: "demo-u3",
+    full_name: "Ngozi Eze",
+    email: "ngozi.demo@example.com",
+    phone: "0805 333 4444",
+  },
+];
+
+const plotRow = (
+  id: string,
+  plot_number: string,
+  est: typeof estE1,
+  size: number,
+  type: string,
+  price: number,
+  status: string,
+  block: string | null = null,
+) => ({
+  id,
+  plot_number,
+  block_number: block,
+  estate_id: est.id,
+  estates: { id: est.id, name: est.name },
+  location: est.location,
+  size_sqm: size,
+  property_type: type,
+  price,
+  status,
+  created_at: monthsAgo(5, 5),
+});
+
+const demoPlots = [
+  plotRow("demo-plt-1", "A-012", estE1, 650, "residential", 95_000_000, "available", "A"),
+  plotRow("demo-plt-2", "A-013", estE1, 700, "residential", 110_000_000, "allocated", "A"),
+  plotRow("demo-plt-3", "B-004", estE2, 500, "residential", 42_000_000, "available", "B"),
+  plotRow("demo-plt-4", "B-005", estE2, 500, "residential", 42_000_000, "sold", "B"),
+  plotRow("demo-plt-5", "P2-118", estE3, 450, "land", 29_250_000, "available", null),
+  plotRow("demo-plt-6", "P2-119", estE3, 450, "land", 29_250_000, "reserved", null),
+];
+
+export const demoEstateOps = {
+  estates: [estE1, estE2, estE3],
+  profiles: demoProfiles,
+  plots: demoPlots,
+  allocations: [
+    {
+      id: "demo-alloc-1",
+      plot_id: "demo-plt-2",
+      user_id: "demo-u2",
+      status: "active",
+      approval_status: "approved",
+      allocation_date: monthsAgo(2, 14),
+      plots: {
+        plot_number: "A-013",
+        location: estE1.location,
+        block_number: "A",
+        estates: { name: estE1.name },
+      },
+      profiles: {
+        full_name: "Chidi Okafor",
+        email: "chidi.demo@example.com",
+        phone: "0803 111 2222",
+      },
+    },
+    {
+      id: "demo-alloc-2",
+      plot_id: "demo-plt-4",
+      user_id: "demo-u3",
+      status: "active",
+      approval_status: "approved",
+      allocation_date: monthsAgo(1, 6),
+      plots: {
+        plot_number: "B-005",
+        location: estE2.location,
+        block_number: "B",
+        estates: { name: estE2.name },
+      },
+      profiles: { full_name: "Ngozi Eze", email: "ngozi.demo@example.com", phone: "0805 333 4444" },
+    },
+  ],
+  applications: [
+    {
+      id: "demo-app-1",
+      application_ref_no: "KS-APP-0231",
+      status: "pending",
+      title: "Mr",
+      surname: "Bello",
+      first_name: "Ibrahim",
+      other_names: null,
+      email: "ibrahim.demo@example.com",
+      phone_number_1: "0807 555 6666",
+      gender: "Male",
+      payment_mode: "installment",
+      building_categories: ["Residential"],
+      created_at: monthsAgo(0, 6),
+      admin_notes: null,
+    },
+    {
+      id: "demo-app-2",
+      application_ref_no: "KS-APP-0230",
+      status: "approved",
+      title: "Mrs",
+      surname: "Adeyemi",
+      first_name: "Folake",
+      other_names: null,
+      email: "folake.demo@example.com",
+      phone_number_1: "0809 777 8888",
+      gender: "Female",
+      payment_mode: "outright",
+      building_categories: ["Residential"],
+      created_at: monthsAgo(1, 20),
+      admin_notes: "Allocated plot A-013.",
+    },
+    {
+      id: "demo-app-3",
+      application_ref_no: "KS-APP-0229",
+      status: "rejected",
+      title: "Mr",
+      surname: "Musa",
+      first_name: "Sadiq",
+      other_names: null,
+      email: "sadiq.demo@example.com",
+      phone_number_1: "0812 999 0000",
+      gender: "Male",
+      payment_mode: "installment",
+      building_categories: ["Land"],
+      created_at: monthsAgo(2, 2),
+      admin_notes: "Incomplete documentation.",
+    },
+  ],
+  reservations: [
+    {
+      id: "demo-res-1",
+      full_name: "Amaka Obi",
+      email: "amaka.demo@example.com",
+      phone: "0803 222 3333",
+      property_type: "Residential",
+      plot_size: "500 sqm",
+      message: "Interested in Karsana Green.",
+      status: "pending",
+      admin_notes: null,
+      created_at: monthsAgo(0, 4),
+    },
+    {
+      id: "demo-res-2",
+      full_name: "Tunde Bakare",
+      email: "tunde.demo@example.com",
+      phone: "0805 444 5555",
+      property_type: "Land",
+      plot_size: "450 sqm",
+      message: "Phase II land enquiry.",
+      status: "contacted",
+      admin_notes: "Called; sending brochure.",
+      created_at: monthsAgo(0, 9),
+    },
+    {
+      id: "demo-res-3",
+      full_name: "Grace Nnamdi",
+      email: "grace.demo@example.com",
+      phone: "0807 666 7777",
+      property_type: "Residential",
+      plot_size: "700 sqm",
+      message: "Guzape Heights, corner plot preferred.",
+      status: "confirmed",
+      admin_notes: "Reserved A-012.",
+      created_at: monthsAgo(1, 15),
+    },
+  ],
+};
