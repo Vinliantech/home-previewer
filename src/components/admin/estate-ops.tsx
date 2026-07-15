@@ -597,7 +597,7 @@ export function AllocationsModule() {
     setLoading(true);
     if (demo) {
       setRows(demoEstateOps.allocations);
-      setPlots(demoEstateOps.plots.filter((p: Row) => p.status === "available"));
+      setPlots(demoEstateOps.plots.filter((p) => p.status === "available"));
       setClients(demoEstateOps.profiles);
     } else {
       const [a, p, c] = await Promise.all([

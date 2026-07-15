@@ -1,21 +1,22 @@
+import { Link } from "@tanstack/react-router";
 import logoImg from "@/assets/logo.png";
 import { ADDRESS_LINES, EMAIL, PHONE_1, PHONE_1_DISPLAY, WHATSAPP_URL } from "@/lib/properties";
 
 const exploreLinks = [
-  { label: "Properties", href: "/properties" },
-  { label: "Invest", href: "/invest" },
-  { label: "Why Kay-Steph", href: "/why-kaysteph" },
-  { label: "Market Report", href: "/market-report" },
-  { label: "FAQ", href: "/faq" },
-  { label: "Contact Us", href: "/contact" },
+  { label: "Properties", to: "/properties" },
+  { label: "Invest", to: "/invest" },
+  { label: "Why Kay-Steph", to: "/why-kaysteph" },
+  { label: "Market Report", to: "/market-report" },
+  { label: "FAQ", to: "/faq" },
+  { label: "Contact Us", to: "/contact" },
 ] as const;
 
 const companyLinks = [
-  { label: "About Kay-Steph", href: "/about" },
-  { label: "Our Team", href: "/team" },
-  { label: "Services", href: "/services" },
-  { label: "Blog", href: "/blog" },
-  { label: "Careers", href: "/careers" },
+  { label: "About Kay-Steph", to: "/about" },
+  { label: "Our Team", to: "/team" },
+  { label: "Services", to: "/services" },
+  { label: "Blog", to: "/blog" },
+  { label: "Careers", to: "/careers" },
 ] as const;
 
 export function SiteFooter() {
@@ -40,9 +41,9 @@ export function SiteFooter() {
             <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gold">Explore</h3>
             <div className="mt-4 space-y-3 text-sm text-white/65">
               {exploreLinks.map((link) => (
-                <a key={link.href} href={link.href} className="block hover:text-white">
+                <Link key={link.to} to={link.to} className="block hover:text-white">
                   {link.label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
@@ -50,27 +51,42 @@ export function SiteFooter() {
             <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gold">Company</h3>
             <div className="mt-4 space-y-3 text-sm text-white/65">
               {companyLinks.map((link) => (
-                <a key={link.href} href={link.href} className="block hover:text-white">
+                <Link key={link.to} to={link.to} className="block hover:text-white">
                   {link.label}
-                </a>
+                </Link>
               ))}
             </div>
           </div>
           <div>
             <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gold">Portals</h3>
             <div className="mt-4 space-y-3 text-sm text-white/65">
-              <a href="/auth" className="block hover:text-white">Client portal</a>
-              <a href="/affiliate/auth" className="block hover:text-white">Affiliate portal</a>
-              <a href="/admin/auth" className="block hover:text-white">Administrator</a>
+              <Link to="/auth" className="block hover:text-white">
+                Client portal
+              </Link>
+              <Link to="/affiliate/auth" className="block hover:text-white">
+                Affiliate portal
+              </Link>
+              <Link to="/admin/auth" className="block hover:text-white">
+                Administrator
+              </Link>
             </div>
           </div>
           <div>
             <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-gold">Contact</h3>
             <div className="mt-4 space-y-3 text-sm text-white/65">
               <div>{ADDRESS_LINES.join(" ")}</div>
-              <a href={`tel:${PHONE_1}`} className="block hover:text-white">{PHONE_1_DISPLAY}</a>
-              <a href={`mailto:${EMAIL}`} className="block hover:text-white">{EMAIL}</a>
-              <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="block hover:text-white">
+              <a href={`tel:${PHONE_1}`} className="block hover:text-white">
+                {PHONE_1_DISPLAY}
+              </a>
+              <a href={`mailto:${EMAIL}`} className="block hover:text-white">
+                {EMAIL}
+              </a>
+              <a
+                href={WHATSAPP_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="block hover:text-white"
+              >
                 Chat on WhatsApp
               </a>
             </div>

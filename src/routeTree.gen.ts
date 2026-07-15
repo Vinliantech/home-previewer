@@ -27,22 +27,25 @@ import { Route as InvestIndexRouteImport } from './routes/invest.index'
 import { Route as PropertiesIdRouteImport } from './routes/properties.$id'
 import { Route as InvestTokenizedRouteImport } from './routes/invest.tokenized'
 import { Route as InvestGroupBuyRouteImport } from './routes/invest.group-buy'
-import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
-import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated/transactions'
-import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
-import { Route as AuthenticatedStatementsRouteImport } from './routes/_authenticated/statements'
-import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
-import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AffiliateAuthRouteImport } from './routes/affiliate.auth'
+import { Route as AdminAuthRouteImport } from './routes/admin.auth'
 import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authenticated/portfolio'
-import { Route as AuthenticatedOpportunitiesRouteImport } from './routes/_authenticated/opportunities'
-import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
-import { Route as AuthenticatedMyTokensRouteImport } from './routes/_authenticated/my-tokens'
-import { Route as AuthenticatedMyPropertiesRouteImport } from './routes/_authenticated/my-properties'
-import { Route as AuthenticatedKycRouteImport } from './routes/_authenticated/kyc'
-import { Route as AuthenticatedExitRequestsRouteImport } from './routes/_authenticated/exit-requests'
-import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
-import { Route as AuthenticatedCertificatesRouteImport } from './routes/_authenticated/certificates'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedPortfolioIndexRouteImport } from './routes/_authenticated/portfolio.index'
+import { Route as AuthenticatedPortfolioWalletRouteImport } from './routes/_authenticated/portfolio.wallet'
+import { Route as AuthenticatedPortfolioTransactionsRouteImport } from './routes/_authenticated/portfolio.transactions'
+import { Route as AuthenticatedPortfolioTokensRouteImport } from './routes/_authenticated/portfolio.tokens'
+import { Route as AuthenticatedPortfolioSupportRouteImport } from './routes/_authenticated/portfolio.support'
+import { Route as AuthenticatedPortfolioStatementsRouteImport } from './routes/_authenticated/portfolio.statements'
+import { Route as AuthenticatedPortfolioReturnsRouteImport } from './routes/_authenticated/portfolio.returns'
+import { Route as AuthenticatedPortfolioPropertiesRouteImport } from './routes/_authenticated/portfolio.properties'
+import { Route as AuthenticatedPortfolioProfileRouteImport } from './routes/_authenticated/portfolio.profile'
+import { Route as AuthenticatedPortfolioOpportunitiesRouteImport } from './routes/_authenticated/portfolio.opportunities'
+import { Route as AuthenticatedPortfolioNotificationsRouteImport } from './routes/_authenticated/portfolio.notifications'
+import { Route as AuthenticatedPortfolioKycRouteImport } from './routes/_authenticated/portfolio.kyc'
+import { Route as AuthenticatedPortfolioExitRequestsRouteImport } from './routes/_authenticated/portfolio.exit-requests'
+import { Route as AuthenticatedPortfolioCertificatesRouteImport } from './routes/_authenticated/portfolio.certificates'
+import { Route as AuthenticatedAffiliatePortalRouteImport } from './routes/_authenticated/affiliate.portal'
 import { Route as AuthenticatedPortfolioPoolsIndexRouteImport } from './routes/_authenticated/portfolio.pools.index'
 import { Route as AuthenticatedPortfolioPoolsIdRouteImport } from './routes/_authenticated/portfolio.pools.$id'
 
@@ -135,92 +138,116 @@ const InvestGroupBuyRoute = InvestGroupBuyRouteImport.update({
   path: '/invest/group-buy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
-  id: '/wallet',
-  path: '/wallet',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const AffiliateAuthRoute = AffiliateAuthRouteImport.update({
+  id: '/affiliate/auth',
+  path: '/affiliate/auth',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedTransactionsRoute =
-  AuthenticatedTransactionsRouteImport.update({
-    id: '/transactions',
-    path: '/transactions',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedSupportRoute = AuthenticatedSupportRouteImport.update({
-  id: '/support',
-  path: '/support',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedStatementsRoute = AuthenticatedStatementsRouteImport.update({
-  id: '/statements',
-  path: '/statements',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedReturnsRoute = AuthenticatedReturnsRouteImport.update({
-  id: '/returns',
-  path: '/returns',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AuthenticatedRouteRoute,
+const AdminAuthRoute = AdminAuthRouteImport.update({
+  id: '/admin/auth',
+  path: '/admin/auth',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedPortfolioRoute = AuthenticatedPortfolioRouteImport.update({
   id: '/portfolio',
   path: '/portfolio',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedOpportunitiesRoute =
-  AuthenticatedOpportunitiesRouteImport.update({
-    id: '/opportunities',
-    path: '/opportunities',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedNotificationsRoute =
-  AuthenticatedNotificationsRouteImport.update({
-    id: '/notifications',
-    path: '/notifications',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedMyTokensRoute = AuthenticatedMyTokensRouteImport.update({
-  id: '/my-tokens',
-  path: '/my-tokens',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedMyPropertiesRoute =
-  AuthenticatedMyPropertiesRouteImport.update({
-    id: '/my-properties',
-    path: '/my-properties',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedKycRoute = AuthenticatedKycRouteImport.update({
-  id: '/kyc',
-  path: '/kyc',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedExitRequestsRoute =
-  AuthenticatedExitRequestsRouteImport.update({
-    id: '/exit-requests',
-    path: '/exit-requests',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedCertificatesRoute =
-  AuthenticatedCertificatesRouteImport.update({
-    id: '/certificates',
-    path: '/certificates',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPortfolioIndexRoute =
+  AuthenticatedPortfolioIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedPortfolioWalletRoute =
+  AuthenticatedPortfolioWalletRouteImport.update({
+    id: '/wallet',
+    path: '/wallet',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedPortfolioTransactionsRoute =
+  AuthenticatedPortfolioTransactionsRouteImport.update({
+    id: '/transactions',
+    path: '/transactions',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedPortfolioTokensRoute =
+  AuthenticatedPortfolioTokensRouteImport.update({
+    id: '/tokens',
+    path: '/tokens',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedPortfolioSupportRoute =
+  AuthenticatedPortfolioSupportRouteImport.update({
+    id: '/support',
+    path: '/support',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedPortfolioStatementsRoute =
+  AuthenticatedPortfolioStatementsRouteImport.update({
+    id: '/statements',
+    path: '/statements',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedPortfolioReturnsRoute =
+  AuthenticatedPortfolioReturnsRouteImport.update({
+    id: '/returns',
+    path: '/returns',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedPortfolioPropertiesRoute =
+  AuthenticatedPortfolioPropertiesRouteImport.update({
+    id: '/properties',
+    path: '/properties',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedPortfolioProfileRoute =
+  AuthenticatedPortfolioProfileRouteImport.update({
+    id: '/profile',
+    path: '/profile',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedPortfolioOpportunitiesRoute =
+  AuthenticatedPortfolioOpportunitiesRouteImport.update({
+    id: '/opportunities',
+    path: '/opportunities',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedPortfolioNotificationsRoute =
+  AuthenticatedPortfolioNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedPortfolioKycRoute =
+  AuthenticatedPortfolioKycRouteImport.update({
+    id: '/kyc',
+    path: '/kyc',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedPortfolioExitRequestsRoute =
+  AuthenticatedPortfolioExitRequestsRouteImport.update({
+    id: '/exit-requests',
+    path: '/exit-requests',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedPortfolioCertificatesRoute =
+  AuthenticatedPortfolioCertificatesRouteImport.update({
+    id: '/certificates',
+    path: '/certificates',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedAffiliatePortalRoute =
+  AuthenticatedAffiliatePortalRouteImport.update({
+    id: '/affiliate/portal',
+    path: '/affiliate/portal',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedPortfolioPoolsIndexRoute =
   AuthenticatedPortfolioPoolsIndexRouteImport.update({
     id: '/pools/',
@@ -248,26 +275,29 @@ export interface FileRoutesByFullPath {
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/certificates': typeof AuthenticatedCertificatesRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/exit-requests': typeof AuthenticatedExitRequestsRoute
-  '/kyc': typeof AuthenticatedKycRoute
-  '/my-properties': typeof AuthenticatedMyPropertiesRoute
-  '/my-tokens': typeof AuthenticatedMyTokensRoute
-  '/notifications': typeof AuthenticatedNotificationsRoute
-  '/opportunities': typeof AuthenticatedOpportunitiesRoute
   '/portfolio': typeof AuthenticatedPortfolioRouteWithChildren
-  '/profile': typeof AuthenticatedProfileRoute
-  '/returns': typeof AuthenticatedReturnsRoute
-  '/statements': typeof AuthenticatedStatementsRoute
-  '/support': typeof AuthenticatedSupportRoute
-  '/transactions': typeof AuthenticatedTransactionsRoute
-  '/wallet': typeof AuthenticatedWalletRoute
+  '/admin/auth': typeof AdminAuthRoute
+  '/affiliate/auth': typeof AffiliateAuthRoute
   '/invest/group-buy': typeof InvestGroupBuyRoute
   '/invest/tokenized': typeof InvestTokenizedRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/invest/': typeof InvestIndexRoute
   '/properties/': typeof PropertiesIndexRoute
+  '/affiliate/portal': typeof AuthenticatedAffiliatePortalRoute
+  '/portfolio/certificates': typeof AuthenticatedPortfolioCertificatesRoute
+  '/portfolio/exit-requests': typeof AuthenticatedPortfolioExitRequestsRoute
+  '/portfolio/kyc': typeof AuthenticatedPortfolioKycRoute
+  '/portfolio/notifications': typeof AuthenticatedPortfolioNotificationsRoute
+  '/portfolio/opportunities': typeof AuthenticatedPortfolioOpportunitiesRoute
+  '/portfolio/profile': typeof AuthenticatedPortfolioProfileRoute
+  '/portfolio/properties': typeof AuthenticatedPortfolioPropertiesRoute
+  '/portfolio/returns': typeof AuthenticatedPortfolioReturnsRoute
+  '/portfolio/statements': typeof AuthenticatedPortfolioStatementsRoute
+  '/portfolio/support': typeof AuthenticatedPortfolioSupportRoute
+  '/portfolio/tokens': typeof AuthenticatedPortfolioTokensRoute
+  '/portfolio/transactions': typeof AuthenticatedPortfolioTransactionsRoute
+  '/portfolio/wallet': typeof AuthenticatedPortfolioWalletRoute
+  '/portfolio/': typeof AuthenticatedPortfolioIndexRoute
   '/portfolio/pools/$id': typeof AuthenticatedPortfolioPoolsIdRoute
   '/portfolio/pools/': typeof AuthenticatedPortfolioPoolsIndexRoute
 }
@@ -285,26 +315,28 @@ export interface FileRoutesByTo {
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
   '/admin': typeof AuthenticatedAdminRoute
-  '/certificates': typeof AuthenticatedCertificatesRoute
-  '/dashboard': typeof AuthenticatedDashboardRoute
-  '/exit-requests': typeof AuthenticatedExitRequestsRoute
-  '/kyc': typeof AuthenticatedKycRoute
-  '/my-properties': typeof AuthenticatedMyPropertiesRoute
-  '/my-tokens': typeof AuthenticatedMyTokensRoute
-  '/notifications': typeof AuthenticatedNotificationsRoute
-  '/opportunities': typeof AuthenticatedOpportunitiesRoute
-  '/portfolio': typeof AuthenticatedPortfolioRouteWithChildren
-  '/profile': typeof AuthenticatedProfileRoute
-  '/returns': typeof AuthenticatedReturnsRoute
-  '/statements': typeof AuthenticatedStatementsRoute
-  '/support': typeof AuthenticatedSupportRoute
-  '/transactions': typeof AuthenticatedTransactionsRoute
-  '/wallet': typeof AuthenticatedWalletRoute
+  '/admin/auth': typeof AdminAuthRoute
+  '/affiliate/auth': typeof AffiliateAuthRoute
   '/invest/group-buy': typeof InvestGroupBuyRoute
   '/invest/tokenized': typeof InvestTokenizedRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/invest': typeof InvestIndexRoute
   '/properties': typeof PropertiesIndexRoute
+  '/affiliate/portal': typeof AuthenticatedAffiliatePortalRoute
+  '/portfolio/certificates': typeof AuthenticatedPortfolioCertificatesRoute
+  '/portfolio/exit-requests': typeof AuthenticatedPortfolioExitRequestsRoute
+  '/portfolio/kyc': typeof AuthenticatedPortfolioKycRoute
+  '/portfolio/notifications': typeof AuthenticatedPortfolioNotificationsRoute
+  '/portfolio/opportunities': typeof AuthenticatedPortfolioOpportunitiesRoute
+  '/portfolio/profile': typeof AuthenticatedPortfolioProfileRoute
+  '/portfolio/properties': typeof AuthenticatedPortfolioPropertiesRoute
+  '/portfolio/returns': typeof AuthenticatedPortfolioReturnsRoute
+  '/portfolio/statements': typeof AuthenticatedPortfolioStatementsRoute
+  '/portfolio/support': typeof AuthenticatedPortfolioSupportRoute
+  '/portfolio/tokens': typeof AuthenticatedPortfolioTokensRoute
+  '/portfolio/transactions': typeof AuthenticatedPortfolioTransactionsRoute
+  '/portfolio/wallet': typeof AuthenticatedPortfolioWalletRoute
+  '/portfolio': typeof AuthenticatedPortfolioIndexRoute
   '/portfolio/pools/$id': typeof AuthenticatedPortfolioPoolsIdRoute
   '/portfolio/pools': typeof AuthenticatedPortfolioPoolsIndexRoute
 }
@@ -324,26 +356,29 @@ export interface FileRoutesById {
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
-  '/_authenticated/certificates': typeof AuthenticatedCertificatesRoute
-  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
-  '/_authenticated/exit-requests': typeof AuthenticatedExitRequestsRoute
-  '/_authenticated/kyc': typeof AuthenticatedKycRoute
-  '/_authenticated/my-properties': typeof AuthenticatedMyPropertiesRoute
-  '/_authenticated/my-tokens': typeof AuthenticatedMyTokensRoute
-  '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
-  '/_authenticated/opportunities': typeof AuthenticatedOpportunitiesRoute
   '/_authenticated/portfolio': typeof AuthenticatedPortfolioRouteWithChildren
-  '/_authenticated/profile': typeof AuthenticatedProfileRoute
-  '/_authenticated/returns': typeof AuthenticatedReturnsRoute
-  '/_authenticated/statements': typeof AuthenticatedStatementsRoute
-  '/_authenticated/support': typeof AuthenticatedSupportRoute
-  '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
-  '/_authenticated/wallet': typeof AuthenticatedWalletRoute
+  '/admin/auth': typeof AdminAuthRoute
+  '/affiliate/auth': typeof AffiliateAuthRoute
   '/invest/group-buy': typeof InvestGroupBuyRoute
   '/invest/tokenized': typeof InvestTokenizedRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/invest/': typeof InvestIndexRoute
   '/properties/': typeof PropertiesIndexRoute
+  '/_authenticated/affiliate/portal': typeof AuthenticatedAffiliatePortalRoute
+  '/_authenticated/portfolio/certificates': typeof AuthenticatedPortfolioCertificatesRoute
+  '/_authenticated/portfolio/exit-requests': typeof AuthenticatedPortfolioExitRequestsRoute
+  '/_authenticated/portfolio/kyc': typeof AuthenticatedPortfolioKycRoute
+  '/_authenticated/portfolio/notifications': typeof AuthenticatedPortfolioNotificationsRoute
+  '/_authenticated/portfolio/opportunities': typeof AuthenticatedPortfolioOpportunitiesRoute
+  '/_authenticated/portfolio/profile': typeof AuthenticatedPortfolioProfileRoute
+  '/_authenticated/portfolio/properties': typeof AuthenticatedPortfolioPropertiesRoute
+  '/_authenticated/portfolio/returns': typeof AuthenticatedPortfolioReturnsRoute
+  '/_authenticated/portfolio/statements': typeof AuthenticatedPortfolioStatementsRoute
+  '/_authenticated/portfolio/support': typeof AuthenticatedPortfolioSupportRoute
+  '/_authenticated/portfolio/tokens': typeof AuthenticatedPortfolioTokensRoute
+  '/_authenticated/portfolio/transactions': typeof AuthenticatedPortfolioTransactionsRoute
+  '/_authenticated/portfolio/wallet': typeof AuthenticatedPortfolioWalletRoute
+  '/_authenticated/portfolio/': typeof AuthenticatedPortfolioIndexRoute
   '/_authenticated/portfolio/pools/$id': typeof AuthenticatedPortfolioPoolsIdRoute
   '/_authenticated/portfolio/pools/': typeof AuthenticatedPortfolioPoolsIndexRoute
 }
@@ -363,26 +398,29 @@ export interface FileRouteTypes {
     | '/team'
     | '/why-kaysteph'
     | '/admin'
-    | '/certificates'
-    | '/dashboard'
-    | '/exit-requests'
-    | '/kyc'
-    | '/my-properties'
-    | '/my-tokens'
-    | '/notifications'
-    | '/opportunities'
     | '/portfolio'
-    | '/profile'
-    | '/returns'
-    | '/statements'
-    | '/support'
-    | '/transactions'
-    | '/wallet'
+    | '/admin/auth'
+    | '/affiliate/auth'
     | '/invest/group-buy'
     | '/invest/tokenized'
     | '/properties/$id'
     | '/invest/'
     | '/properties/'
+    | '/affiliate/portal'
+    | '/portfolio/certificates'
+    | '/portfolio/exit-requests'
+    | '/portfolio/kyc'
+    | '/portfolio/notifications'
+    | '/portfolio/opportunities'
+    | '/portfolio/profile'
+    | '/portfolio/properties'
+    | '/portfolio/returns'
+    | '/portfolio/statements'
+    | '/portfolio/support'
+    | '/portfolio/tokens'
+    | '/portfolio/transactions'
+    | '/portfolio/wallet'
+    | '/portfolio/'
     | '/portfolio/pools/$id'
     | '/portfolio/pools/'
   fileRoutesByTo: FileRoutesByTo
@@ -400,26 +438,28 @@ export interface FileRouteTypes {
     | '/team'
     | '/why-kaysteph'
     | '/admin'
-    | '/certificates'
-    | '/dashboard'
-    | '/exit-requests'
-    | '/kyc'
-    | '/my-properties'
-    | '/my-tokens'
-    | '/notifications'
-    | '/opportunities'
-    | '/portfolio'
-    | '/profile'
-    | '/returns'
-    | '/statements'
-    | '/support'
-    | '/transactions'
-    | '/wallet'
+    | '/admin/auth'
+    | '/affiliate/auth'
     | '/invest/group-buy'
     | '/invest/tokenized'
     | '/properties/$id'
     | '/invest'
     | '/properties'
+    | '/affiliate/portal'
+    | '/portfolio/certificates'
+    | '/portfolio/exit-requests'
+    | '/portfolio/kyc'
+    | '/portfolio/notifications'
+    | '/portfolio/opportunities'
+    | '/portfolio/profile'
+    | '/portfolio/properties'
+    | '/portfolio/returns'
+    | '/portfolio/statements'
+    | '/portfolio/support'
+    | '/portfolio/tokens'
+    | '/portfolio/transactions'
+    | '/portfolio/wallet'
+    | '/portfolio'
     | '/portfolio/pools/$id'
     | '/portfolio/pools'
   id:
@@ -438,26 +478,29 @@ export interface FileRouteTypes {
     | '/team'
     | '/why-kaysteph'
     | '/_authenticated/admin'
-    | '/_authenticated/certificates'
-    | '/_authenticated/dashboard'
-    | '/_authenticated/exit-requests'
-    | '/_authenticated/kyc'
-    | '/_authenticated/my-properties'
-    | '/_authenticated/my-tokens'
-    | '/_authenticated/notifications'
-    | '/_authenticated/opportunities'
     | '/_authenticated/portfolio'
-    | '/_authenticated/profile'
-    | '/_authenticated/returns'
-    | '/_authenticated/statements'
-    | '/_authenticated/support'
-    | '/_authenticated/transactions'
-    | '/_authenticated/wallet'
+    | '/admin/auth'
+    | '/affiliate/auth'
     | '/invest/group-buy'
     | '/invest/tokenized'
     | '/properties/$id'
     | '/invest/'
     | '/properties/'
+    | '/_authenticated/affiliate/portal'
+    | '/_authenticated/portfolio/certificates'
+    | '/_authenticated/portfolio/exit-requests'
+    | '/_authenticated/portfolio/kyc'
+    | '/_authenticated/portfolio/notifications'
+    | '/_authenticated/portfolio/opportunities'
+    | '/_authenticated/portfolio/profile'
+    | '/_authenticated/portfolio/properties'
+    | '/_authenticated/portfolio/returns'
+    | '/_authenticated/portfolio/statements'
+    | '/_authenticated/portfolio/support'
+    | '/_authenticated/portfolio/tokens'
+    | '/_authenticated/portfolio/transactions'
+    | '/_authenticated/portfolio/wallet'
+    | '/_authenticated/portfolio/'
     | '/_authenticated/portfolio/pools/$id'
     | '/_authenticated/portfolio/pools/'
   fileRoutesById: FileRoutesById
@@ -476,6 +519,8 @@ export interface RootRouteChildren {
   ServicesRoute: typeof ServicesRoute
   TeamRoute: typeof TeamRoute
   WhyKaystephRoute: typeof WhyKaystephRoute
+  AdminAuthRoute: typeof AdminAuthRoute
+  AffiliateAuthRoute: typeof AffiliateAuthRoute
   InvestGroupBuyRoute: typeof InvestGroupBuyRoute
   InvestTokenizedRoute: typeof InvestTokenizedRoute
   PropertiesIdRoute: typeof PropertiesIdRoute
@@ -611,47 +656,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InvestGroupBuyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/wallet': {
-      id: '/_authenticated/wallet'
-      path: '/wallet'
-      fullPath: '/wallet'
-      preLoaderRoute: typeof AuthenticatedWalletRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/affiliate/auth': {
+      id: '/affiliate/auth'
+      path: '/affiliate/auth'
+      fullPath: '/affiliate/auth'
+      preLoaderRoute: typeof AffiliateAuthRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/transactions': {
-      id: '/_authenticated/transactions'
-      path: '/transactions'
-      fullPath: '/transactions'
-      preLoaderRoute: typeof AuthenticatedTransactionsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/support': {
-      id: '/_authenticated/support'
-      path: '/support'
-      fullPath: '/support'
-      preLoaderRoute: typeof AuthenticatedSupportRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/statements': {
-      id: '/_authenticated/statements'
-      path: '/statements'
-      fullPath: '/statements'
-      preLoaderRoute: typeof AuthenticatedStatementsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/returns': {
-      id: '/_authenticated/returns'
-      path: '/returns'
-      fullPath: '/returns'
-      preLoaderRoute: typeof AuthenticatedReturnsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/profile': {
-      id: '/_authenticated/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AuthenticatedProfileRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
+    '/admin/auth': {
+      id: '/admin/auth'
+      path: '/admin/auth'
+      fullPath: '/admin/auth'
+      preLoaderRoute: typeof AdminAuthRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/portfolio': {
       id: '/_authenticated/portfolio'
@@ -660,67 +677,116 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortfolioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/opportunities': {
-      id: '/_authenticated/opportunities'
-      path: '/opportunities'
-      fullPath: '/opportunities'
-      preLoaderRoute: typeof AuthenticatedOpportunitiesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/notifications': {
-      id: '/_authenticated/notifications'
-      path: '/notifications'
-      fullPath: '/notifications'
-      preLoaderRoute: typeof AuthenticatedNotificationsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/my-tokens': {
-      id: '/_authenticated/my-tokens'
-      path: '/my-tokens'
-      fullPath: '/my-tokens'
-      preLoaderRoute: typeof AuthenticatedMyTokensRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/my-properties': {
-      id: '/_authenticated/my-properties'
-      path: '/my-properties'
-      fullPath: '/my-properties'
-      preLoaderRoute: typeof AuthenticatedMyPropertiesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/kyc': {
-      id: '/_authenticated/kyc'
-      path: '/kyc'
-      fullPath: '/kyc'
-      preLoaderRoute: typeof AuthenticatedKycRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/exit-requests': {
-      id: '/_authenticated/exit-requests'
-      path: '/exit-requests'
-      fullPath: '/exit-requests'
-      preLoaderRoute: typeof AuthenticatedExitRequestsRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/dashboard': {
-      id: '/_authenticated/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/certificates': {
-      id: '/_authenticated/certificates'
-      path: '/certificates'
-      fullPath: '/certificates'
-      preLoaderRoute: typeof AuthenticatedCertificatesRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/admin': {
       id: '/_authenticated/admin'
       path: '/admin'
       fullPath: '/admin'
       preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/portfolio/': {
+      id: '/_authenticated/portfolio/'
+      path: '/'
+      fullPath: '/portfolio/'
+      preLoaderRoute: typeof AuthenticatedPortfolioIndexRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/portfolio/wallet': {
+      id: '/_authenticated/portfolio/wallet'
+      path: '/wallet'
+      fullPath: '/portfolio/wallet'
+      preLoaderRoute: typeof AuthenticatedPortfolioWalletRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/portfolio/transactions': {
+      id: '/_authenticated/portfolio/transactions'
+      path: '/transactions'
+      fullPath: '/portfolio/transactions'
+      preLoaderRoute: typeof AuthenticatedPortfolioTransactionsRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/portfolio/tokens': {
+      id: '/_authenticated/portfolio/tokens'
+      path: '/tokens'
+      fullPath: '/portfolio/tokens'
+      preLoaderRoute: typeof AuthenticatedPortfolioTokensRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/portfolio/support': {
+      id: '/_authenticated/portfolio/support'
+      path: '/support'
+      fullPath: '/portfolio/support'
+      preLoaderRoute: typeof AuthenticatedPortfolioSupportRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/portfolio/statements': {
+      id: '/_authenticated/portfolio/statements'
+      path: '/statements'
+      fullPath: '/portfolio/statements'
+      preLoaderRoute: typeof AuthenticatedPortfolioStatementsRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/portfolio/returns': {
+      id: '/_authenticated/portfolio/returns'
+      path: '/returns'
+      fullPath: '/portfolio/returns'
+      preLoaderRoute: typeof AuthenticatedPortfolioReturnsRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/portfolio/properties': {
+      id: '/_authenticated/portfolio/properties'
+      path: '/properties'
+      fullPath: '/portfolio/properties'
+      preLoaderRoute: typeof AuthenticatedPortfolioPropertiesRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/portfolio/profile': {
+      id: '/_authenticated/portfolio/profile'
+      path: '/profile'
+      fullPath: '/portfolio/profile'
+      preLoaderRoute: typeof AuthenticatedPortfolioProfileRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/portfolio/opportunities': {
+      id: '/_authenticated/portfolio/opportunities'
+      path: '/opportunities'
+      fullPath: '/portfolio/opportunities'
+      preLoaderRoute: typeof AuthenticatedPortfolioOpportunitiesRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/portfolio/notifications': {
+      id: '/_authenticated/portfolio/notifications'
+      path: '/notifications'
+      fullPath: '/portfolio/notifications'
+      preLoaderRoute: typeof AuthenticatedPortfolioNotificationsRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/portfolio/kyc': {
+      id: '/_authenticated/portfolio/kyc'
+      path: '/kyc'
+      fullPath: '/portfolio/kyc'
+      preLoaderRoute: typeof AuthenticatedPortfolioKycRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/portfolio/exit-requests': {
+      id: '/_authenticated/portfolio/exit-requests'
+      path: '/exit-requests'
+      fullPath: '/portfolio/exit-requests'
+      preLoaderRoute: typeof AuthenticatedPortfolioExitRequestsRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/portfolio/certificates': {
+      id: '/_authenticated/portfolio/certificates'
+      path: '/certificates'
+      fullPath: '/portfolio/certificates'
+      preLoaderRoute: typeof AuthenticatedPortfolioCertificatesRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/affiliate/portal': {
+      id: '/_authenticated/affiliate/portal'
+      path: '/affiliate/portal'
+      fullPath: '/affiliate/portal'
+      preLoaderRoute: typeof AuthenticatedAffiliatePortalRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/portfolio/pools/': {
@@ -741,12 +807,47 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedPortfolioRouteChildren {
+  AuthenticatedPortfolioCertificatesRoute: typeof AuthenticatedPortfolioCertificatesRoute
+  AuthenticatedPortfolioExitRequestsRoute: typeof AuthenticatedPortfolioExitRequestsRoute
+  AuthenticatedPortfolioKycRoute: typeof AuthenticatedPortfolioKycRoute
+  AuthenticatedPortfolioNotificationsRoute: typeof AuthenticatedPortfolioNotificationsRoute
+  AuthenticatedPortfolioOpportunitiesRoute: typeof AuthenticatedPortfolioOpportunitiesRoute
+  AuthenticatedPortfolioProfileRoute: typeof AuthenticatedPortfolioProfileRoute
+  AuthenticatedPortfolioPropertiesRoute: typeof AuthenticatedPortfolioPropertiesRoute
+  AuthenticatedPortfolioReturnsRoute: typeof AuthenticatedPortfolioReturnsRoute
+  AuthenticatedPortfolioStatementsRoute: typeof AuthenticatedPortfolioStatementsRoute
+  AuthenticatedPortfolioSupportRoute: typeof AuthenticatedPortfolioSupportRoute
+  AuthenticatedPortfolioTokensRoute: typeof AuthenticatedPortfolioTokensRoute
+  AuthenticatedPortfolioTransactionsRoute: typeof AuthenticatedPortfolioTransactionsRoute
+  AuthenticatedPortfolioWalletRoute: typeof AuthenticatedPortfolioWalletRoute
+  AuthenticatedPortfolioIndexRoute: typeof AuthenticatedPortfolioIndexRoute
   AuthenticatedPortfolioPoolsIdRoute: typeof AuthenticatedPortfolioPoolsIdRoute
   AuthenticatedPortfolioPoolsIndexRoute: typeof AuthenticatedPortfolioPoolsIndexRoute
 }
 
 const AuthenticatedPortfolioRouteChildren: AuthenticatedPortfolioRouteChildren =
   {
+    AuthenticatedPortfolioCertificatesRoute:
+      AuthenticatedPortfolioCertificatesRoute,
+    AuthenticatedPortfolioExitRequestsRoute:
+      AuthenticatedPortfolioExitRequestsRoute,
+    AuthenticatedPortfolioKycRoute: AuthenticatedPortfolioKycRoute,
+    AuthenticatedPortfolioNotificationsRoute:
+      AuthenticatedPortfolioNotificationsRoute,
+    AuthenticatedPortfolioOpportunitiesRoute:
+      AuthenticatedPortfolioOpportunitiesRoute,
+    AuthenticatedPortfolioProfileRoute: AuthenticatedPortfolioProfileRoute,
+    AuthenticatedPortfolioPropertiesRoute:
+      AuthenticatedPortfolioPropertiesRoute,
+    AuthenticatedPortfolioReturnsRoute: AuthenticatedPortfolioReturnsRoute,
+    AuthenticatedPortfolioStatementsRoute:
+      AuthenticatedPortfolioStatementsRoute,
+    AuthenticatedPortfolioSupportRoute: AuthenticatedPortfolioSupportRoute,
+    AuthenticatedPortfolioTokensRoute: AuthenticatedPortfolioTokensRoute,
+    AuthenticatedPortfolioTransactionsRoute:
+      AuthenticatedPortfolioTransactionsRoute,
+    AuthenticatedPortfolioWalletRoute: AuthenticatedPortfolioWalletRoute,
+    AuthenticatedPortfolioIndexRoute: AuthenticatedPortfolioIndexRoute,
     AuthenticatedPortfolioPoolsIdRoute: AuthenticatedPortfolioPoolsIdRoute,
     AuthenticatedPortfolioPoolsIndexRoute:
       AuthenticatedPortfolioPoolsIndexRoute,
@@ -759,40 +860,14 @@ const AuthenticatedPortfolioRouteWithChildren =
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
-  AuthenticatedCertificatesRoute: typeof AuthenticatedCertificatesRoute
-  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
-  AuthenticatedExitRequestsRoute: typeof AuthenticatedExitRequestsRoute
-  AuthenticatedKycRoute: typeof AuthenticatedKycRoute
-  AuthenticatedMyPropertiesRoute: typeof AuthenticatedMyPropertiesRoute
-  AuthenticatedMyTokensRoute: typeof AuthenticatedMyTokensRoute
-  AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
-  AuthenticatedOpportunitiesRoute: typeof AuthenticatedOpportunitiesRoute
   AuthenticatedPortfolioRoute: typeof AuthenticatedPortfolioRouteWithChildren
-  AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
-  AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
-  AuthenticatedStatementsRoute: typeof AuthenticatedStatementsRoute
-  AuthenticatedSupportRoute: typeof AuthenticatedSupportRoute
-  AuthenticatedTransactionsRoute: typeof AuthenticatedTransactionsRoute
-  AuthenticatedWalletRoute: typeof AuthenticatedWalletRoute
+  AuthenticatedAffiliatePortalRoute: typeof AuthenticatedAffiliatePortalRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminRoute: AuthenticatedAdminRoute,
-  AuthenticatedCertificatesRoute: AuthenticatedCertificatesRoute,
-  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
-  AuthenticatedExitRequestsRoute: AuthenticatedExitRequestsRoute,
-  AuthenticatedKycRoute: AuthenticatedKycRoute,
-  AuthenticatedMyPropertiesRoute: AuthenticatedMyPropertiesRoute,
-  AuthenticatedMyTokensRoute: AuthenticatedMyTokensRoute,
-  AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
-  AuthenticatedOpportunitiesRoute: AuthenticatedOpportunitiesRoute,
   AuthenticatedPortfolioRoute: AuthenticatedPortfolioRouteWithChildren,
-  AuthenticatedProfileRoute: AuthenticatedProfileRoute,
-  AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
-  AuthenticatedStatementsRoute: AuthenticatedStatementsRoute,
-  AuthenticatedSupportRoute: AuthenticatedSupportRoute,
-  AuthenticatedTransactionsRoute: AuthenticatedTransactionsRoute,
-  AuthenticatedWalletRoute: AuthenticatedWalletRoute,
+  AuthenticatedAffiliatePortalRoute: AuthenticatedAffiliatePortalRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
@@ -812,6 +887,8 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesRoute: ServicesRoute,
   TeamRoute: TeamRoute,
   WhyKaystephRoute: WhyKaystephRoute,
+  AdminAuthRoute: AdminAuthRoute,
+  AffiliateAuthRoute: AffiliateAuthRoute,
   InvestGroupBuyRoute: InvestGroupBuyRoute,
   InvestTokenizedRoute: InvestTokenizedRoute,
   PropertiesIdRoute: PropertiesIdRoute,

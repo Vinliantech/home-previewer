@@ -95,7 +95,7 @@ export const listOpenPools = createServerFn({ method: "GET" })
 /** One pool with its members (RLS shows members to co-members and the founder). */
 export const getPoolDetail = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i) => z.object({ pool_id: z.string().uuid() }).parse(i))
+  .validator((i) => z.object({ pool_id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as unknown as AnyClient;
     const { data: pool, error } = await sb
@@ -145,7 +145,7 @@ const createSchema = z.object({
 
 export const createPool = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i) => createSchema.parse(i))
+  .validator((i) => createSchema.parse(i))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as unknown as AnyClient;
     const { data: id, error } = await sb.rpc("create_group_pool", {
@@ -166,7 +166,7 @@ export const createPool = createServerFn({ method: "POST" })
 
 export const joinPool = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i) =>
+  .validator((i) =>
     z.object({ pool_id: z.string().uuid(), amount: z.number().positive() }).parse(i),
   )
   .handler(async ({ data, context }) => {
@@ -181,7 +181,7 @@ export const joinPool = createServerFn({ method: "POST" })
 
 export const invitePoolMember = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i) => z.object({ pool_id: z.string().uuid(), email: z.string().email() }).parse(i))
+  .validator((i) => z.object({ pool_id: z.string().uuid(), email: z.string().email() }).parse(i))
   .handler(async ({ data, context }) => {
     const sb = context.supabase as unknown as AnyClient;
     const { error } = await sb.rpc("invite_pool_member", {
@@ -224,7 +224,7 @@ export const adminListPools = createServerFn({ method: "GET" })
 
 export const adminReviewPool = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((i) =>
+  .validator((i) =>
     z
       .object({
         pool_id: z.string().uuid(),

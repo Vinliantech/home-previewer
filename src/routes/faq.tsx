@@ -25,17 +25,17 @@ import { PHONE_1_DISPLAY, WHATSAPP_URL } from "@/lib/properties";
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
-      { title: "FAQ | Full Purchase, Group Buy & Tokenized Ownership — Kay-Steph" },
+      { title: "FAQ | Property Ownership & Fractional Investment — Kay-Steph" },
       {
         name: "description",
         content:
-          "Detailed answers about buying Kay-Steph property, Group Buy pools, Tokenized Ownership from ₦1M, SPV protection, rental income, withdrawals, resale, legal documents, payments, risks and account security.",
+          "Detailed answers about buying Kay-Steph property, fractional investment, minimum contributions, SPVs, tokenization, rental income, withdrawals, resale, legal documents, payments, risks and account security.",
       },
       { property: "og:title", content: "Kay-Steph FAQ | Clear Answers Before You Decide" },
       {
         property: "og:description",
         content:
-          "Everything investors ask about ownership, Group Buy, Tokenized Ownership, SPV protection, returns and security.",
+          "Everything investors ask about ownership, fractional investing, SPVs, tokenization, returns and security.",
       },
       { property: "og:type", content: "website" },
     ],
@@ -90,33 +90,28 @@ const categories: FaqCategory[] = [
   {
     id: "fractional",
     icon: PiggyBank,
-    title: "Group Buy & Tokenized Ownership",
+    title: "Fractional & group investment",
     description: "How co-ownership works and what it costs to start.",
     items: [
       {
-        question: "How does co-ownership work at Kay-Steph?",
+        question: "How does fractional property investment work?",
         answer:
-          "There is one shared-ownership product, packaged two ways. In Tokenized Ownership you buy fixed-value units in a verified property from ₦1M per unit — ₦14M into a ₦140M asset is a 10% interest, in writing. In a Group Buy, a coordinated pool of verified buyers targets a specific development or bulk allocation together, with shared milestones and documents. Both give you a proportional interest counted in units and held via a dedicated SPV.",
-      },
-      {
-        question: "Is fractional ownership a separate product?",
-        answer:
-          "No. A fraction and a token are the same thing here — a proportional ownership interest, counted in fixed-value units and held via the property's SPV. We simply call it Tokenized Ownership because that is how your fraction is issued, tracked and resold.",
+          "A verified property is opened for contributions. You invest an amount you choose (at or above the property's minimum), and receive a proportional ownership interest — for example, ₦14M into a ₦140M property gives you a 10% interest. Your ownership, current value, income and documents are tracked in your investor dashboard.",
       },
       {
         question: "What is the minimum contribution?",
         answer:
-          "Tokenized Ownership starts from ₦1M per unit. Group Buy pools set their own thresholds (commonly from ₦10M). Full Purchase starts from ₦32.5M for estate plots. The exact minimum is always displayed on each property before you commit.",
+          "It varies by property and model. Tokenized projects start from about ₦1M per unit, fractional contributions typically start from ₦5M, and group-purchase pools set their own thresholds (commonly from ₦10M). The exact minimum is always displayed on each property before you commit.",
       },
       {
-        question: "How is Group Buy different from Tokenized Ownership?",
+        question: "How is group purchase different from fractional ownership?",
         answer:
-          "Group Buy coordinates a pool of buyers toward a specific target — for example, a bulk allocation of units — with contribution milestones, participant records and a defined closing date. Tokenized Ownership lets you buy standardised units of a single property at any time it is open, in whatever quantity you want. Both are documented, both are held via the property's SPV, and both are tracked in the portal.",
+          "Group purchase coordinates a pool of buyers toward a specific target — for example, a bulk allocation of units — with contribution milestones, participant records and a defined closing date. Fractional ownership divides a single property into proportional interests you can buy directly. Both are documented and tracked in the portal.",
       },
       {
         question: "Can I create a private group with family or friends?",
         answer:
-          "Yes. We can set up a private Group Buy pool restricted to people you invite — common for families buying together or diaspora groups. Everyone completes verification, sees the same milestones and documents, and receives participant-level records. Contact us to structure one.",
+          "Yes. We can set up a private pool restricted to people you invite — common for families buying together or diaspora groups. Everyone completes verification, sees the same milestones and documents, and receives participant-level records. Contact us to structure one.",
       },
       {
         question: "Can I invest in more than one property?",
@@ -128,23 +123,23 @@ const categories: FaqCategory[] = [
   {
     id: "structure",
     icon: Landmark,
-    title: "SPV protection & how units work",
-    description: "The legal wrapper behind every shared deal — Group Buy or Tokenized Ownership.",
+    title: "SPVs & tokenization",
+    description: "The legal machinery behind co-ownership.",
     items: [
+      {
+        question: "What is an SPV and why does it matter?",
+        answer:
+          "A Special Purpose Vehicle is a separate legal entity created to hold one property and nothing else. Your ownership interest is recorded against the SPV, which means the asset is ring-fenced: it cannot be touched by liabilities of Kay-Steph's other operations or of other projects. It is the same structure institutional investors use.",
+      },
+      {
+        question: "How does property tokenization work at Kay-Steph?",
+        answer:
+          "Selected properties are divided into fixed-value digital units (tokens). Each unit represents a defined fraction of the property held through the SPV. You buy the number of units you can afford, receive income distributions per unit, and can list units for resale to other verified investors when you want liquidity. Token status — reserved, active, listed for resale, transferred — is tracked in the portal.",
+      },
       {
         question: "Is tokenization the same as cryptocurrency?",
         answer:
           "No. Our units are records of beneficial interest in a real, verified property held through a legal SPV structure — not a tradeable cryptocurrency. There is no speculative coin; the value of your units follows the professionally assessed value of the underlying property.",
-      },
-      {
-        question: "What is an SPV and why does it matter?",
-        answer:
-          "A Special Purpose Vehicle is a separate legal entity created to hold one property and nothing else. Every co-owned property — Group Buy or Tokenized Ownership — is held by its own SPV. Your interest is recorded against that SPV, ring-fencing the asset from Kay-Steph's other operations and from every other project. It is the same structure institutional investors use — not a product you choose, but the protection wrapped around every shared deal.",
-      },
-      {
-        question: "How does Tokenized Ownership work at Kay-Steph?",
-        answer:
-          "Selected properties are divided into fixed-value units. Each unit represents a defined fraction of the property held through the SPV. You buy the number of units you can afford from ₦1M each, receive income distributions per unit, and can list units for resale to other verified investors when you want liquidity. Unit status — reserved, active, listed for resale, transferred — is tracked in the portal.",
       },
       {
         question: "What happens to the SPV when the property is sold?",
@@ -218,7 +213,7 @@ const categories: FaqCategory[] = [
       {
         question: "What documents do I receive as an investor?",
         answer:
-          "Depending on the route: an allocation letter or sale agreement for Full Purchase; SPV interest records and an ownership certificate for Group Buy participation; and unit records for Tokenized Ownership. All documents live in your portal, alongside title information, risk disclosures and contribution terms shown before you committed.",
+          "Depending on the model: an allocation letter or sale agreement for direct purchases; SPV interest records and an ownership certificate for fractional and group investments; and unit records for tokenized holdings. All documents live in your portal, alongside title information, risk disclosures and contribution terms shown before you committed.",
       },
       {
         question: "Can I verify my ownership certificate independently?",
@@ -318,7 +313,7 @@ function FaqPage() {
             <span className="block text-gold">before you decide.</span>
           </>
         }
-        description={`${totalItems} detailed answers covering full purchase, Group Buy, Tokenized Ownership, SPV protection, returns, withdrawals, documentation, payments and security. If yours isn't here, ask us directly.`}
+        description={`${totalItems} detailed answers covering ownership, fractional investment, SPVs, tokenization, returns, withdrawals, documentation, payments and security. If yours isn't here, ask us directly.`}
       >
         <div className="relative mt-8 max-w-xl">
           <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-navy/50" />
