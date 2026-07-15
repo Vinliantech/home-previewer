@@ -72,6 +72,7 @@ const navGroups: { label: string | null; items: NavItem[] }[] = [
   {
     label: "Documents",
     items: [
+      { to: "/portfolio/documents", label: "Documents", icon: FileText },
       { to: "/portfolio/certificates", label: "Certificates", icon: Award },
       { to: "/portfolio/exit-requests", label: "Exit Requests", icon: DoorOpen },
     ],
