@@ -259,6 +259,3 @@ function DocumentItem({ row, onChanged }: { row: any; onChanged: () => void }) {
     </li>
   );
 }
-
-// silence unused-import warnings when preview isn't rendered
-void useEffect;
