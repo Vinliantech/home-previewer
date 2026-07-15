@@ -65,22 +65,31 @@ export function StatCard({
   label,
   value,
   sub,
+  subTone = "neutral",
 }: {
   icon: LucideIcon;
   label: string;
   value: string;
   sub?: string;
+  subTone?: "neutral" | "positive" | "negative";
 }) {
+  const toneClass =
+    subTone === "negative"
+      ? "text-rose-600"
+      : subTone === "positive"
+        ? "text-emerald-600"
+        : "text-slate-500";
   return (
     <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
         <Icon className="h-3.5 w-3.5" /> {label}
       </div>
       <p className="mt-2 font-serif text-xl font-bold text-navy">{value}</p>
-      {sub && <p className="mt-0.5 text-xs text-slate-500">{sub}</p>}
+      {sub && <p className={`mt-0.5 text-xs ${toneClass}`}>{sub}</p>}
     </div>
   );
 }
+
 
 const STATUS_TONE: Record<string, string> = {
   open: "bg-emerald-50 text-emerald-700 ring-emerald-200",
