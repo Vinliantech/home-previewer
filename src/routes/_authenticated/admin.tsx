@@ -25,6 +25,12 @@ import {
   PaymentPlansModule,
   ReceiptsModule,
 } from "@/components/admin/finance-ops";
+import {
+  DocumentsModule,
+  SupportModule,
+  UserRolesModule,
+} from "@/components/admin/support-ops";
+
 
 
 export const Route = createFileRoute("/_authenticated/admin")({
