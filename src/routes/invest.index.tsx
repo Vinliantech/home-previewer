@@ -376,6 +376,31 @@ function InvestPage() {
                   <span className="text-muted-foreground">Entry: </span>
                   <span className="font-semibold text-navy">{door.minimum}</span>
                 </div>
+
+                {door.title === "Full Purchase" && (
+                  <Link
+                    to="/properties"
+                    className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-navy/25 px-6 py-2.5 text-sm font-bold text-navy transition-colors hover:border-gold hover:text-gold"
+                  >
+                    Browse available properties <ArrowRight className="h-4 w-4" />
+                  </Link>
+                )}
+                {door.title === "Group Buy" && (
+                  <Link
+                    to="/invest/group-buy"
+                    className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-navy/25 px-6 py-2.5 text-sm font-bold text-navy transition-colors hover:border-gold hover:text-gold"
+                  >
+                    Explore group buying <ArrowRight className="h-4 w-4" />
+                  </Link>
+                )}
+                {door.title === "Tokenized Ownership" && (
+                  <Link
+                    to="/invest/tokenized"
+                    className="mt-4 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-gold px-6 py-2.5 text-sm font-bold text-gold-foreground hover:bg-gold/90"
+                  >
+                    Explore tokenized ownership <ArrowRight className="h-4 w-4" />
+                  </Link>
+                )}
               </div>
             ))}
           </div>

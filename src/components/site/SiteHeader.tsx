@@ -20,7 +20,7 @@ const mainNav = [
 
 const investMenu = [
   { label: "Full Purchase", href: "/invest" },
-  { label: "Group Buy", href: "/invest" },
+  { label: "Group Buy", href: "/invest/group-buy" },
   { label: "Tokenized Ownership", href: "/invest/tokenized" },
 ] as const;
 
