@@ -25,6 +25,12 @@ import {
   PaymentPlansModule,
   ReceiptsModule,
 } from "@/components/admin/finance-ops";
+import {
+  DocumentsModule,
+  SupportModule,
+  UserRolesModule,
+} from "@/components/admin/support-ops";
+
 
 
 export const Route = createFileRoute("/_authenticated/admin")({
@@ -63,7 +69,11 @@ function AdminPage() {
           <TabsTrigger value="receipts">Receipts</TabsTrigger>
           <TabsTrigger value="plans">Payment plans</TabsTrigger>
           <TabsTrigger value="accounts">Company accounts</TabsTrigger>
+          <TabsTrigger value="support">Support</TabsTrigger>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="roles">User roles</TabsTrigger>
         </TabsList>
+
 
         <TabsContent value="pools" className="mt-6 space-y-6">
           <PoolsSection />
@@ -92,6 +102,16 @@ function AdminPage() {
         <TabsContent value="accounts" className="mt-6">
           <CompanyAccountsModule />
         </TabsContent>
+        <TabsContent value="support" className="mt-6">
+          <SupportModule />
+        </TabsContent>
+        <TabsContent value="documents" className="mt-6">
+          <DocumentsModule />
+        </TabsContent>
+        <TabsContent value="roles" className="mt-6">
+          <UserRolesModule />
+        </TabsContent>
+
       </Tabs>
 
     </PortalShell>
