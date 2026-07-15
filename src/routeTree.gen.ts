@@ -33,6 +33,7 @@ import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedStatementsRouteImport } from './routes/_authenticated/statements'
 import { Route as AuthenticatedReturnsRouteImport } from './routes/_authenticated/returns'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
+import { Route as AuthenticatedPortfolioRouteImport } from './routes/_authenticated/portfolio'
 import { Route as AuthenticatedOpportunitiesRouteImport } from './routes/_authenticated/opportunities'
 import { Route as AuthenticatedNotificationsRouteImport } from './routes/_authenticated/notifications'
 import { Route as AuthenticatedMyTokensRouteImport } from './routes/_authenticated/my-tokens'
@@ -41,6 +42,9 @@ import { Route as AuthenticatedKycRouteImport } from './routes/_authenticated/ky
 import { Route as AuthenticatedExitRequestsRouteImport } from './routes/_authenticated/exit-requests'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedCertificatesRouteImport } from './routes/_authenticated/certificates'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as AuthenticatedPortfolioPoolsIndexRouteImport } from './routes/_authenticated/portfolio.pools.index'
+import { Route as AuthenticatedPortfolioPoolsIdRouteImport } from './routes/_authenticated/portfolio.pools.$id'
 
 const WhyKaystephRoute = WhyKaystephRouteImport.update({
   id: '/why-kaysteph',
@@ -162,6 +166,11 @@ const AuthenticatedProfileRoute = AuthenticatedProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedPortfolioRoute = AuthenticatedPortfolioRouteImport.update({
+  id: '/portfolio',
+  path: '/portfolio',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedOpportunitiesRoute =
   AuthenticatedOpportunitiesRouteImport.update({
     id: '/opportunities',
@@ -207,6 +216,23 @@ const AuthenticatedCertificatesRoute =
     path: '/certificates',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedPortfolioPoolsIndexRoute =
+  AuthenticatedPortfolioPoolsIndexRouteImport.update({
+    id: '/pools/',
+    path: '/pools/',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
+const AuthenticatedPortfolioPoolsIdRoute =
+  AuthenticatedPortfolioPoolsIdRouteImport.update({
+    id: '/pools/$id',
+    path: '/pools/$id',
+    getParentRoute: () => AuthenticatedPortfolioRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -221,6 +247,7 @@ export interface FileRoutesByFullPath {
   '/services': typeof ServicesRoute
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/certificates': typeof AuthenticatedCertificatesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exit-requests': typeof AuthenticatedExitRequestsRoute
@@ -229,6 +256,7 @@ export interface FileRoutesByFullPath {
   '/my-tokens': typeof AuthenticatedMyTokensRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/opportunities': typeof AuthenticatedOpportunitiesRoute
+  '/portfolio': typeof AuthenticatedPortfolioRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/returns': typeof AuthenticatedReturnsRoute
   '/statements': typeof AuthenticatedStatementsRoute
@@ -240,6 +268,8 @@ export interface FileRoutesByFullPath {
   '/properties/$id': typeof PropertiesIdRoute
   '/invest/': typeof InvestIndexRoute
   '/properties/': typeof PropertiesIndexRoute
+  '/portfolio/pools/$id': typeof AuthenticatedPortfolioPoolsIdRoute
+  '/portfolio/pools/': typeof AuthenticatedPortfolioPoolsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -254,6 +284,7 @@ export interface FileRoutesByTo {
   '/services': typeof ServicesRoute
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/certificates': typeof AuthenticatedCertificatesRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/exit-requests': typeof AuthenticatedExitRequestsRoute
@@ -262,6 +293,7 @@ export interface FileRoutesByTo {
   '/my-tokens': typeof AuthenticatedMyTokensRoute
   '/notifications': typeof AuthenticatedNotificationsRoute
   '/opportunities': typeof AuthenticatedOpportunitiesRoute
+  '/portfolio': typeof AuthenticatedPortfolioRouteWithChildren
   '/profile': typeof AuthenticatedProfileRoute
   '/returns': typeof AuthenticatedReturnsRoute
   '/statements': typeof AuthenticatedStatementsRoute
@@ -273,6 +305,8 @@ export interface FileRoutesByTo {
   '/properties/$id': typeof PropertiesIdRoute
   '/invest': typeof InvestIndexRoute
   '/properties': typeof PropertiesIndexRoute
+  '/portfolio/pools/$id': typeof AuthenticatedPortfolioPoolsIdRoute
+  '/portfolio/pools': typeof AuthenticatedPortfolioPoolsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -289,6 +323,7 @@ export interface FileRoutesById {
   '/services': typeof ServicesRoute
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/certificates': typeof AuthenticatedCertificatesRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/exit-requests': typeof AuthenticatedExitRequestsRoute
@@ -297,6 +332,7 @@ export interface FileRoutesById {
   '/_authenticated/my-tokens': typeof AuthenticatedMyTokensRoute
   '/_authenticated/notifications': typeof AuthenticatedNotificationsRoute
   '/_authenticated/opportunities': typeof AuthenticatedOpportunitiesRoute
+  '/_authenticated/portfolio': typeof AuthenticatedPortfolioRouteWithChildren
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/returns': typeof AuthenticatedReturnsRoute
   '/_authenticated/statements': typeof AuthenticatedStatementsRoute
@@ -308,6 +344,8 @@ export interface FileRoutesById {
   '/properties/$id': typeof PropertiesIdRoute
   '/invest/': typeof InvestIndexRoute
   '/properties/': typeof PropertiesIndexRoute
+  '/_authenticated/portfolio/pools/$id': typeof AuthenticatedPortfolioPoolsIdRoute
+  '/_authenticated/portfolio/pools/': typeof AuthenticatedPortfolioPoolsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -324,6 +362,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/team'
     | '/why-kaysteph'
+    | '/admin'
     | '/certificates'
     | '/dashboard'
     | '/exit-requests'
@@ -332,6 +371,7 @@ export interface FileRouteTypes {
     | '/my-tokens'
     | '/notifications'
     | '/opportunities'
+    | '/portfolio'
     | '/profile'
     | '/returns'
     | '/statements'
@@ -343,6 +383,8 @@ export interface FileRouteTypes {
     | '/properties/$id'
     | '/invest/'
     | '/properties/'
+    | '/portfolio/pools/$id'
+    | '/portfolio/pools/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -357,6 +399,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/team'
     | '/why-kaysteph'
+    | '/admin'
     | '/certificates'
     | '/dashboard'
     | '/exit-requests'
@@ -365,6 +408,7 @@ export interface FileRouteTypes {
     | '/my-tokens'
     | '/notifications'
     | '/opportunities'
+    | '/portfolio'
     | '/profile'
     | '/returns'
     | '/statements'
@@ -376,6 +420,8 @@ export interface FileRouteTypes {
     | '/properties/$id'
     | '/invest'
     | '/properties'
+    | '/portfolio/pools/$id'
+    | '/portfolio/pools'
   id:
     | '__root__'
     | '/'
@@ -391,6 +437,7 @@ export interface FileRouteTypes {
     | '/services'
     | '/team'
     | '/why-kaysteph'
+    | '/_authenticated/admin'
     | '/_authenticated/certificates'
     | '/_authenticated/dashboard'
     | '/_authenticated/exit-requests'
@@ -399,6 +446,7 @@ export interface FileRouteTypes {
     | '/_authenticated/my-tokens'
     | '/_authenticated/notifications'
     | '/_authenticated/opportunities'
+    | '/_authenticated/portfolio'
     | '/_authenticated/profile'
     | '/_authenticated/returns'
     | '/_authenticated/statements'
@@ -410,6 +458,8 @@ export interface FileRouteTypes {
     | '/properties/$id'
     | '/invest/'
     | '/properties/'
+    | '/_authenticated/portfolio/pools/$id'
+    | '/_authenticated/portfolio/pools/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -603,6 +653,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProfileRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/portfolio': {
+      id: '/_authenticated/portfolio'
+      path: '/portfolio'
+      fullPath: '/portfolio'
+      preLoaderRoute: typeof AuthenticatedPortfolioRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/opportunities': {
       id: '/_authenticated/opportunities'
       path: '/opportunities'
@@ -659,10 +716,49 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCertificatesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/portfolio/pools/': {
+      id: '/_authenticated/portfolio/pools/'
+      path: '/pools'
+      fullPath: '/portfolio/pools/'
+      preLoaderRoute: typeof AuthenticatedPortfolioPoolsIndexRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
+    '/_authenticated/portfolio/pools/$id': {
+      id: '/_authenticated/portfolio/pools/$id'
+      path: '/pools/$id'
+      fullPath: '/portfolio/pools/$id'
+      preLoaderRoute: typeof AuthenticatedPortfolioPoolsIdRouteImport
+      parentRoute: typeof AuthenticatedPortfolioRoute
+    }
   }
 }
 
+interface AuthenticatedPortfolioRouteChildren {
+  AuthenticatedPortfolioPoolsIdRoute: typeof AuthenticatedPortfolioPoolsIdRoute
+  AuthenticatedPortfolioPoolsIndexRoute: typeof AuthenticatedPortfolioPoolsIndexRoute
+}
+
+const AuthenticatedPortfolioRouteChildren: AuthenticatedPortfolioRouteChildren =
+  {
+    AuthenticatedPortfolioPoolsIdRoute: AuthenticatedPortfolioPoolsIdRoute,
+    AuthenticatedPortfolioPoolsIndexRoute:
+      AuthenticatedPortfolioPoolsIndexRoute,
+  }
+
+const AuthenticatedPortfolioRouteWithChildren =
+  AuthenticatedPortfolioRoute._addFileChildren(
+    AuthenticatedPortfolioRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedCertificatesRoute: typeof AuthenticatedCertificatesRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedExitRequestsRoute: typeof AuthenticatedExitRequestsRoute
@@ -671,6 +767,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedMyTokensRoute: typeof AuthenticatedMyTokensRoute
   AuthenticatedNotificationsRoute: typeof AuthenticatedNotificationsRoute
   AuthenticatedOpportunitiesRoute: typeof AuthenticatedOpportunitiesRoute
+  AuthenticatedPortfolioRoute: typeof AuthenticatedPortfolioRouteWithChildren
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedReturnsRoute: typeof AuthenticatedReturnsRoute
   AuthenticatedStatementsRoute: typeof AuthenticatedStatementsRoute
@@ -680,6 +777,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedCertificatesRoute: AuthenticatedCertificatesRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedExitRequestsRoute: AuthenticatedExitRequestsRoute,
@@ -688,6 +786,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedMyTokensRoute: AuthenticatedMyTokensRoute,
   AuthenticatedNotificationsRoute: AuthenticatedNotificationsRoute,
   AuthenticatedOpportunitiesRoute: AuthenticatedOpportunitiesRoute,
+  AuthenticatedPortfolioRoute: AuthenticatedPortfolioRouteWithChildren,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedReturnsRoute: AuthenticatedReturnsRoute,
   AuthenticatedStatementsRoute: AuthenticatedStatementsRoute,
@@ -722,13 +821,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

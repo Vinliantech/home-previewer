@@ -17,6 +17,7 @@ import {
   TrendingUp,
   UserCircle2,
   Wallet,
+  UsersRound,
   type LucideIcon,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -38,6 +39,7 @@ const navSections: NavSection[] = [
       { label: "Opportunities", icon: Briefcase, to: "/opportunities" },
       { label: "My Properties", icon: Home, to: "/my-properties" },
       { label: "My Tokens", icon: Coins, to: "/my-tokens" },
+      { label: "Group Pools", icon: UsersRound, to: "/portfolio/pools" },
     ],
   },
   {
