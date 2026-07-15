@@ -26,6 +26,7 @@ import { Route as PropertiesIndexRouteImport } from './routes/properties.index'
 import { Route as InvestIndexRouteImport } from './routes/invest.index'
 import { Route as PropertiesIdRouteImport } from './routes/properties.$id'
 import { Route as InvestTokenizedRouteImport } from './routes/invest.tokenized'
+import { Route as InvestGroupBuyRouteImport } from './routes/invest.group-buy'
 import { Route as AuthenticatedWalletRouteImport } from './routes/_authenticated/wallet'
 import { Route as AuthenticatedTransactionsRouteImport } from './routes/_authenticated/transactions'
 import { Route as AuthenticatedSupportRouteImport } from './routes/_authenticated/support'
@@ -123,6 +124,11 @@ const PropertiesIdRoute = PropertiesIdRouteImport.update({
 const InvestTokenizedRoute = InvestTokenizedRouteImport.update({
   id: '/invest/tokenized',
   path: '/invest/tokenized',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InvestGroupBuyRoute = InvestGroupBuyRouteImport.update({
+  id: '/invest/group-buy',
+  path: '/invest/group-buy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedWalletRoute = AuthenticatedWalletRouteImport.update({
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/support': typeof AuthenticatedSupportRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/wallet': typeof AuthenticatedWalletRoute
+  '/invest/group-buy': typeof InvestGroupBuyRoute
   '/invest/tokenized': typeof InvestTokenizedRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/invest/': typeof InvestIndexRoute
@@ -261,6 +268,7 @@ export interface FileRoutesByTo {
   '/support': typeof AuthenticatedSupportRoute
   '/transactions': typeof AuthenticatedTransactionsRoute
   '/wallet': typeof AuthenticatedWalletRoute
+  '/invest/group-buy': typeof InvestGroupBuyRoute
   '/invest/tokenized': typeof InvestTokenizedRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/invest': typeof InvestIndexRoute
@@ -295,6 +303,7 @@ export interface FileRoutesById {
   '/_authenticated/support': typeof AuthenticatedSupportRoute
   '/_authenticated/transactions': typeof AuthenticatedTransactionsRoute
   '/_authenticated/wallet': typeof AuthenticatedWalletRoute
+  '/invest/group-buy': typeof InvestGroupBuyRoute
   '/invest/tokenized': typeof InvestTokenizedRoute
   '/properties/$id': typeof PropertiesIdRoute
   '/invest/': typeof InvestIndexRoute
@@ -329,6 +338,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/transactions'
     | '/wallet'
+    | '/invest/group-buy'
     | '/invest/tokenized'
     | '/properties/$id'
     | '/invest/'
@@ -361,6 +371,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/transactions'
     | '/wallet'
+    | '/invest/group-buy'
     | '/invest/tokenized'
     | '/properties/$id'
     | '/invest'
@@ -394,6 +405,7 @@ export interface FileRouteTypes {
     | '/_authenticated/support'
     | '/_authenticated/transactions'
     | '/_authenticated/wallet'
+    | '/invest/group-buy'
     | '/invest/tokenized'
     | '/properties/$id'
     | '/invest/'
@@ -414,6 +426,7 @@ export interface RootRouteChildren {
   ServicesRoute: typeof ServicesRoute
   TeamRoute: typeof TeamRoute
   WhyKaystephRoute: typeof WhyKaystephRoute
+  InvestGroupBuyRoute: typeof InvestGroupBuyRoute
   InvestTokenizedRoute: typeof InvestTokenizedRoute
   PropertiesIdRoute: typeof PropertiesIdRoute
   InvestIndexRoute: typeof InvestIndexRoute
@@ -539,6 +552,13 @@ declare module '@tanstack/react-router' {
       path: '/invest/tokenized'
       fullPath: '/invest/tokenized'
       preLoaderRoute: typeof InvestTokenizedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invest/group-buy': {
+      id: '/invest/group-buy'
+      path: '/invest/group-buy'
+      fullPath: '/invest/group-buy'
+      preLoaderRoute: typeof InvestGroupBuyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/wallet': {
@@ -693,6 +713,7 @@ const rootRouteChildren: RootRouteChildren = {
   ServicesRoute: ServicesRoute,
   TeamRoute: TeamRoute,
   WhyKaystephRoute: WhyKaystephRoute,
+  InvestGroupBuyRoute: InvestGroupBuyRoute,
   InvestTokenizedRoute: InvestTokenizedRoute,
   PropertiesIdRoute: PropertiesIdRoute,
   InvestIndexRoute: InvestIndexRoute,
@@ -701,13 +722,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
