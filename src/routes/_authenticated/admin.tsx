@@ -69,7 +69,11 @@ function AdminPage() {
           <TabsTrigger value="receipts">Receipts</TabsTrigger>
           <TabsTrigger value="plans">Payment plans</TabsTrigger>
           <TabsTrigger value="accounts">Company accounts</TabsTrigger>
+          <TabsTrigger value="support">Support</TabsTrigger>
+          <TabsTrigger value="documents">Documents</TabsTrigger>
+          <TabsTrigger value="roles">User roles</TabsTrigger>
         </TabsList>
+
 
         <TabsContent value="pools" className="mt-6 space-y-6">
           <PoolsSection />
