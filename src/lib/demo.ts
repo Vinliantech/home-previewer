@@ -773,34 +773,6 @@ export const demoAdminPools = {
   ],
 };
 
-const seededClients = new WeakSet<QueryClient>();
-
-/** Pre-seed every dashboard query with fresh sample data so no server call runs. */
-export function seedDemoData(queryClient: QueryClient) {
-  if (seededClients.has(queryClient)) return;
-  seededClients.add(queryClient);
-
-  const entries: [readonly unknown[], unknown][] = [
-    [["portfolio"], demoData.portfolio],
-    [["txns"], demoData.transactions],
-    [["certs"], demoData.certificates],
-    [["notifs"], demoData.notifications],
-    [["kyc"], demoData.kyc],
-    [["invest", "list"], demoData.investList],
-    [["exits", "mine"], demoData.exits],
-  ];
-  for (const [key, data] of entries) {
-    queryClient.setQueryDefaults(key, {
-      staleTime: Infinity,
-      gcTime: Infinity,
-      retry: false,
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-    });
-    queryClient.setQueryData(key, data);
-  }
-}
 /* ------------------------------------------------------------------ */
 /* Estate operations (sales-ops) sample data                          */
 /* ------------------------------------------------------------------ */
@@ -1016,6 +988,10 @@ export const demoEstateOps = {
   ],
 };
 
+/* ------------------------------------------------------------------ */
+/* Finance ops (receipts, payment plans, company accounts) sample data */
+/* ------------------------------------------------------------------ */
+
 export const demoFinanceOps = {
   accounts: [
     {
@@ -1137,6 +1113,11 @@ export const demoFinanceOps = {
     },
   ],
 };
+
+/* ------------------------------------------------------------------ */
+/* Support & system ops (tickets, documents, roles) sample data        */
+/* ------------------------------------------------------------------ */
+
 export const demoSupportOps = {
   tickets: [
     {
@@ -1294,3 +1275,32 @@ export const demoSupportOps = {
     },
   ],
 };
+
+const seededClients = new WeakSet<QueryClient>();
+
+/** Pre-seed every dashboard query with fresh sample data so no server call runs. */
+export function seedDemoData(queryClient: QueryClient) {
+  if (seededClients.has(queryClient)) return;
+  seededClients.add(queryClient);
+
+  const entries: [readonly unknown[], unknown][] = [
+    [["portfolio"], demoData.portfolio],
+    [["txns"], demoData.transactions],
+    [["certs"], demoData.certificates],
+    [["notifs"], demoData.notifications],
+    [["kyc"], demoData.kyc],
+    [["invest", "list"], demoData.investList],
+    [["exits", "mine"], demoData.exits],
+  ];
+  for (const [key, data] of entries) {
+    queryClient.setQueryDefaults(key, {
+      staleTime: Infinity,
+      gcTime: Infinity,
+      retry: false,
+      refetchOnMount: false,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+    });
+    queryClient.setQueryData(key, data);
+  }
+}

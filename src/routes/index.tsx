@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   Building2,
@@ -53,6 +53,7 @@ export const Route = createFileRoute("/")({
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
+    links: [{ rel: "canonical", href: "https://kaystephgroup.com/" }],
   }),
   component: Home,
 });
@@ -93,9 +94,30 @@ const faqs = [
   },
 ];
 
+const organisationSchema = {
+  "@context": "https://schema.org",
+  "@type": "RealEstateAgent",
+  name: "Kay-Steph Group",
+  url: "https://kaystephgroup.com/",
+  telephone: PHONE_1,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: "No. 43 Kenneth Minimah Crescent",
+    addressLocality: "Guzape",
+    addressRegion: "Abuja FCT",
+    addressCountry: "NG",
+  },
+  areaServed: "Abuja, Nigeria",
+};
+
 function Home() {
   return (
     <PageShell>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organisationSchema) }}
+      />
+
       <section id="top" className="relative min-h-[760px] overflow-hidden bg-navy text-white">
         <img
           src={heroImg}
@@ -122,18 +144,18 @@ function Home() {
               clear documentation and lasting value in Nigeria's capital.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="/properties"
+              <Link
+                to="/properties"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-gold px-7 py-3 text-sm font-bold text-gold-foreground hover:bg-gold/90"
               >
                 Explore properties <ArrowRight className="h-4 w-4" />
-              </a>
-              <a
-                href="/contact"
+              </Link>
+              <Link
+                to="/contact"
                 className="inline-flex min-h-12 items-center justify-center rounded-full border border-white/40 px-7 py-3 text-sm font-bold hover:border-white hover:bg-white hover:text-navy"
               >
                 Book a private inspection
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -144,12 +166,12 @@ function Home() {
       <section id="about" className="relative z-20 bg-background pb-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="relative -mt-12 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a
-              href="/properties"
+            <Link
+              to="/properties"
               className="inline-flex min-h-11 items-center justify-center rounded-full bg-gold px-6 py-2.5 text-sm font-bold text-gold-foreground shadow-lg"
             >
               View available homes
-            </a>
+            </Link>
             <a
               href={WHATSAPP_URL}
               target="_blank"
@@ -193,12 +215,12 @@ function Home() {
               ))}
             </div>
             <div className="mt-8 text-center">
-              <a
-                href="/why-kaysteph"
+              <Link
+                to="/why-kaysteph"
                 className="inline-flex items-center gap-1 text-sm font-bold text-navy hover:text-gold"
               >
                 See why investors choose Kay-Steph <ArrowRight className="h-4 w-4" />
-              </a>
+              </Link>
             </div>
           </div>
         </div>
@@ -292,24 +314,25 @@ function Home() {
                       <div className="font-serif text-xl font-bold text-gold">{property.price}</div>
                       <div className="text-xs text-white/55">{property.priceNote}</div>
                     </div>
-                    <a
-                      href={`/properties/${property.id}`}
+                    <Link
+                      to="/properties/$id"
+                      params={{ id: property.id }}
                       className="inline-flex items-center gap-1 text-sm font-bold hover:text-gold"
                     >
                       View project <ArrowRight className="h-4 w-4" />
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </article>
             ))}
           </div>
           <div className="mt-10 text-center">
-            <a
-              href="/properties"
+            <Link
+              to="/properties"
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-navy/25 px-8 py-3 text-sm font-bold text-navy hover:border-gold hover:text-gold"
             >
               View all properties with filters <ArrowRight className="h-4 w-4" />
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -323,7 +346,7 @@ function Home() {
               loading="lazy"
               width={1200}
               height={800}
-              className="absolute inset-0 h-full w-full object-cover opacity-30"
+              className="absolute inset-0 h-full w-full object-cover opacity-32"
             />
             <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,12,42,0.98)_0%,rgba(7,12,42,0.82)_58%,rgba(7,12,42,0.52)_100%)]" />
             <div className="relative grid gap-10 px-6 py-14 sm:px-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-end lg:px-16 lg:py-16">
@@ -335,7 +358,7 @@ function Home() {
                   Property ownership, made more accessible.
                 </h2>
                 <p className="mt-5 max-w-2xl leading-7 text-white/72">
-                  Explore verified group buy and tokenized ownership opportunities, complete KYC securely,
+                  Explore verified group-buy and fractional opportunities, complete KYC securely,
                   review risk disclosures and monitor your ownership through one investor portal.
                 </p>
               </div>
@@ -343,12 +366,12 @@ function Home() {
                 <FeatureLine icon={Users} text="Structured group ownership" />
                 <FeatureLine icon={FileCheck2} text="KYC and document tracking" />
                 <FeatureLine icon={TrendingUp} text="Portfolio and return reporting" />
-                <a
-                  href="/invest"
+                <Link
+                  to="/invest"
                   className="mt-5 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-gold px-6 py-3 text-sm font-bold text-gold-foreground hover:bg-gold/90"
                 >
                   View investment opportunities <ArrowRight className="h-4 w-4" />
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -382,12 +405,12 @@ function Home() {
             ))}
           </Accordion>
           <div className="mt-10 text-center">
-            <a
-              href="/faq"
+            <Link
+              to="/faq"
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-navy/25 bg-white px-8 py-3 text-sm font-bold text-navy hover:border-gold hover:text-gold"
             >
               Read the full FAQ <ArrowRight className="h-4 w-4" />
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -438,8 +461,8 @@ function Home() {
               </a>
             </ContactBlock>
             <ContactBlock icon={Clock3} title="Office hours">
-              <div>Monday – Friday: 9:00 – 18:00</div>
-              <div>Saturday: 10:00 – 15:00</div>
+              <div>Monday - Friday: 9:00 - 18:00</div>
+              <div>Saturday: 10:00 - 15:00</div>
             </ContactBlock>
             <ContactBlock icon={Handshake} title="Private inspections">
               <div>Available by confirmed appointment across all active projects.</div>

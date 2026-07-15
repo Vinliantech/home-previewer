@@ -30,7 +30,7 @@ const groupBuySchema = z.object({
 export type GroupBuyInput = z.infer<typeof groupBuySchema>;
 
 export const submitGroupBuyRequest = createServerFn({ method: "POST" })
-  .inputValidator((input: unknown) => groupBuySchema.parse(input))
+  .validator((input) => groupBuySchema.parse(input))
   .handler(async ({ data }) => {
     const FRIENDLY_ERROR =
       "We could not submit your request. Please try again or contact us on WhatsApp.";

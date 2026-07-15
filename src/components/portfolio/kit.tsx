@@ -1,5 +1,65 @@
-import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
+
+/** Light-theme status badge tones for the banking dashboard. */
+export function statusToneLight(status: string): string {
+  if (
+    [
+      "approved",
+      "verified",
+      "active",
+      "fully_funded",
+      "completed",
+      "acquired",
+      "income_generating",
+      "paid",
+    ].includes(status)
+  )
+    return "border-emerald-200 bg-emerald-50 text-emerald-700";
+  if (["rejected", "cancelled", "closed", "sold"].includes(status))
+    return "border-rose-200 bg-rose-50 text-rose-700";
+  if (
+    [
+      "pending",
+      "submitted",
+      "under_review",
+      "payment_pending",
+      "payment_received",
+      "more_info",
+      "reserved",
+      "pending_approval",
+      "pending_payment",
+      "not_submitted",
+      "draft",
+    ].includes(status)
+  )
+    return "border-amber-200 bg-amber-50 text-amber-700";
+  if (
+    [
+      "open",
+      "partially_funded",
+      "approved_for_listing",
+      "buyer_found",
+      "transfer_in_progress",
+    ].includes(status)
+  )
+    return "border-sky-200 bg-sky-50 text-sky-700";
+  return "border-slate-200 bg-slate-100 text-slate-600";
+}
+
+export function StatusBadge({ status, label }: { status: string; label?: string }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide",
+        statusToneLight(status),
+      )}
+    >
+      {label ?? status.replace(/_/g, " ")}
+    </span>
+  );
+}
 
 export function PageHeader({
   title,
@@ -11,52 +71,13 @@ export function PageHeader({
   actions?: ReactNode;
 }) {
   return (
-    <div className="flex flex-wrap items-start justify-between gap-3">
-      <div className="min-w-0">
-        <h1 className="font-serif text-2xl font-bold text-navy sm:text-3xl">{title}</h1>
+    <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
+      <div>
+        <h1 className="font-serif text-2xl font-bold text-navy">{title}</h1>
         {description && <p className="mt-1 text-sm text-slate-500">{description}</p>}
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
-  );
-}
-
-export function DashCard({
-  title,
-  description,
-  children,
-  className = "",
-  noPadding = false,
-  action,
-}: {
-  title?: string;
-  description?: string;
-  children: ReactNode;
-  className?: string;
-  noPadding?: boolean;
-  action?: ReactNode;
-}) {
-  return (
-    <section
-      className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${
-        noPadding ? "" : "p-5 sm:p-6"
-      } ${className}`}
-    >
-      {(title || description || action) && (
-        <header
-          className={`flex flex-wrap items-start justify-between gap-3 ${
-            noPadding ? "border-b border-slate-100 p-5 sm:p-6" : "mb-4"
-          }`}
-        >
-          <div className="min-w-0">
-            {title && <h2 className="font-serif text-lg font-bold text-navy">{title}</h2>}
-            {description && <p className="mt-0.5 text-sm text-slate-500">{description}</p>}
-          </div>
-          {action}
-        </header>
-      )}
-      <div>{children}</div>
-    </section>
   );
 }
 
@@ -71,51 +92,63 @@ export function StatCard({
   label: string;
   value: string;
   sub?: string;
-  subTone?: "neutral" | "positive" | "negative";
+  subTone?: "positive" | "negative" | "neutral";
 }) {
-  const toneClass =
-    subTone === "negative"
-      ? "text-rose-600"
-      : subTone === "positive"
-        ? "text-emerald-600"
-        : "text-slate-500";
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
-      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-        <Icon className="h-3.5 w-3.5" /> {label}
+    <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <div className="flex items-center justify-between gap-3">
+        <div className="text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
+          {label}
+        </div>
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-navy/5 text-navy">
+          <Icon className="h-4.5 w-4.5" />
+        </div>
       </div>
-      <p className="mt-2 font-serif text-xl font-bold text-navy">{value}</p>
-      {sub && <p className={`mt-0.5 text-xs ${toneClass}`}>{sub}</p>}
+      <div className="mt-2 font-serif text-2xl font-bold tabular-nums text-navy">{value}</div>
+      {sub && (
+        <div
+          className={cn(
+            "mt-1 text-xs font-medium",
+            subTone === "positive" && "text-emerald-600",
+            subTone === "negative" && "text-rose-600",
+            subTone === "neutral" && "text-slate-500",
+          )}
+        >
+          {sub}
+        </div>
+      )}
     </div>
   );
 }
 
-
-const STATUS_TONE: Record<string, string> = {
-  open: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  approved: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  committed: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  completed: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  threshold_met: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  pending: "bg-amber-50 text-amber-700 ring-amber-200",
-  pending_approval: "bg-amber-50 text-amber-700 ring-amber-200",
-  invited: "bg-amber-50 text-amber-700 ring-amber-200",
-  closing: "bg-amber-50 text-amber-700 ring-amber-200",
-  rejected: "bg-rose-50 text-rose-700 ring-rose-200",
-  declined: "bg-rose-50 text-rose-700 ring-rose-200",
-  cancelled: "bg-slate-100 text-slate-600 ring-slate-200",
-  removed: "bg-slate-100 text-slate-600 ring-slate-200",
-};
-
-export function StatusBadge({ status, label }: { status: string; label?: string }) {
-  const tone = STATUS_TONE[status] ?? "bg-slate-100 text-slate-600 ring-slate-200";
-  const text = label ?? String(status).replace(/_/g, " ");
+export function DashCard({
+  title,
+  description,
+  action,
+  children,
+  className,
+  noPadding,
+}: {
+  title?: string;
+  description?: string;
+  action?: ReactNode;
+  children: ReactNode;
+  className?: string;
+  noPadding?: boolean;
+}) {
   return (
-    <span
-      className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ring-1 ${tone}`}
-    >
-      {text}
-    </span>
+    <section className={cn("rounded-xl border border-slate-200 bg-white shadow-sm", className)}>
+      {(title || action) && (
+        <header className="flex items-center justify-between gap-4 border-b border-slate-100 px-5 py-4">
+          <div>
+            {title && <h2 className="text-sm font-bold text-navy">{title}</h2>}
+            {description && <p className="mt-0.5 text-xs text-slate-500">{description}</p>}
+          </div>
+          {action}
+        </header>
+      )}
+      <div className={noPadding ? "" : "p-5"}>{children}</div>
+    </section>
   );
 }
 
@@ -131,32 +164,30 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-300 bg-slate-50/50 p-8 text-center">
-      <span className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-slate-500 ring-1 ring-slate-200">
-        <Icon className="h-5 w-5" />
-      </span>
-      <div>
-        <p className="font-bold text-navy">{title}</p>
-        {body && <p className="mt-1 text-sm text-slate-500">{body}</p>}
+    <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
+      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 text-slate-400">
+        <Icon className="h-6 w-6" />
       </div>
-      {action}
+      <h3 className="mt-4 text-sm font-bold text-navy">{title}</h3>
+      {body && <p className="mt-1 max-w-sm text-sm leading-6 text-slate-500">{body}</p>}
+      {action && <div className="mt-4">{action}</div>}
     </div>
   );
 }
 
-export function fmtDate(input: string | null | undefined): string {
-  if (!input) return "—";
-  const d = new Date(input);
-  if (Number.isNaN(d.getTime())) return String(input);
-  return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+export function fmtDate(value: string | null | undefined): string {
+  if (!value) return "—";
+  return new Date(value).toLocaleDateString("en-NG", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
 
-export function fmtDateTime(input: string | null | undefined): string {
-  if (!input) return "—";
-  const d = new Date(input);
-  if (Number.isNaN(d.getTime())) return String(input);
-  return d.toLocaleString("en-GB", {
-    day: "numeric",
+export function fmtDateTime(value: string | null | undefined): string {
+  if (!value) return "—";
+  return new Date(value).toLocaleString("en-NG", {
+    day: "2-digit",
     month: "short",
     year: "numeric",
     hour: "2-digit",

@@ -46,7 +46,7 @@ const milestones = [
   },
   {
     title: "Ownership opened up",
-    body: "Beyond outright sales, we opened premium property up through structured Group Buy pools and Tokenized Ownership from ₦1M — each shared deal protected by a dedicated SPV.",
+    body: "Beyond outright sales, we pioneered structured group purchase, fractional ownership, SPV co-investment and tokenized units so more people can own verified Abuja property.",
   },
   {
     title: "Documented from day one",
@@ -140,9 +140,9 @@ function AboutPage() {
             </p>
             <p className="mt-4 leading-7 text-muted-foreground">
               We also believe premium property should not be reserved for those who can buy
-              outright. Through Group Buy pools and Tokenized Ownership — each shared deal
-              held in a dedicated SPV — verified investors join the same projects, with the
-              same documentation, from far smaller tickets.
+              outright. Through structured group purchase, fractional ownership, SPV co-investment
+              and tokenized units, verified investors join the same projects — with the same
+              documentation — from far smaller tickets.
             </p>
             <div className="mt-10 grid grid-cols-2 gap-6 border-t border-border pt-8 sm:grid-cols-4">
               {[

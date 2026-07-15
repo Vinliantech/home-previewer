@@ -71,7 +71,7 @@ const pillars = [
   {
     icon: Landmark,
     title: "Documented ownership",
-    body: "Every purchase and every co-ownership interest — group buy or tokenized unit — is evidenced by verifiable records, not promises.",
+    body: "Every purchase and every fractional interest is evidenced by verifiable records, not promises.",
   },
 ];
 
