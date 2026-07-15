@@ -199,6 +199,247 @@ export type Database = {
           },
         ]
       }
+      client_document_assignments: {
+        Row: {
+          client_id: string
+          confirmed_at: string | null
+          created_at: string
+          document_id: string
+          download_count: number
+          first_viewed_at: string | null
+          id: string
+          last_downloaded_at: string | null
+          last_viewed_at: string | null
+          notified_at: string | null
+          notify_email: boolean
+          notify_sms: boolean
+          notify_whatsapp: boolean
+          updated_at: string
+          view_count: number
+        }
+        Insert: {
+          client_id: string
+          confirmed_at?: string | null
+          created_at?: string
+          document_id: string
+          download_count?: number
+          first_viewed_at?: string | null
+          id?: string
+          last_downloaded_at?: string | null
+          last_viewed_at?: string | null
+          notified_at?: string | null
+          notify_email?: boolean
+          notify_sms?: boolean
+          notify_whatsapp?: boolean
+          updated_at?: string
+          view_count?: number
+        }
+        Update: {
+          client_id?: string
+          confirmed_at?: string | null
+          created_at?: string
+          document_id?: string
+          download_count?: number
+          first_viewed_at?: string | null
+          id?: string
+          last_downloaded_at?: string | null
+          last_viewed_at?: string | null
+          notified_at?: string | null
+          notify_email?: boolean
+          notify_sms?: boolean
+          notify_whatsapp?: boolean
+          updated_at?: string
+          view_count?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_document_assignments_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "client_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_document_audit: {
+        Row: {
+          action: Database["public"]["Enums"]["doc_audit_action"]
+          actor_id: string | null
+          assignment_id: string | null
+          created_at: string
+          document_id: string | null
+          id: string
+          meta: Json
+          version_id: string | null
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["doc_audit_action"]
+          actor_id?: string | null
+          assignment_id?: string | null
+          created_at?: string
+          document_id?: string | null
+          id?: string
+          meta?: Json
+          version_id?: string | null
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["doc_audit_action"]
+          actor_id?: string | null
+          assignment_id?: string | null
+          created_at?: string
+          document_id?: string | null
+          id?: string
+          meta?: Json
+          version_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_document_audit_assignment_id_fkey"
+            columns: ["assignment_id"]
+            isOneToOne: false
+            referencedRelation: "client_document_assignments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_document_audit_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "client_documents"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_document_audit_version_id_fkey"
+            columns: ["version_id"]
+            isOneToOne: false
+            referencedRelation: "client_document_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_document_versions: {
+        Row: {
+          document_id: string
+          file_name: string
+          id: string
+          mime_type: string | null
+          size_bytes: number | null
+          storage_path: string
+          uploaded_at: string
+          uploaded_by: string | null
+          version_no: number
+        }
+        Insert: {
+          document_id: string
+          file_name: string
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_path: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+          version_no: number
+        }
+        Update: {
+          document_id?: string
+          file_name?: string
+          id?: string
+          mime_type?: string | null
+          size_bytes?: number | null
+          storage_path?: string
+          uploaded_at?: string
+          uploaded_by?: string | null
+          version_no?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_document_versions_document_id_fkey"
+            columns: ["document_id"]
+            isOneToOne: false
+            referencedRelation: "client_documents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      client_documents: {
+        Row: {
+          category: Database["public"]["Enums"]["doc_category"]
+          created_at: string
+          current_version_id: string | null
+          description: string | null
+          expiry_date: string | null
+          id: string
+          issue_date: string | null
+          related_investment_id: string | null
+          related_property_id: string | null
+          require_confirmation: boolean
+          title: string
+          updated_at: string
+          uploaded_by: string | null
+          visibility: Database["public"]["Enums"]["doc_visibility"]
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["doc_category"]
+          created_at?: string
+          current_version_id?: string | null
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string | null
+          related_investment_id?: string | null
+          related_property_id?: string | null
+          require_confirmation?: boolean
+          title: string
+          updated_at?: string
+          uploaded_by?: string | null
+          visibility?: Database["public"]["Enums"]["doc_visibility"]
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["doc_category"]
+          created_at?: string
+          current_version_id?: string | null
+          description?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string | null
+          related_investment_id?: string | null
+          related_property_id?: string | null
+          require_confirmation?: boolean
+          title?: string
+          updated_at?: string
+          uploaded_by?: string | null
+          visibility?: Database["public"]["Enums"]["doc_visibility"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_documents_current_version_fk"
+            columns: ["current_version_id"]
+            isOneToOne: false
+            referencedRelation: "client_document_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_documents_related_investment_id_fkey"
+            columns: ["related_investment_id"]
+            isOneToOne: false
+            referencedRelation: "investments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_documents_related_property_id_fkey"
+            columns: ["related_property_id"]
+            isOneToOne: false
+            referencedRelation: "available_properties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "client_documents_related_property_id_fkey"
+            columns: ["related_property_id"]
+            isOneToOne: false
+            referencedRelation: "tokenized_properties"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       client_leads: {
         Row: {
           affiliate_id: string
@@ -1731,6 +1972,53 @@ export type Database = {
         Args: { _reference: string; _withdrawal_id: string }
         Returns: undefined
       }
+      admin_assign_document: {
+        Args: {
+          _client_ids: string[]
+          _doc_id: string
+          _notify_email: boolean
+          _notify_sms: boolean
+          _notify_whatsapp: boolean
+        }
+        Returns: undefined
+      }
+      admin_create_document: {
+        Args: {
+          _category: Database["public"]["Enums"]["doc_category"]
+          _description: string
+          _expiry_date: string
+          _file_name: string
+          _issue_date: string
+          _mime: string
+          _related_investment_id: string
+          _related_property_id: string
+          _require_confirmation: boolean
+          _size: number
+          _storage_path: string
+          _title: string
+          _visibility: Database["public"]["Enums"]["doc_visibility"]
+        }
+        Returns: string
+      }
+      admin_delete_document: { Args: { _doc_id: string }; Returns: undefined }
+      admin_edit_document: {
+        Args: {
+          _category: Database["public"]["Enums"]["doc_category"]
+          _description: string
+          _doc_id: string
+          _expiry_date: string
+          _issue_date: string
+          _related_investment_id: string
+          _related_property_id: string
+          _require_confirmation: boolean
+          _title: string
+        }
+        Returns: undefined
+      }
+      admin_mark_document_notified: {
+        Args: { _client_ids: string[]; _doc_id: string }
+        Returns: undefined
+      }
       admin_mark_rental_payout_paid: {
         Args: { _payout_id: string; _reference: string }
         Returns: undefined
@@ -1767,6 +2055,16 @@ export type Database = {
         Args: { _notes: string; _withdrawal_id: string }
         Returns: undefined
       }
+      admin_replace_document_file: {
+        Args: {
+          _doc_id: string
+          _file_name: string
+          _mime: string
+          _size: number
+          _storage_path: string
+        }
+        Returns: string
+      }
       admin_review_investor_kyc: {
         Args: {
           _notes: string
@@ -1779,6 +2077,13 @@ export type Database = {
         Args: { _approve: boolean; _notes: string; _pool_id: string }
         Returns: undefined
       }
+      admin_set_document_visibility: {
+        Args: {
+          _doc_id: string
+          _visibility: Database["public"]["Enums"]["doc_visibility"]
+        }
+        Returns: undefined
+      }
       admin_set_pool_member_status: {
         Args: {
           _member_id: string
@@ -1786,11 +2091,22 @@ export type Database = {
         }
         Returns: undefined
       }
+      admin_unassign_document: {
+        Args: { _assignment_id: string }
+        Returns: undefined
+      }
       admin_update_exit_request: {
         Args: {
           _exit_id: string
           _notes: string
           _status: Database["public"]["Enums"]["exit_status"]
+        }
+        Returns: undefined
+      }
+      client_log_document_event: {
+        Args: {
+          _action: Database["public"]["Enums"]["doc_audit_action"]
+          _assignment_id: string
         }
         Returns: undefined
       }
@@ -1899,6 +2215,35 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "investor" | "manager"
+      doc_audit_action:
+        | "upload"
+        | "replace"
+        | "edit"
+        | "assign"
+        | "unassign"
+        | "download"
+        | "view"
+        | "archive"
+        | "unarchive"
+        | "delete"
+        | "notify"
+        | "confirm"
+      doc_category:
+        | "property"
+        | "receipt"
+        | "allocation_letter"
+        | "agreement"
+        | "spv"
+        | "share_certificate"
+        | "token_certificate"
+        | "kyc"
+        | "rental_statement"
+        | "return_statement"
+        | "valuation"
+        | "legal"
+        | "correspondence"
+        | "other"
+      doc_visibility: "published" | "draft" | "archived"
       exit_status:
         | "submitted"
         | "under_review"
@@ -2075,6 +2420,37 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "investor", "manager"],
+      doc_audit_action: [
+        "upload",
+        "replace",
+        "edit",
+        "assign",
+        "unassign",
+        "download",
+        "view",
+        "archive",
+        "unarchive",
+        "delete",
+        "notify",
+        "confirm",
+      ],
+      doc_category: [
+        "property",
+        "receipt",
+        "allocation_letter",
+        "agreement",
+        "spv",
+        "share_certificate",
+        "token_certificate",
+        "kyc",
+        "rental_statement",
+        "return_statement",
+        "valuation",
+        "legal",
+        "correspondence",
+        "other",
+      ],
+      doc_visibility: ["published", "draft", "archived"],
       exit_status: [
         "submitted",
         "under_review",
