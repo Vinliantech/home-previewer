@@ -14,6 +14,242 @@ export type Database = {
   }
   public: {
     Tables: {
+      client_applications: {
+        Row: {
+          admin_notes: string | null
+          application_ref_no: string | null
+          assigned_plot_id: string | null
+          assigned_user_id: string | null
+          building_categories: string[] | null
+          city_town: string | null
+          company_name: string | null
+          contact_state: string | null
+          created_at: string
+          date_of_birth: string | null
+          email: string | null
+          employer_name: string | null
+          employment_status: string | null
+          first_name: string | null
+          gender: string | null
+          house_number: string | null
+          id: string
+          id_number: string | null
+          id_type: string | null
+          is_company: boolean | null
+          local_government_area: string | null
+          nationality: string | null
+          nok_name: string | null
+          nok_phone: string | null
+          nok_relationship: string | null
+          office_address: string | null
+          other_names: string | null
+          passport_url: string | null
+          payment_mode: string | null
+          phone_number_1: string | null
+          phone_number_2: string | null
+          position_held: string | null
+          processed_at: string | null
+          processed_by: string | null
+          state_of_origin: string | null
+          status: string
+          street_name: string | null
+          surname: string | null
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          application_ref_no?: string | null
+          assigned_plot_id?: string | null
+          assigned_user_id?: string | null
+          building_categories?: string[] | null
+          city_town?: string | null
+          company_name?: string | null
+          contact_state?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          employer_name?: string | null
+          employment_status?: string | null
+          first_name?: string | null
+          gender?: string | null
+          house_number?: string | null
+          id?: string
+          id_number?: string | null
+          id_type?: string | null
+          is_company?: boolean | null
+          local_government_area?: string | null
+          nationality?: string | null
+          nok_name?: string | null
+          nok_phone?: string | null
+          nok_relationship?: string | null
+          office_address?: string | null
+          other_names?: string | null
+          passport_url?: string | null
+          payment_mode?: string | null
+          phone_number_1?: string | null
+          phone_number_2?: string | null
+          position_held?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          state_of_origin?: string | null
+          status?: string
+          street_name?: string | null
+          surname?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          application_ref_no?: string | null
+          assigned_plot_id?: string | null
+          assigned_user_id?: string | null
+          building_categories?: string[] | null
+          city_town?: string | null
+          company_name?: string | null
+          contact_state?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          email?: string | null
+          employer_name?: string | null
+          employment_status?: string | null
+          first_name?: string | null
+          gender?: string | null
+          house_number?: string | null
+          id?: string
+          id_number?: string | null
+          id_type?: string | null
+          is_company?: boolean | null
+          local_government_area?: string | null
+          nationality?: string | null
+          nok_name?: string | null
+          nok_phone?: string | null
+          nok_relationship?: string | null
+          office_address?: string | null
+          other_names?: string | null
+          passport_url?: string | null
+          payment_mode?: string | null
+          phone_number_1?: string | null
+          phone_number_2?: string | null
+          position_held?: string | null
+          processed_at?: string | null
+          processed_by?: string | null
+          state_of_origin?: string | null
+          status?: string
+          street_name?: string | null
+          surname?: string | null
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "client_applications_assigned_plot_id_fkey"
+            columns: ["assigned_plot_id"]
+            isOneToOne: false
+            referencedRelation: "plots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      company_account: {
+        Row: {
+          account_name: string
+          account_number: string
+          account_type: string | null
+          bank_name: string
+          created_at: string
+          id: string
+          purpose: string | null
+          updated_at: string
+        }
+        Insert: {
+          account_name: string
+          account_number: string
+          account_type?: string | null
+          bank_name: string
+          created_at?: string
+          id?: string
+          purpose?: string | null
+          updated_at?: string
+        }
+        Update: {
+          account_name?: string
+          account_number?: string
+          account_type?: string | null
+          bank_name?: string
+          created_at?: string
+          id?: string
+          purpose?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      documents: {
+        Row: {
+          approval_status: string | null
+          created_at: string
+          document_type: string
+          file_name: string
+          file_url: string
+          id: string
+          notes: string | null
+          payment_category: string | null
+          user_id: string | null
+        }
+        Insert: {
+          approval_status?: string | null
+          created_at?: string
+          document_type?: string
+          file_name: string
+          file_url: string
+          id?: string
+          notes?: string | null
+          payment_category?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          approval_status?: string | null
+          created_at?: string
+          document_type?: string
+          file_name?: string
+          file_url?: string
+          id?: string
+          notes?: string | null
+          payment_category?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      estates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          location: string
+          name: string
+          total_land_size: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          location: string
+          name: string
+          total_land_size?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: string
+          name?: string
+          total_land_size?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       group_pools: {
         Row: {
           admin_notes: string | null
@@ -104,6 +340,172 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_records: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          payment_date: string | null
+          payment_type: string | null
+          status: string
+          transaction_reference: string | null
+          user_id: string | null
+        }
+        Insert: {
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_date?: string | null
+          payment_type?: string | null
+          status?: string
+          transaction_reference?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          payment_date?: string | null
+          payment_type?: string | null
+          status?: string
+          transaction_reference?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      payment_requirements: {
+        Row: {
+          amount_paid: number
+          amount_required: number
+          created_at: string
+          id: string
+          payment_category: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount_paid?: number
+          amount_required?: number
+          created_at?: string
+          id?: string
+          payment_category: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount_paid?: number
+          amount_required?: number
+          created_at?: string
+          id?: string
+          payment_category?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      plot_allocations: {
+        Row: {
+          admin_id: string | null
+          allocation_date: string
+          allocation_type: string
+          approval_status: string
+          created_at: string
+          id: string
+          notes: string | null
+          plot_id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          admin_id?: string | null
+          allocation_date?: string
+          allocation_type?: string
+          approval_status?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          plot_id: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          admin_id?: string | null
+          allocation_date?: string
+          allocation_type?: string
+          approval_status?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          plot_id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plot_allocations_plot_id_fkey"
+            columns: ["plot_id"]
+            isOneToOne: false
+            referencedRelation: "plots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      plots: {
+        Row: {
+          block_number: string | null
+          created_at: string
+          estate_id: string | null
+          id: string
+          location: string
+          plot_number: string
+          price: number
+          property_type: string
+          size_sqm: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          block_number?: string | null
+          created_at?: string
+          estate_id?: string | null
+          id?: string
+          location: string
+          plot_number: string
+          price?: number
+          property_type?: string
+          size_sqm?: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          block_number?: string | null
+          created_at?: string
+          estate_id?: string | null
+          id?: string
+          location?: string
+          plot_number?: string
+          price?: number
+          property_type?: string
+          size_sqm?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "plots_estate_id_fkey"
+            columns: ["estate_id"]
+            isOneToOne: false
+            referencedRelation: "estates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pool_members: {
         Row: {
           committed_amount: number
@@ -156,7 +558,14 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           full_name: string | null
+          google_drive_folder_url: string | null
           id: string
+          id_document_url: string | null
+          id_verification_status: string
+          nok_address: string | null
+          nok_name: string | null
+          nok_phone: string | null
+          nok_relationship: string | null
           phone: string | null
           updated_at: string
         }
@@ -164,7 +573,14 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
+          google_drive_folder_url?: string | null
           id: string
+          id_document_url?: string | null
+          id_verification_status?: string
+          nok_address?: string | null
+          nok_name?: string | null
+          nok_phone?: string | null
+          nok_relationship?: string | null
           phone?: string | null
           updated_at?: string
         }
@@ -172,11 +588,128 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
+          google_drive_folder_url?: string | null
           id?: string
+          id_document_url?: string | null
+          id_verification_status?: string
+          nok_address?: string | null
+          nok_name?: string | null
+          nok_phone?: string | null
+          nok_relationship?: string | null
           phone?: string | null
           updated_at?: string
         }
         Relationships: []
+      }
+      reservations: {
+        Row: {
+          admin_notes: string | null
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          message: string | null
+          phone: string
+          plot_size: string | null
+          property_type: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          message?: string | null
+          phone: string
+          plot_size?: string | null
+          property_type?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_notes?: string | null
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          message?: string | null
+          phone?: string
+          plot_size?: string | null
+          property_type?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          priority: string
+          status: string
+          subject: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          priority?: string
+          status?: string
+          subject: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          priority?: string
+          status?: string
+          subject?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      ticket_messages: {
+        Row: {
+          created_at: string
+          id: string
+          is_internal: boolean
+          message: string
+          sender_id: string | null
+          ticket_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_internal?: boolean
+          message: string
+          sender_id?: string | null
+          ticket_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_internal?: boolean
+          message?: string
+          sender_id?: string | null
+          ticket_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_messages_ticket_id_fkey"
+            columns: ["ticket_id"]
+            isOneToOne: false
+            referencedRelation: "support_tickets"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -230,6 +763,21 @@ export type Database = {
         }
         Returns: string
       }
+      get_estate_ops_summary: {
+        Args: never
+        Returns: {
+          allocated_plots: number
+          available_plots: number
+          open_tickets: number
+          pending_applications: number
+          pending_receipts: number
+          pending_reservations: number
+          total_estates: number
+          total_plots: number
+          total_reservations: number
+          total_revenue: number
+        }[]
+      }
       get_pool_summaries: {
         Args: { _pool_ids: string[] }
         Returns: {
@@ -265,7 +813,7 @@ export type Database = {
       }
     }
     Enums: {
-      app_role: "admin" | "investor"
+      app_role: "admin" | "investor" | "manager"
       pool_member_status:
         | "invited"
         | "pending"
@@ -409,7 +957,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["admin", "investor"],
+      app_role: ["admin", "investor", "manager"],
       pool_member_status: [
         "invited",
         "pending",
