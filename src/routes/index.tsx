@@ -22,8 +22,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { PageShell } from "@/components/site/PageShell";
-import heroImg from "@/assets/hero.jpg";
-import storyImg from "@/assets/guzape-dream-homes.jpg";
+import heroImg from "@/assets/karsana-shopping-mall-hero.jpg";
+import storyImg from "@/assets/kaysteph-reception-office.jpg";
 import investmentImg from "@/assets/estate-plots.jpg";
 import {
   ADDRESS_LINES,
@@ -32,10 +32,18 @@ import {
   PHONE_2,
   PHONE_2_DISPLAY,
   WHATSAPP_URL,
-  properties,
+  mergeCatalogueProperties,
 } from "@/lib/properties";
+import { listPublicPropertyCatalogue } from "@/lib/invest.functions";
 
 export const Route = createFileRoute("/")({
+  loader: async () => {
+    try {
+      return await listPublicPropertyCatalogue();
+    } catch {
+      return { properties: [] };
+    }
+  },
   head: () => ({
     meta: [
       { title: "Kay-Steph Group | Premium Real Estate in Abuja" },
@@ -111,6 +119,19 @@ const organisationSchema = {
 };
 
 function Home() {
+  const loaderData = Route.useLoaderData();
+  const displayedProperties = mergeCatalogueProperties(loaderData.properties).filter(
+    (property) => property.showOnHome !== false,
+  );
+  const activeProjects = displayedProperties.filter(
+    (property) => property.fundingStatus !== "coming_soon",
+  ).length;
+  const districts = new Set(
+    displayedProperties
+      .filter((property) => property.fundingStatus !== "coming_soon")
+      .map((property) => property.location.split(",")[0].trim()),
+  ).size;
+
   return (
     <PageShell>
       <script
@@ -121,10 +142,10 @@ function Home() {
       <section id="top" className="relative min-h-[760px] overflow-hidden bg-navy text-white">
         <img
           src={heroImg}
-          alt="Premium Kay-Steph residence in Abuja"
+          alt="Karsana Shopping Mall by Kay-Steph Group in Abuja"
           className="absolute inset-0 h-full w-full object-cover"
-          width={1600}
-          height={1000}
+          width={2400}
+          height={1350}
           fetchPriority="high"
         />
         <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(7,12,42,0.92)_0%,rgba(7,12,42,0.68)_52%,rgba(7,12,42,0.35)_100%)]" />
@@ -231,10 +252,10 @@ function Home() {
           <div className="relative">
             <img
               src={storyImg}
-              alt="Kay-Steph residential development in Abuja"
+              alt="Kay-Steph Group reception office in Guzape, Abuja"
               className="aspect-[4/3] w-full object-cover"
-              width={1200}
-              height={800}
+              width={2000}
+              height={1428}
               loading="lazy"
             />
             <div className="absolute -bottom-5 -right-4 hidden border border-gold/40 bg-navy px-6 py-4 sm:block">
@@ -260,11 +281,10 @@ function Home() {
               surveyed estate land, with direct access to the team responsible for each transaction.
             </p>
 
-            <div className="mt-10 grid grid-cols-2 gap-6 border-t border-white/15 pt-8 sm:grid-cols-4">
-              <StoryStat value="5" label="Active projects" />
-              <StoryStat value="4" label="Abuja districts" />
-              <StoryStat value="2" label="Ownership routes" />
-              <StoryStat value="1" label="Dedicated team" />
+            <div className="mt-10 grid grid-cols-2 gap-6 border-t border-white/15 pt-8 sm:grid-cols-3">
+              <StoryStat value={String(activeProjects)} label="Active projects" />
+              <StoryStat value={String(districts)} label="Abuja districts" />
+              <StoryStat value="3" label="Ownership routes" />
             </div>
           </div>
         </div>
@@ -286,7 +306,7 @@ function Home() {
           </div>
 
           <div className="mt-14 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {properties.map((property, index) => (
+            {displayedProperties.map((property, index) => (
               <article
                 key={property.id}
                 className={`group relative min-h-[430px] overflow-hidden rounded-md bg-navy ${

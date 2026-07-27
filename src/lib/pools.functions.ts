@@ -106,20 +106,24 @@ export const getPoolDetail = createServerFn({ method: "GET" })
     if (error) throw new Error(error.message);
     if (!pool) throw new Error("Pool not found");
 
-    const { data: members } = await sb
-      .from("pool_members")
-      .select("*")
-      .eq("pool_id", data.pool_id)
-      .order("is_founder", { ascending: false })
-      .order("created_at", { ascending: true });
+    // Through an RPC, not a table read: profiles is readable only by its
+    // owner, so a direct select cannot resolve co-members' names and every row
+    // rendered as "Verified member".
+    const { data: members, error: membersError } = await sb.rpc("get_pool_members", {
+      _pool_id: data.pool_id,
+    });
+    if (membersError) throw new Error(membersError.message);
 
     const { data: summaryRows } = await sb.rpc("get_pool_summaries", {
       _pool_ids: [data.pool_id],
     });
 
+    const memberRows = (members ?? []) as Array<{ is_self?: boolean }>;
+
     return {
       pool,
-      members: members ?? [],
+      members: memberRows,
+      i_am_member: memberRows.some((member) => member.is_self === true),
       summary: (summaryRows ?? [])[0] ?? {
         committed: 0,
         approved: 0,

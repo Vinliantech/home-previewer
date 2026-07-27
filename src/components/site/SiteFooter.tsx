@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import logoImg from "@/assets/logo.png";
+import { NewsletterForm } from "@/components/content/Editorial";
 import { ADDRESS_LINES, EMAIL, PHONE_1, PHONE_1_DISPLAY, WHATSAPP_URL } from "@/lib/properties";
 
 const exploreLinks = [
@@ -16,6 +17,7 @@ const companyLinks = [
   { label: "Our Team", to: "/team" },
   { label: "Services", to: "/services" },
   { label: "Blog", to: "/blog" },
+  { label: "Youth Network", to: "/events/youth-network" },
   { label: "Careers", to: "/careers" },
 ] as const;
 
@@ -23,6 +25,20 @@ export function SiteFooter() {
   return (
     <footer className="bg-[#05091f] py-14 text-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="mb-10 grid gap-5 border-b border-white/12 pb-10 lg:grid-cols-[0.75fr_1.25fr] lg:items-center">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-gold">
+              Kay-Steph Journal
+            </p>
+            <h2 className="mt-2 font-serif text-2xl font-semibold">
+              Property intelligence, selected for you.
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-white/55">
+              Choose relevant updates and receive verified market guidance without inbox noise.
+            </p>
+          </div>
+          <NewsletterForm compact dark />
+        </div>
         <div className="grid gap-10 border-b border-white/12 pb-10 sm:grid-cols-2 md:grid-cols-[1.2fr_0.7fr_0.7fr_0.7fr_1fr]">
           <div>
             <div className="flex items-center gap-3">

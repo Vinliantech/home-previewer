@@ -23,14 +23,22 @@ import {
   FUNDING_STATUS_LABEL,
   INVESTMENT_MODEL_LABEL,
   WHATSAPP_URL,
-  properties,
+  mergeCatalogueProperties,
   type FundingStatus,
   type InvestmentModel,
   type Property,
   type PropertyType,
 } from "@/lib/properties";
+import { listPublicPropertyCatalogue } from "@/lib/invest.functions";
 
 export const Route = createFileRoute("/properties/")({
+  loader: async () => {
+    try {
+      return await listPublicPropertyCatalogue();
+    } catch {
+      return { properties: [] };
+    }
+  },
   head: () => ({
     meta: [
       { title: "Properties | Homes, Terraces, Apartments & Land in Abuja — Kay-Steph" },
@@ -87,8 +95,11 @@ const EMPTY_FILTERS: Filters = {
 function applyFilters(list: Property[], filters: Filters): Property[] {
   return list.filter((property) => {
     if (filters.location !== ALL && property.location !== filters.location) return false;
-    if (filters.type !== ALL && property.propertyType !== filters.type) return false;
+    if (filters.type !== ALL && !property.propertyTypes.includes(filters.type as PropertyType))
+      return false;
     if (filters.price !== ALL) {
+      // A coming-soon project has no price yet, so it can't honestly match any band.
+      if (property.fundingStatus === "coming_soon") return false;
       const band = PRICE_BANDS.find((b) => b.value === filters.price);
       if (band && (property.priceValue < band.min || property.priceValue >= band.max)) return false;
     }
@@ -108,11 +119,29 @@ function applyFilters(list: Property[], filters: Filters): Property[] {
 
 function PropertiesPage() {
   const [filters, setFilters] = useState<Filters>(EMPTY_FILTERS);
+  const loaderData = Route.useLoaderData();
+  const catalogue = useMemo(
+    () => mergeCatalogueProperties(loaderData.properties),
+    [loaderData.properties],
+  );
 
-  const locations = useMemo(() => Array.from(new Set(properties.map((p) => p.location))), []);
-  const types = useMemo(() => Array.from(new Set(properties.map((p) => p.propertyType))), []);
+  const locations = useMemo(
+    () => Array.from(new Set(catalogue.map((p) => p.location))),
+    [catalogue],
+  );
+  const types = useMemo(
+    () => Array.from(new Set(catalogue.flatMap((p) => p.propertyTypes))),
+    [catalogue],
+  );
 
-  const filtered = useMemo(() => applyFilters(properties, filters), [filters]);
+  const filtered = useMemo(() => applyFilters(catalogue, filters), [catalogue, filters]);
+  // Coming-soon projects get their own section: mixing unpriced teasers into
+  // the buyable grid would make the listings look less concrete than they are.
+  const live = useMemo(() => filtered.filter((p) => p.fundingStatus !== "coming_soon"), [filtered]);
+  const comingSoon = useMemo(
+    () => filtered.filter((p) => p.fundingStatus === "coming_soon"),
+    [filtered],
+  );
   const activeCount = Object.values(filters).filter((value) => value !== ALL).length;
 
   const set = (field: keyof Filters) => (value: string) =>
@@ -264,12 +293,12 @@ function PropertiesPage() {
           {/* Results */}
           <div className="mt-8 flex items-center justify-between">
             <p className="text-sm text-muted-foreground">
-              Showing <span className="font-bold text-navy">{filtered.length}</span> of{" "}
-              {properties.length} properties
+              Showing <span className="font-bold text-navy">{live.length}</span> of{" "}
+              {catalogue.length} properties
             </p>
           </div>
 
-          {filtered.length === 0 ? (
+          {live.length === 0 ? (
             <div className="mt-8 rounded-md border border-border bg-white p-12 text-center shadow-sm">
               <Building2 className="mx-auto h-10 w-10 text-gold" />
               <h3 className="mt-4 font-serif text-2xl font-bold text-navy">
@@ -296,9 +325,24 @@ function PropertiesPage() {
             </div>
           ) : (
             <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((property) => (
+              {live.map((property) => (
                 <PropertyCard key={property.id} property={property} />
               ))}
+            </div>
+          )}
+
+          {comingSoon.length > 0 && (
+            <div className="mt-16">
+              <SectionHeading
+                eyebrow="On the horizon"
+                title="Coming Soon Projects"
+                description="New Kay-Steph developments in final planning. Register your interest and an adviser will contact you with launch details before public release."
+              />
+              <div className="mt-8 grid gap-6 md:grid-cols-2">
+                {comingSoon.map((property) => (
+                  <PropertyCard key={property.id} property={property} />
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -416,12 +460,14 @@ function PropertyCard({ property }: { property: Property }) {
             <div className="font-serif text-xl font-bold text-navy">{property.price}</div>
             <div className="text-xs text-muted-foreground">{property.priceNote}</div>
           </div>
-          <div className="text-right">
-            <div className="font-serif text-xl font-bold text-gold">
-              {property.expectedReturnPct}%
+          {property.expectedReturnPct > 0 && (
+            <div className="text-right">
+              <div className="font-serif text-xl font-bold text-gold">
+                {property.expectedReturnPct}%
+              </div>
+              <div className="text-xs text-muted-foreground">proj. return / yr</div>
             </div>
-            <div className="text-xs text-muted-foreground">proj. return / yr</div>
-          </div>
+          )}
         </div>
 
         <Link

@@ -13,6 +13,90 @@ import {
 } from "lucide-react";
 import { PageHero, PageShell, SectionHeading } from "@/components/site/PageShell";
 import { PHONE_1_DISPLAY, WHATSAPP_URL } from "@/lib/properties";
+import ceoImg from "@/assets/team/dr-kolawole-omolayo-ceo.jpg";
+import cooImg from "@/assets/team/stephanie-tayado-kolawole-coo.jpg";
+import buildingEngineerKureImg from "@/assets/team/cyril-christian-kure-building-engineer.jpg";
+import communicationsImg from "@/assets/team/blaize-itodo-communications-manager.jpg";
+import hrImg from "@/assets/team/eboshogwe-acha-hr-manager.jpg";
+import lawyerImg from "@/assets/team/victor-yusuf-zemo-lawyer.jpg";
+import surveyorImg from "@/assets/team/fundi-zachariah-surveyor.jpg";
+import architectImg from "@/assets/team/ifeanyi-uzoigwe-architect.jpg";
+import mediaImg from "@/assets/team/ifunanya-divine-anozie-head-of-media.jpg";
+
+type Leader = {
+  name: string;
+  role: string;
+  bio?: string;
+  photo?: string;
+};
+
+const leadership: Leader[] = [
+  {
+    name: "Dr. Kolawole E. Omolayo",
+    role: "Chief Executive Officer",
+    photo: ceoImg,
+    bio: "A seasoned real estate development and corporate leadership professional. As CEO, he provides strategic direction, oversees project growth, and drives the company's long-term vision for sustainable real estate development.",
+  },
+  {
+    name: "Stephanie Tayado Kolawole",
+    role: "Chief Operating Officer",
+    photo: cooImg,
+    bio: "Leads daily operations across the company's real estate and investment portfolio, with a strong focus on project execution, business growth, and premium residential and commercial developments.",
+  },
+  {
+    name: "Cyril Christian Kure",
+    role: "Building Engineer",
+    photo: buildingEngineerKureImg,
+    bio: "A seasoned Project Coordinator and Project Engineer with over 19 years of experience in public and private sector construction. A Registered Builder and Chartered Project Manager, known for delivering quality projects on time.",
+  },
+  {
+    name: "Mr. Blaize Itodo",
+    role: "Communications Manager",
+    photo: communicationsImg,
+    bio: "A strategic communications professional with over a decade of experience in media, development consulting, and real estate communication — combining strong writing, brand positioning and visual storytelling.",
+  },
+  {
+    name: "Eboshogwe Acha",
+    role: "Human Resource Manager",
+    photo: hrImg,
+    bio: "A results-driven HR professional with strong experience in workforce management, compliance, analytics, and organizational development, supporting structured people operations across Kay-Steph Group.",
+  },
+  {
+    name: "Mr. Victor Yusuf Zemo",
+    role: "Lawyer",
+    photo: lawyerImg,
+    bio: "A legal practitioner with over 10 years of experience in litigation, corporate advisory, and property law. He leads V.Y. Zemo & Co., providing strategic legal support, dispute resolution and advisory services.",
+  },
+  {
+    name: "Mr. Fundi Zachariah",
+    role: "Surveyor",
+    photo: surveyorImg,
+    bio: "A Surveyor and Urban Planning professional with over 15 years of experience in land surveying, layout design, GIS, and site planning, contributing to major estate and master planning projects across Abuja and Nasarawa State.",
+  },
+  {
+    name: "Arc. Ifeanyi Uzoigwe",
+    role: "Architect",
+    photo: architectImg,
+    bio: "A veteran Architect with over 35 years of experience in architectural design and public sector project leadership. A registered MNIA and ARCON member, and former Deputy Director at FCDA Abuja.",
+  },
+  {
+    name: "Ifunanya Divine Anozie",
+    role: "Head of Media",
+    photo: mediaImg,
+    bio: "A Mass Communication graduate with experience in real estate marketing, media, administration, and sales, supporting the company's visibility through client relations, content creation and digital marketing.",
+  },
+];
+
+function initials(name: string): string {
+  return name
+    .replace(/^(Dr\.|Mr\.|Mrs\.|Arc\.)\s+/i, "")
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+}
 
 export const Route = createFileRoute("/team")({
   head: () => ({
@@ -103,8 +187,66 @@ function TeamPage() {
         </div>
       </PageHero>
 
+      {/* Leadership */}
+      <section className="bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8">
+          <SectionHeading
+            eyebrow="The core team"
+            title="The people behind Kay-Steph."
+            description="Named individuals, not a call centre — each with direct accountability for their part of every transaction."
+          />
+
+          <div className="mx-auto mt-14 max-w-5xl divide-y divide-border sm:mt-16">
+            {leadership.map((leader, index) => (
+              <article
+                key={leader.name}
+                className={`grid gap-8 sm:grid-cols-[210px_minmax(0,1fr)] sm:items-center sm:gap-11 ${
+                  index === 0 ? "pb-14" : "py-14"
+                }`}
+              >
+                <div className="relative mx-auto w-full max-w-[210px] sm:mx-0">
+                  <div
+                    aria-hidden="true"
+                    className="absolute -left-2 bottom-[7%] top-[30%] w-2 bg-gold"
+                  />
+                  {leader.photo ? (
+                    <img
+                      src={leader.photo}
+                      alt={leader.name}
+                      width={760}
+                      height={950}
+                      loading="lazy"
+                      className="relative aspect-[4/5] w-full rounded-sm bg-cream object-cover object-top shadow-sm"
+                    />
+                  ) : (
+                    <div className="relative flex aspect-[4/5] w-full items-center justify-center rounded-sm bg-navy font-serif text-4xl font-bold text-gold shadow-sm">
+                      {initials(leader.name)}
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-gold">
+                    {leader.role}
+                  </p>
+                  <h2 className="mt-3 font-serif text-2xl font-bold leading-tight text-navy sm:text-3xl">
+                    {leader.name}
+                  </h2>
+                  <div className="mt-4 max-w-3xl text-sm leading-6 text-muted-foreground">
+                    <p>
+                      {leader.bio ??
+                        `${leader.name} serves as ${leader.role} at Kay-Steph Group.`}
+                    </p>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Desks */}
-      <section className="bg-background py-20">
+      <section className="bg-cream py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <SectionHeading
             eyebrow="Who does what"

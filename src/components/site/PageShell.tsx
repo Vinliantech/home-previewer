@@ -31,15 +31,38 @@ export function PageHero({
   eyebrow,
   title,
   description,
+  /**
+   * Optional artwork behind the hero. It sits under a heavy navy scrim
+   * because these headlines are white and gold — the image reads as texture,
+   * never as the thing you look at, so contrast stays where it needs to be.
+   */
+  backgroundImage,
+  backgroundAlt = "",
   children,
 }: {
   eyebrow: string;
   title: ReactNode;
   description?: string;
+  backgroundImage?: string;
+  backgroundAlt?: string;
   children?: ReactNode;
 }) {
   return (
-    <section className="bg-navy pb-16 pt-[136px] text-white">
+    <section className="relative isolate overflow-hidden bg-navy pb-16 pt-[136px] text-white">
+      {backgroundImage && (
+        <>
+          <img
+            src={backgroundImage}
+            alt={backgroundAlt}
+            aria-hidden={backgroundAlt === "" ? true : undefined}
+            className="absolute inset-0 -z-10 h-full w-full object-cover object-right"
+          />
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 bg-gradient-to-r from-navy via-navy/95 to-navy/75"
+          />
+        </>
+      )}
       <div className="mx-auto max-w-7xl px-4 sm:px-6">
         <p className="text-xs font-bold uppercase tracking-[0.24em] text-gold">{eyebrow}</p>
         <h1 className="mt-4 max-w-3xl font-serif text-4xl font-bold leading-[1.08] sm:text-5xl lg:text-6xl">

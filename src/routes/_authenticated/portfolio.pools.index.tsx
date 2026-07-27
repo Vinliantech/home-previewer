@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ArrowRight, Crown, Loader2, Plus, Target, Users, UsersRound } from "lucide-react";
 import { toast } from "sonner";
 import { createPool, getMyPools, listOpenPools } from "@/lib/pools.functions";
+import { listPublicPropertyCatalogue } from "@/lib/invest.functions";
 import {
   POOL_STATUS_LABEL,
   POOL_VISIBILITY_LABEL,
@@ -12,7 +13,6 @@ import {
   type PoolStatus,
 } from "@/lib/pools";
 import { fmtNGN } from "@/lib/invest";
-import { blockInDemo, demoPools, isDemoActive } from "@/lib/demo";
 import { DashCard, EmptyState, PageHeader, StatusBadge, fmtDate } from "@/components/portfolio/kit";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -32,7 +32,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { properties } from "@/lib/properties";
 
 export const Route = createFileRoute("/_authenticated/portfolio/pools/")({
   component: PoolsPage,
@@ -44,15 +43,13 @@ type PoolWithSummary = GroupPool & {
 };
 
 function PoolsPage() {
-  const demo = isDemoActive();
-
   const { data: mine, isLoading } = useQuery({
     queryKey: ["pools", "mine"],
-    queryFn: () => (demo ? Promise.resolve(demoPools.mine) : getMyPools()),
+    queryFn: () => getMyPools(),
   });
   const { data: open } = useQuery({
     queryKey: ["pools", "open"],
-    queryFn: () => (demo ? Promise.resolve(demoPools.open) : listOpenPools()),
+    queryFn: () => listOpenPools(),
   });
 
   const myPools = (mine?.pools ?? []) as PoolWithSummary[];
@@ -169,9 +166,11 @@ function PoolCard({
   );
 }
 
+const UNDECIDED_PROPERTY = "__undecided__";
+
 const EMPTY_CREATE = {
   name: "",
-  property_name: "",
+  property_id: "",
   visibility: "private" as "private" | "open",
   target_amount: "",
   min_contribution: "",
@@ -183,6 +182,17 @@ const EMPTY_CREATE = {
 
 function CreatePoolDialog({ triggerLabel = "Create pool" }: { triggerLabel?: string }) {
   const qc = useQueryClient();
+  // Same catalogue the public site and admin edit, so a property added in
+  // admin is immediately selectable here.
+  // Raw catalogue rows, not the merged Property[]: a pool links by
+  // tokenized_properties.id, and the merge maps rows onto slugs so the id is
+  // lost. That means the picker only offers DB-backed properties — which is
+  // correct, since a code-only fallback has no record to link to. Anything
+  // else goes in under "to be confirmed".
+  const { data: catalogue } = useQuery({
+    queryKey: ["catalogue", "public"],
+    queryFn: () => listPublicPropertyCatalogue(),
+  });
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState(EMPTY_CREATE);
 
@@ -201,9 +211,13 @@ function CreatePoolDialog({ triggerLabel = "Create pool" }: { triggerLabel?: str
       toast.error(e instanceof Error ? e.message : "Could not create the pool."),
   });
 
+  const chosenProperty =
+    form.property_id && form.property_id !== UNDECIDED_PROPERTY
+      ? (catalogue?.properties ?? []).find((row) => row.id === form.property_id)
+      : undefined;
+
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (blockInDemo()) return;
     const target = Number(form.target_amount);
     if (!form.name.trim() || !target) {
       toast.error("Pool name and target amount are required.");
@@ -212,7 +226,13 @@ function CreatePoolDialog({ triggerLabel = "Create pool" }: { triggerLabel?: str
     mut.mutate({
       data: {
         name: form.name.trim(),
-        property_name: form.property_name || undefined,
+        // Send the real tokenized_properties id so the pool is linked to the
+        // property record, not just labelled with its name. group_pools.property_id
+        // has always had the foreign key; nothing was populating it.
+        property_id: chosenProperty?.id,
+        property_name: chosenProperty
+          ? `${chosenProperty.name} — ${chosenProperty.location}`
+          : undefined,
         visibility: form.visibility,
         target_amount: target,
         min_contribution: form.min_contribution ? Number(form.min_contribution) : undefined,
@@ -248,17 +268,17 @@ function CreatePoolDialog({ triggerLabel = "Create pool" }: { triggerLabel?: str
           </div>
           <div className="space-y-2">
             <Label>Target property</Label>
-            <Select value={form.property_name} onValueChange={set("property_name")}>
+            <Select value={form.property_id} onValueChange={set("property_id")}>
               <SelectTrigger aria-label="Target property">
                 <SelectValue placeholder="Choose a property" />
               </SelectTrigger>
               <SelectContent>
-                {properties.map((p) => (
-                  <SelectItem key={p.id} value={`${p.title} — ${p.location}`}>
-                    {p.title} — {p.location}
+                {(catalogue?.properties ?? []).map((row) => (
+                  <SelectItem key={row.id} value={row.id}>
+                    {row.name} — {row.location}
                   </SelectItem>
                 ))}
-                <SelectItem value="Another property / to be confirmed">
+                <SelectItem value={UNDECIDED_PROPERTY}>
                   Another property / to be confirmed
                 </SelectItem>
               </SelectContent>

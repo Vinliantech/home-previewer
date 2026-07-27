@@ -18,6 +18,7 @@ import {
 import { toast } from "sonner";
 import { PageHero, PageShell, SectionHeading } from "@/components/site/PageShell";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -29,6 +30,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { submitEnquiry } from "@/lib/enquiry.functions";
+import { listPublicPropertyCatalogue } from "@/lib/invest.functions";
 import {
   ADDRESS_LINES,
   EMAIL,
@@ -39,10 +41,17 @@ import {
   PHONE_2,
   PHONE_2_DISPLAY,
   WHATSAPP_URL,
-  properties,
+  mergeCatalogueProperties,
 } from "@/lib/properties";
 
 export const Route = createFileRoute("/contact")({
+  loader: async () => {
+    try {
+      return await listPublicPropertyCatalogue();
+    } catch {
+      return { properties: [] };
+    }
+  },
   head: () => ({
     meta: [
       { title: "Contact Kay-Steph Group | Guzape Office, Abuja" },
@@ -89,6 +98,7 @@ type FormState = {
   propertyInterest: string;
   budget: string;
   message: string;
+  consentGiven: boolean;
   company: string; // honeypot
 };
 
@@ -100,6 +110,7 @@ const EMPTY_FORM: FormState = {
   propertyInterest: "",
   budget: "",
   message: "",
+  consentGiven: false,
   company: "",
 };
 
@@ -329,6 +340,8 @@ function ContactPage() {
 }
 
 function EnquiryForm() {
+  const { properties: catalogueRows } = Route.useLoaderData();
+  const properties = mergeCatalogueProperties(catalogueRows);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -342,6 +355,10 @@ function EnquiryForm() {
       toast.error("Please choose what your enquiry is about.");
       return;
     }
+    if (!form.consentGiven) {
+      toast.error("Please agree to the contact and privacy notice.");
+      return;
+    }
     setSubmitting(true);
     try {
       await submitEnquiry({
@@ -353,6 +370,7 @@ function EnquiryForm() {
           propertyInterest: form.propertyInterest || undefined,
           budget: form.budget || undefined,
           message: form.message,
+          consentGiven: form.consentGiven,
           company: form.company || undefined,
         },
       });
@@ -440,6 +458,22 @@ function EnquiryForm() {
           onChange={(e) => set("email")(e.target.value)}
         />
       </div>
+
+      <label className="flex items-start gap-3 rounded-md border border-border bg-cream/40 p-4 text-sm leading-6 text-muted-foreground">
+        <Checkbox
+          checked={form.consentGiven}
+          onCheckedChange={(checked) =>
+            setForm((previous) => ({ ...previous, consentGiven: checked === true }))
+          }
+          required
+          aria-label="Consent to receive communication from Kay-Steph"
+          className="mt-1"
+        />
+        <span>
+          I agree that Kay-Steph may use the information provided to contact me about properties,
+          events and investment opportunities. I understand that I can unsubscribe at any time.
+        </span>
+      </label>
 
       <div className="grid gap-5 sm:grid-cols-2">
         <div className="space-y-2">
@@ -531,8 +565,7 @@ function EnquiryForm() {
         )}
       </Button>
       <p className="text-xs leading-5 text-muted-foreground">
-        By submitting this form you agree to be contacted by Kay-Steph Group about your enquiry. We
-        never share your details with third parties.
+        We protect your contact information and retain the consent record with this enquiry.
       </p>
     </form>
   );

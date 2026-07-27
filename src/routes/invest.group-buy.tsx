@@ -34,9 +34,17 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { PageHero, PageShell, SectionHeading } from "@/components/site/PageShell";
 import { submitGroupBuyRequest, type GroupBuyInput } from "@/lib/groupbuy.functions";
-import { WHATSAPP_URL, properties } from "@/lib/properties";
+import { listPublicPropertyCatalogue } from "@/lib/invest.functions";
+import { WHATSAPP_URL, mergeCatalogueProperties } from "@/lib/properties";
 
 export const Route = createFileRoute("/invest/group-buy")({
+  loader: async () => {
+    try {
+      return await listPublicPropertyCatalogue();
+    } catch {
+      return { properties: [] };
+    }
+  },
   head: () => ({
     meta: [
       { title: "Group Buy | Buy Abuja Property Together — Kay-Steph" },
@@ -434,6 +442,9 @@ function PropertySelect({
   onChange: (value: string) => void;
   id: string;
 }) {
+  const { properties: catalogueRows } = Route.useLoaderData();
+  const properties = mergeCatalogueProperties(catalogueRows);
+
   return (
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger aria-label="Target property" id={id}>
