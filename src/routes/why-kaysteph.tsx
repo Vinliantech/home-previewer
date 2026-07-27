@@ -19,7 +19,11 @@ import {
   WalletCards,
 } from "lucide-react";
 import { PageHero, PageShell, SectionHeading } from "@/components/site/PageShell";
-import storyImg from "@/assets/guzape-dream-homes.jpg";
+import siteSurveyImg from "@/assets/why-kaysteph/site-survey.jpg";
+import siteTeamImg from "@/assets/why-kaysteph/site-team.jpg";
+import womenOnSiteImg from "@/assets/why-kaysteph/women-on-site.jpg";
+import ceoAndSonImg from "@/assets/why-kaysteph/ceo-and-son.jpg";
+import storyImg from "@/assets/why-kaysteph/guzape-development.jpg";
 import { PHONE_1_DISPLAY, WHATSAPP_URL } from "@/lib/properties";
 
 export const Route = createFileRoute("/why-kaysteph")({
@@ -204,16 +208,88 @@ function WhyKayStephPage() {
         </div>
       </section>
 
+      {/* Proof on the ground */}
+      <section className="bg-cream py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr] lg:items-end">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-gold">
+                On the ground
+              </p>
+              <h2 className="mt-4 font-serif text-3xl font-bold leading-tight text-navy sm:text-4xl">
+                Due diligence is work you can see.
+              </h2>
+            </div>
+            <p className="max-w-2xl leading-7 text-muted-foreground lg:justify-self-end">
+              Our team visits, measures and documents active sites directly. The people advising
+              clients are connected to the engineers, surveyors and project teams responsible for
+              delivery.
+            </p>
+          </div>
+
+          <div className="mt-12 grid gap-5 lg:grid-cols-[1.12fr_0.88fr]">
+            <figure className="group relative min-h-[360px] overflow-hidden bg-navy lg:min-h-[620px]">
+              <img
+                src={siteSurveyImg}
+                alt="Kay-Steph team carrying out survey work on an Abuja development site"
+                width={2200}
+                height={1467}
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+              />
+              <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(5,9,31,0.78),transparent_48%)]" />
+              <figcaption className="absolute inset-x-0 bottom-0 p-6 text-white">
+                <span className="text-xs font-bold uppercase tracking-[0.2em] text-gold">
+                  Physical verification
+                </span>
+                <p className="mt-2 font-serif text-2xl font-bold">Measured on site, not assumed.</p>
+              </figcaption>
+            </figure>
+
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-1">
+              <figure className="group relative min-h-[260px] overflow-hidden bg-navy lg:min-h-0">
+                <img
+                  src={siteTeamImg}
+                  alt="Kay-Steph project team walking an active development site"
+                  width={2200}
+                  height={1467}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(5,9,31,0.7),transparent_46%)]" />
+                <figcaption className="absolute inset-x-0 bottom-0 p-5 text-sm font-semibold text-white">
+                  One team, directly connected to delivery.
+                </figcaption>
+              </figure>
+              <figure className="group relative min-h-[260px] overflow-hidden bg-navy lg:min-h-0">
+                <img
+                  src={womenOnSiteImg}
+                  alt="Women of the Kay-Steph team during an Abuja site inspection"
+                  width={2200}
+                  height={1467}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                />
+                <div className="absolute inset-0 bg-[linear-gradient(0deg,rgba(5,9,31,0.7),transparent_46%)]" />
+                <figcaption className="absolute inset-x-0 bottom-0 p-5 text-sm font-semibold text-white">
+                  Professional oversight at every stage.
+                </figcaption>
+              </figure>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Credibility */}
       <section className="bg-navy py-20 text-white">
         <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div className="relative">
             <img
               src={storyImg}
-              alt="Kay-Steph residential development in Guzape, Abuja"
+              alt="Kay-Steph Dream House development in Guzape, Abuja"
               className="aspect-[4/3] w-full object-cover"
-              width={1200}
-              height={800}
+              width={1280}
+              height={720}
               loading="lazy"
             />
             <div className="absolute -bottom-5 -right-4 hidden border border-gold/40 bg-navy px-6 py-4 sm:block">
@@ -236,16 +312,15 @@ function WhyKayStephPage() {
               we sell, and every client deals directly with the people responsible for delivery.
             </p>
             <p className="mt-4 leading-7 text-white/72">
-              Our active portfolio spans five projects across four Abuja districts, covering
+              Our active portfolio spans six projects across six Abuja districts, covering
               signature residences, serviced apartments, terraces and surveyed estate land — with
-              two documented ownership routes: outright purchase and structured co-investment.
+              three documented ownership routes for buyers and investors.
             </p>
-            <div className="mt-10 grid grid-cols-2 gap-6 border-t border-white/15 pt-8 sm:grid-cols-4">
+            <div className="mt-10 grid grid-cols-2 gap-6 border-t border-white/15 pt-8 sm:grid-cols-3">
               {[
-                { value: "5", label: "Active projects" },
-                { value: "4", label: "Abuja districts" },
-                { value: "2", label: "Ownership routes" },
-                { value: "1", label: "Accountable team" },
+                { value: "6", label: "Active projects" },
+                { value: "6", label: "Abuja districts" },
+                { value: "3", label: "Ownership routes" },
               ].map((stat) => (
                 <div key={stat.label}>
                   <div className="font-serif text-3xl font-bold text-gold">{stat.value}</div>
@@ -255,6 +330,48 @@ function WhyKayStephPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Leadership and legacy */}
+      <section className="bg-background py-20">
+        <div className="mx-auto grid max-w-7xl gap-12 px-4 sm:px-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <figure>
+            <img
+              src={ceoAndSonImg}
+              alt="Kay-Steph CEO Dr. Kolawole E. Omolayo with his son at the Guzape office"
+              width={2000}
+              height={1429}
+              loading="lazy"
+              className="aspect-[4/3] w-full object-cover"
+            />
+            <figcaption className="mt-3 text-sm text-muted-foreground">
+              Dr. Kolawole E. Omolayo with his son at Kay-Steph's Guzape office.
+            </figcaption>
+          </figure>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-gold">
+              Leadership & legacy
+            </p>
+            <h2 className="mt-4 font-serif text-3xl font-bold leading-tight text-navy sm:text-4xl">
+              Building for families — and the next generation.
+            </h2>
+            <p className="mt-6 leading-7 text-muted-foreground">
+              Under Dr. Kolawole E. Omolayo's leadership, Kay-Steph takes a long-term view of every
+              development: the quality of the homes, the clarity of each transaction and the value
+              clients should be able to pass on.
+            </p>
+            <p className="mt-4 leading-7 text-muted-foreground">
+              That standard is personal. We want every Kay-Steph project and process to be worthy
+              of the families who trust us today and the children who will inherit what they build.
+            </p>
+            <Link
+              to="/team"
+              className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-navy hover:text-gold"
+            >
+              Meet the Kay-Steph team <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>

@@ -1,9 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, ArrowLeft, Eye, Shield } from "lucide-react";
+import { Loader2, ArrowLeft, Shield } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { DEMO_ENABLED, DEMO_PASSWORD, enableDemo } from "@/lib/demo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +18,30 @@ export const Route = createFileRoute("/admin/auth")({
   component: AdminAuth,
 });
 
+/**
+ * Where a staff account belongs after signing in, or null when the account has
+ * no staff standing at all. Platform admins land on the control centre, which
+ * links through to the CRM; CRM managers and sales agents go straight to the
+ * CRM workspace, since /admin would only bounce them back here. Anyone in the
+ * directory without a workspace role — including someone still waiting on
+ * approval — lands on their own profile rather than being turned away.
+ */
+async function staffDestination(userId: string): Promise<"/admin" | "/crm" | "/staff" | null> {
+  const { data: isAdmin } = await supabase.rpc("is_admin", { _user_id: userId });
+  if (isAdmin) return "/admin";
+  const [{ data: isCrmAdmin }, { data: isAgent }] = await Promise.all([
+    supabase.rpc("is_crm_admin", { _uid: userId }),
+    supabase.rpc("is_sales_agent", { _uid: userId }),
+  ]);
+  if (isCrmAdmin || isAgent) return "/crm";
+  const { data: staff } = await supabase
+    .from("staff_members")
+    .select("id")
+    .eq("user_id", userId)
+    .maybeSingle();
+  return staff ? "/staff" : null;
+}
+
 function AdminAuth() {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -28,8 +51,8 @@ function AdminAuth() {
   useEffect(() => {
     supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) return;
-      const { data: isAdmin } = await supabase.rpc("is_admin", { _user_id: session.user.id });
-      if (isAdmin) navigate({ to: "/admin" });
+      const destination = await staffDestination(session.user.id);
+      if (destination) navigate({ to: destination });
     });
   }, [navigate]);
 
@@ -45,15 +68,21 @@ function AdminAuth() {
       toast.error("Login failed", { description: error?.message ?? "Unknown error" });
       return;
     }
-    const { data: isAdmin } = await supabase.rpc("is_admin", { _user_id: data.session.user.id });
+    const destination = await staffDestination(data.session.user.id);
     setLoading(false);
-    if (!isAdmin) {
+    if (!destination) {
       await supabase.auth.signOut();
-      toast.error("Access denied", { description: "This account is not an administrator." });
+      toast.error("Access denied", { description: "This account has no staff access." });
       return;
     }
-    toast.success("Welcome, admin");
-    navigate({ to: "/admin" });
+    toast.success(
+      destination === "/admin"
+        ? "Welcome, admin"
+        : destination === "/crm"
+          ? "Welcome to the CRM workspace"
+          : "Welcome to Kay-Steph",
+    );
+    navigate({ to: destination });
   }
 
   return (
@@ -115,55 +144,8 @@ function AdminAuth() {
               )}
             </Button>
           </form>
-
-          {DEMO_ENABLED && <DemoAccess />}
         </div>
       </div>
-    </div>
-  );
-}
-
-function DemoAccess() {
-  const navigate = useNavigate();
-  const [demoPassword, setDemoPassword] = useState("");
-
-  function startDemo(e: React.FormEvent) {
-    e.preventDefault();
-    if (demoPassword !== DEMO_PASSWORD) {
-      toast.error("Incorrect demo password.");
-      return;
-    }
-    enableDemo("admin");
-    toast.success("Demo mode active — viewing sample admin data.");
-    navigate({ to: "/admin" });
-  }
-
-  return (
-    <div className="mt-6 rounded-xl border border-white/15 bg-white/[0.04] p-4">
-      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-white/60">
-        <Eye className="h-3.5 w-3.5 text-gold" /> Demo access
-      </div>
-      <p className="mt-2 text-xs leading-5 text-white/55">
-        Preview the super-admin dashboard with sample data — no account needed.
-      </p>
-      <form onSubmit={startDemo} className="mt-3 flex gap-2">
-        <Input
-          type="password"
-          placeholder="Demo password"
-          value={demoPassword}
-          onChange={(e) => setDemoPassword(e.target.value)}
-          className="h-9 bg-white/5 text-sm text-white placeholder:text-white/40"
-          aria-label="Demo password"
-        />
-        <Button
-          type="submit"
-          size="sm"
-          variant="outline"
-          className="h-9 shrink-0 border-white/25 bg-transparent font-bold text-white hover:border-gold hover:bg-transparent hover:text-gold"
-        >
-          View demo
-        </Button>
-      </form>
     </div>
   );
 }

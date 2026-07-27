@@ -13,6 +13,37 @@ function publicClient() {
 
 // ============= PUBLIC =============
 
+export const listPublicPropertyCatalogue = createServerFn({ method: "GET" }).handler(async () => {
+  const sb = publicClient();
+  // is_public must be filtered here, not in the browser. RLS on
+  // tokenized_properties is USING (true), so anything selected is served to
+  // anonymous visitors — an unlisted project was previously hidden only by
+  // mergeCatalogueProperties dropping it after it had already been sent.
+  const { data, error } = await sb
+    .from("tokenized_properties")
+    .select("*")
+    .eq("is_public", true)
+    .order("created_at", { ascending: true });
+  if (error) throw new Error(error.message);
+  return { properties: data ?? [] };
+});
+
+export const getPublicCatalogueProperty = createServerFn({ method: "GET" })
+  .validator((input) => z.object({ slug: z.string().min(1).max(180) }).parse(input))
+  .handler(async ({ data }) => {
+    const sb = publicClient();
+    // Same reason as the catalogue: an unlisted project with a slug must not
+    // be fetchable by guessing or reusing that slug.
+    const { data: property, error } = await sb
+      .from("tokenized_properties")
+      .select("*")
+      .eq("public_slug", data.slug)
+      .eq("is_public", true)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    return { property: property ?? null };
+  });
+
 export const listOpenProperties = createServerFn({ method: "GET" }).handler(async () => {
   const sb = publicClient();
   const { data, error } = await sb
@@ -26,6 +57,7 @@ export const listOpenProperties = createServerFn({ method: "GET" }).handler(asyn
       "approved",
       "acquisition_in_progress",
     ])
+    .eq("is_public", true)
     .order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
 
@@ -63,6 +95,7 @@ export const getPropertyDetail = createServerFn({ method: "GET" })
       .from("tokenized_properties")
       .select("*, spvs(name)")
       .eq("id", data.id)
+      .eq("is_public", true)
       .maybeSingle();
     if (propertyError) throw new Error(propertyError.message);
     if (!prop) throw new Error("Property not found");
@@ -235,7 +268,7 @@ export const uploadPaymentEvidence = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("submit_investment_payment_evidence", {
       _investment_id: data.investment_id,
       _evidence_url: data.evidence_url,
-      _reference: data.reference ?? "",
+      _reference: data.reference ?? null,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -426,39 +459,77 @@ export const adminReviewKyc = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("admin_review_investor_kyc", {
       _profile_id: data.id,
       _status: data.status,
-      _notes: data.notes ?? "",
+      _notes: data.notes ?? null,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
 
+const adminPropertyInput = z.object({
+  name: z.string().min(2),
+  location: z.string().min(2),
+  description: z.string().optional(),
+  property_type: z.string().optional(),
+  images: z.array(z.string()).optional(),
+  initial_value: z.number().positive(),
+  min_investors: z.number().int().min(1),
+  max_investors: z.number().int().optional(),
+  min_investment: z.number().positive(),
+  max_investment: z.number().optional(),
+  token_value: z.number().positive(),
+  funding_deadline: z.string().optional(),
+  expected_rental_yield: z.number().optional(),
+  expected_appreciation: z.number().optional(),
+  legal_title: z.string().optional(),
+  management_fee_pct: z.number().optional(),
+  exit_terms: z.string().optional(),
+  risk_disclosure: z.string().optional(),
+  spv_id: z.string().uuid().optional(),
+  status: z
+    .enum([
+      "open",
+      "partially_funded",
+      "fully_funded",
+      "under_review",
+      "approved",
+      "acquisition_in_progress",
+      "acquired",
+      "income_generating",
+      "available_for_resale",
+      "sold",
+      "closed",
+    ])
+    .default("open"),
+  public_slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
+  public_tag: z.string().optional(),
+  tagline: z.string().optional(),
+  price_label: z.string().optional(),
+  price_note: z.string().optional(),
+  highlight: z.string().optional(),
+  features: z.array(z.string()).optional(),
+  overview: z.array(z.string()).optional(),
+  public_units: z
+    .array(z.object({ label: z.string().min(1), price: z.string().optional().default("") }))
+    .optional(),
+  public_property_types: z.array(z.string()).optional(),
+  investment_models: z.array(
+    z.enum(["full_purchase", "group_purchase", "fractional", "spv", "tokenized"]),
+  ),
+  public_funding_status: z.enum([
+    "available",
+    "selling",
+    "funding_open",
+    "fully_funded",
+    "coming_soon",
+  ]),
+  is_public: z.boolean(),
+  show_on_home: z.boolean(),
+  home_order: z.number().int().min(0),
+});
+
 export const adminCreateProperty = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((i) =>
-    z
-      .object({
-        name: z.string().min(2),
-        location: z.string().min(2),
-        description: z.string().optional(),
-        property_type: z.string().optional(),
-        images: z.array(z.string()).optional(),
-        initial_value: z.number().positive(),
-        min_investors: z.number().int().min(1),
-        max_investors: z.number().int().optional(),
-        min_investment: z.number().positive(),
-        max_investment: z.number().optional(),
-        token_value: z.number().positive(),
-        funding_deadline: z.string().optional(),
-        expected_rental_yield: z.number().optional(),
-        expected_appreciation: z.number().optional(),
-        legal_title: z.string().optional(),
-        management_fee_pct: z.number().optional(),
-        exit_terms: z.string().optional(),
-        risk_disclosure: z.string().optional(),
-        spv_id: z.string().uuid().optional(),
-      })
-      .parse(i),
-  )
+  .validator((i) => adminPropertyInput.parse(i))
   .handler(async ({ data, context }) => {
     await ensureAdmin(context);
     const payload = { ...data, current_value: data.initial_value, created_by: context.userId };
@@ -469,6 +540,20 @@ export const adminCreateProperty = createServerFn({ method: "POST" })
       .single();
     if (error) throw new Error(error.message);
     return { id: ins.id };
+  });
+
+export const adminUpdateProperty = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .validator((i) => adminPropertyInput.extend({ id: z.string().uuid() }).parse(i))
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { id, ...payload } = data;
+    const { error } = await context.supabase
+      .from("tokenized_properties")
+      .update(payload)
+      .eq("id", id);
+    if (error) throw new Error(error.message);
+    return { id };
   });
 
 export const adminListProperties = createServerFn({ method: "GET" })
@@ -520,7 +605,7 @@ export const adminApproveInvestment = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("admin_approve_investment", {
       _investment_id: data.id,
       _approved_amount: data.approved_amount,
-      _notes: data.notes ?? "",
+      _notes: data.notes ?? null,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -533,7 +618,7 @@ export const adminRejectInvestment = createServerFn({ method: "POST" })
     await ensureAdmin(context);
     const { error } = await context.supabase.rpc("admin_reject_investment", {
       _investment_id: data.id,
-      _notes: data.notes ?? "",
+      _notes: data.notes ?? null,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -559,9 +644,9 @@ export const adminRecordValuation = createServerFn({ method: "POST" })
       _property_id: data.property_id,
       _new_value: data.new_value,
       _valuation_date: data.valuation_date,
-      _valuer: data.valuer ?? "",
-      _report_url: data.report_url ?? "",
-      _notes: data.notes ?? "",
+      _valuer: data.valuer ?? null,
+      _report_url: data.report_url ?? null,
+      _notes: data.notes ?? null,
     });
     if (error) throw new Error(error.message);
     return { ok: true, change: Number(change ?? 0) };
@@ -596,7 +681,7 @@ export const adminRecordRentalIncome = createServerFn({ method: "POST" })
       _taxes: data.taxes,
       _other_expenses: data.other_expenses,
       _distribution_date: data.distribution_date,
-      _notes: data.notes ?? "",
+      _notes: data.notes ?? null,
     });
     if (error) throw new Error(error.message);
     return { ok: true, net };
@@ -609,7 +694,7 @@ export const adminMarkPayoutPaid = createServerFn({ method: "POST" })
     await ensureAdmin(context);
     const { error } = await context.supabase.rpc("admin_mark_rental_payout_paid", {
       _payout_id: data.id,
-      _reference: data.reference ?? "",
+      _reference: data.reference ?? null,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -664,7 +749,7 @@ export const adminApproveWithdrawal = createServerFn({ method: "POST" })
     await ensureAdmin(context);
     const { error } = await context.supabase.rpc("admin_approve_withdrawal", {
       _withdrawal_id: data.id,
-      _reference: data.reference ?? "",
+      _reference: data.reference ?? null,
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -737,7 +822,7 @@ export const adminUpdateExit = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("admin_update_exit_request", {
       _exit_id: data.id,
       _status: data.status,
-      _notes: data.notes ?? "",
+      _notes: data.notes ?? null,
     });
     if (error) throw new Error(error.message);
     return { ok: true };

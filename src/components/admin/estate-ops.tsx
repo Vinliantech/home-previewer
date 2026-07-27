@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { Building2, Download, Landmark, Loader2, MapPin, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { blockInDemo, demoEstateOps, isDemoActive } from "@/lib/demo";
 import { fmtNGN } from "@/lib/invest";
 import { DashCard, EmptyState, StatusBadge, fmtDate } from "@/components/portfolio/kit";
 import { Button } from "@/components/ui/button";
@@ -64,7 +63,6 @@ function Loading() {
 
 /* ============================ ESTATES ============================ */
 export function EstatesModule() {
-  const demo = isDemoActive();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -78,15 +76,11 @@ export function EstatesModule() {
 
   async function load() {
     setLoading(true);
-    if (demo) {
-      setRows(demoEstateOps.estates);
-    } else {
-      const { data } = await sb()
-        .from("estates")
-        .select("*")
-        .order("created_at", { ascending: false });
-      setRows(data ?? []);
-    }
+    const { data } = await sb()
+      .from("estates")
+      .select("*")
+      .order("created_at", { ascending: false });
+    setRows(data ?? []);
     setLoading(false);
   }
   useEffect(() => {
@@ -110,7 +104,6 @@ export function EstatesModule() {
   }
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    if (blockInDemo()) return;
     if (!form.name.trim() || !form.location.trim())
       return void toast.error("Name and location are required.");
     const payload = {
@@ -128,7 +121,6 @@ export function EstatesModule() {
     load();
   }
   async function remove(r: Row) {
-    if (blockInDemo()) return;
     if (
       !window.confirm(
         `Delete estate "${r.name}"? Plots keep their records but lose the estate link.`,
@@ -253,11 +245,10 @@ export function EstatesModule() {
 }
 
 /* ============================ PLOTS ============================ */
-const PLOT_STATUSES = ["available", "reserved", "allocated", "sold"];
+const PLOT_STATUSES = ["available", "on_hold", "reserved", "allocated", "sold"];
 const PROPERTY_TYPES = ["residential", "commercial", "land", "mixed_use"];
 
 export function PlotsModule() {
-  const demo = isDemoActive();
   const [rows, setRows] = useState<Row[]>([]);
   const [estates, setEstates] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
@@ -276,17 +267,12 @@ export function PlotsModule() {
 
   async function load() {
     setLoading(true);
-    if (demo) {
-      setRows(demoEstateOps.plots);
-      setEstates(demoEstateOps.estates);
-    } else {
-      const [p, e] = await Promise.all([
-        sb().from("plots").select("*, estates(id, name)").order("plot_number"),
-        sb().from("estates").select("id, name, location").order("name"),
-      ]);
-      setRows(p.data ?? []);
-      setEstates(e.data ?? []);
-    }
+    const [p, e] = await Promise.all([
+      sb().from("plots").select("*, estates(id, name)").order("plot_number"),
+      sb().from("estates").select("id, name, location").order("name"),
+    ]);
+    setRows(p.data ?? []);
+    setEstates(e.data ?? []);
     setLoading(false);
   }
   useEffect(() => {
@@ -305,7 +291,6 @@ export function PlotsModule() {
 
   async function addPlot(e: React.FormEvent) {
     e.preventDefault();
-    if (blockInDemo()) return;
     if (!form.plot_number.trim() || !form.estate_id)
       return void toast.error("Plot number and estate are required.");
     const { error } = await sb()
@@ -335,14 +320,12 @@ export function PlotsModule() {
     load();
   }
   async function setStatus(r: Row, status: string) {
-    if (blockInDemo()) return;
     const { error } = await sb().from("plots").update({ status }).eq("id", r.id);
     if (error) return void toast.error(error.message);
     toast.success(`Plot marked ${status}`);
     load();
   }
   async function remove(r: Row) {
-    if (blockInDemo()) return;
     if (!window.confirm(`Delete plot ${r.plot_number}?`)) return;
     const { error } = await sb().from("plots").delete().eq("id", r.id);
     if (error) return void toast.error(error.message);
@@ -492,7 +475,7 @@ export function PlotsModule() {
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
           <DialogHeader>
             <DialogTitle className="font-serif text-navy">Add plot</DialogTitle>
           </DialogHeader>
@@ -584,7 +567,6 @@ export function PlotsModule() {
 
 /* ============================ ALLOCATIONS ============================ */
 export function AllocationsModule() {
-  const demo = isDemoActive();
   const [rows, setRows] = useState<Row[]>([]);
   const [plots, setPlots] = useState<Row[]>([]);
   const [clients, setClients] = useState<Row[]>([]);
@@ -595,29 +577,23 @@ export function AllocationsModule() {
 
   async function load() {
     setLoading(true);
-    if (demo) {
-      setRows(demoEstateOps.allocations);
-      setPlots(demoEstateOps.plots.filter((p) => p.status === "available"));
-      setClients(demoEstateOps.profiles);
-    } else {
-      const [a, p, c] = await Promise.all([
-        sb()
-          .from("plot_allocations")
-          .select(
-            "*, plots(plot_number, location, block_number, estates(name)), profiles(full_name, email, phone)",
-          )
-          .order("allocation_date", { ascending: false }),
-        sb()
-          .from("plots")
-          .select("id, plot_number, location, status")
-          .eq("status", "available")
-          .order("plot_number"),
-        sb().from("profiles").select("id, user_id, full_name, email").order("full_name"),
-      ]);
-      setRows(a.data ?? []);
-      setPlots(p.data ?? []);
-      setClients(c.data ?? []);
-    }
+    const [a, p, c] = await Promise.all([
+      sb()
+        .from("plot_allocations")
+        .select(
+          "*, plots(plot_number, location, block_number, estates(name)), profiles(full_name, email, phone)",
+        )
+        .order("allocation_date", { ascending: false }),
+      sb()
+        .from("plots")
+        .select("id, plot_number, location, status")
+        .eq("status", "available")
+        .order("plot_number"),
+      sb().from("profiles").select("id, user_id, full_name, email").order("full_name"),
+    ]);
+    setRows(a.data ?? []);
+    setPlots(p.data ?? []);
+    setClients(c.data ?? []);
     setLoading(false);
   }
   useEffect(() => {
@@ -626,7 +602,6 @@ export function AllocationsModule() {
 
   async function allocate(e: React.FormEvent) {
     e.preventDefault();
-    if (blockInDemo()) return;
     if (!plotId || !userId) return void toast.error("Choose a plot and a client.");
     const { data: auth } = await sb().auth.getUser();
     const { error } = await sb()
@@ -648,7 +623,6 @@ export function AllocationsModule() {
     load();
   }
   async function deallocate(r: Row) {
-    if (blockInDemo()) return;
     if (!window.confirm("Release this allocation and return the plot to available?")) return;
     await sb().from("plot_allocations").delete().eq("id", r.id);
     await sb().from("plots").update({ status: "available" }).eq("id", r.plot_id);
@@ -773,7 +747,6 @@ export function AllocationsModule() {
 
 /* ============================ APPLICATIONS ============================ */
 export function ApplicationsModule() {
-  const demo = isDemoActive();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<Row | null>(null);
@@ -781,15 +754,11 @@ export function ApplicationsModule() {
 
   async function load() {
     setLoading(true);
-    if (demo) {
-      setRows(demoEstateOps.applications);
-    } else {
-      const { data } = await sb()
-        .from("client_applications")
-        .select("*")
-        .order("created_at", { ascending: false });
-      setRows(data ?? []);
-    }
+    const { data } = await sb()
+      .from("client_applications")
+      .select("*")
+      .order("created_at", { ascending: false });
+    setRows(data ?? []);
     setLoading(false);
   }
   useEffect(() => {
@@ -797,7 +766,6 @@ export function ApplicationsModule() {
   }, []);
 
   async function review(app: Row, status: "approved" | "rejected") {
-    if (blockInDemo()) return;
     const { data: auth } = await sb().auth.getUser();
     const { error } = await sb()
       .from("client_applications")
@@ -885,22 +853,56 @@ export function ApplicationsModule() {
           </DialogHeader>
           {selected && (
             <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3 text-sm">
+              <div className="grid gap-3 text-sm sm:grid-cols-2">
                 <Detail
                   label="Applicant"
-                  value={[selected.title, selected.first_name, selected.surname]
+                  value={[selected.title, selected.first_name, selected.other_names, selected.surname]
                     .filter(Boolean)
                     .join(" ")}
                 />
                 <Detail label="Gender" value={selected.gender} />
+                <Detail label="Date of birth" value={fmtDate(selected.date_of_birth)} />
+                <Detail label="Nationality" value={selected.nationality} />
+                <Detail label="State of origin" value={selected.state_of_origin} />
+                <Detail label="Local government" value={selected.local_government_area} />
                 <Detail label="Email" value={selected.email} />
                 <Detail label="Phone" value={selected.phone_number_1} />
+                <Detail label="Alternative phone" value={selected.phone_number_2} />
+                <Detail
+                  label="Residential address"
+                  value={[
+                    selected.house_number,
+                    selected.street_name,
+                    selected.city_town,
+                    selected.contact_state,
+                  ].filter(Boolean).join(", ")}
+                />
                 <Detail label="Payment mode" value={selected.payment_mode} />
                 <Detail
                   label="Categories"
                   value={(selected.building_categories ?? []).join(", ")}
                 />
+                <Detail label="Employment status" value={selected.employment_status} />
+                <Detail label="Employer" value={selected.employer_name} />
+                <Detail label="Position held" value={selected.position_held} />
+                <Detail label="Office address" value={selected.office_address} />
+                <Detail label="Next of kin" value={selected.nok_name} />
+                <Detail label="Next-of-kin phone" value={selected.nok_phone} />
+                <Detail label="Next-of-kin relationship" value={selected.nok_relationship} />
+                <Detail
+                  label="Identity document"
+                  value={[selected.id_type, selected.id_number].filter(Boolean).join(" · ")}
+                />
+                <Detail label="Company application" value={selected.is_company ? "Yes" : "No"} />
+                {selected.is_company && <Detail label="Company name" value={selected.company_name} />}
+                <Detail label="Received" value={fmtDate(selected.created_at)} />
+                <Detail label="Processed" value={fmtDate(selected.processed_at)} />
               </div>
+              {selected.passport_url && (
+                <a href={selected.passport_url} target="_blank" rel="noreferrer" className="text-sm font-semibold text-navy underline">
+                  View passport photograph
+                </a>
+              )}
               <Field label="Admin notes">
                 <Textarea
                   rows={3}
@@ -936,23 +938,30 @@ export function ApplicationsModule() {
 const RESERVATION_STATUSES = ["pending", "contacted", "confirmed", "cancelled"];
 
 export function ReservationsModule() {
-  const demo = isDemoActive();
   const [rows, setRows] = useState<Row[]>([]);
+  const [estates, setEstates] = useState<Row[]>([]);
+  const [plots, setPlots] = useState<Row[]>([]);
+  const [clients, setClients] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [active, setActive] = useState<Row | null>(null);
   const [notes, setNotes] = useState("");
+  const [estateId, setEstateId] = useState("");
+  const [plotId, setPlotId] = useState("");
+  const [clientUserId, setClientUserId] = useState("");
+  const [reservedUntil, setReservedUntil] = useState("");
 
   async function load() {
     setLoading(true);
-    if (demo) {
-      setRows(demoEstateOps.reservations);
-    } else {
-      const { data } = await sb()
-        .from("reservations")
-        .select("*")
-        .order("created_at", { ascending: false });
-      setRows(data ?? []);
-    }
+    const [r, e, p, c] = await Promise.all([
+      sb().from("reservations").select("*, plots(plot_number, status, estates(id, name))").order("created_at", { ascending: false }),
+      sb().from("estates").select("id, name, location").order("name"),
+      sb().from("plots").select("id, estate_id, plot_number, block_number, size_sqm, status").in("status", ["available", "on_hold"]).order("plot_number"),
+      sb().from("profiles").select("id, user_id, full_name, email").order("full_name"),
+    ]);
+    setRows(r.data ?? []);
+    setEstates(e.data ?? []);
+    setPlots(p.data ?? []);
+    setClients(c.data ?? []);
     setLoading(false);
   }
   useEffect(() => {
@@ -960,27 +969,59 @@ export function ReservationsModule() {
   }, []);
 
   async function setStatus(r: Row, status: string) {
-    if (blockInDemo()) return;
+    if (status === "cancelled" && r.plot_id) {
+      const { error } = await (supabase as any).rpc("admin_assign_reservation_plot", {
+        _reservation_id: r.id,
+        _plot_id: null,
+        _client_user_id: r.client_user_id ?? null,
+        _reserved_until: null,
+        _notes: r.admin_notes ?? null,
+        _status: status,
+      });
+      if (error) return void toast.error(error.message);
+      toast.success("Reservation cancelled and plot returned to sale");
+      return void load();
+    }
     const { error } = await sb().from("reservations").update({ status }).eq("id", r.id);
     if (error) return void toast.error(error.message);
     toast.success(`Reservation ${status}`);
     load();
   }
+  function openReservation(r: Row) {
+    setActive(r);
+    setNotes(r.admin_notes ?? "");
+    setEstateId(r.estate_id ?? r.plots?.estates?.id ?? "");
+    setPlotId(r.plot_id ?? "");
+    setClientUserId(r.client_user_id ?? "");
+    setReservedUntil(r.reserved_until ?? "");
+  }
   async function saveNotes() {
     if (!active) return;
-    if (blockInDemo()) return;
-    const { error } = await sb()
-      .from("reservations")
-      .update({ admin_notes: notes })
-      .eq("id", active.id);
+    const { error } = await (supabase as any).rpc("admin_assign_reservation_plot", {
+      _reservation_id: active.id,
+      _plot_id: plotId || null,
+      _client_user_id: clientUserId || null,
+      _reserved_until: reservedUntil || null,
+      _notes: notes || null,
+      _status: plotId ? "confirmed" : active.status,
+    });
     if (error) return void toast.error(error.message);
-    toast.success("Notes saved");
+    toast.success(plotId ? "Plot placed on hold for this reservation" : "Reservation updated");
     setActive(null);
     load();
   }
   async function remove(r: Row) {
-    if (blockInDemo()) return;
     if (!window.confirm("Delete this reservation?")) return;
+    if (r.plot_id) {
+      await (supabase as any).rpc("admin_assign_reservation_plot", {
+        _reservation_id: r.id,
+        _plot_id: null,
+        _client_user_id: r.client_user_id ?? null,
+        _reserved_until: null,
+        _notes: r.admin_notes ?? null,
+        _status: "cancelled",
+      });
+    }
     await sb().from("reservations").delete().eq("id", r.id);
     toast.success("Reservation deleted");
     load();
@@ -1022,8 +1063,8 @@ export function ReservationsModule() {
                 {r.phone}
               </Td>
               <Td className="text-slate-600">
-                {r.property_type ?? "—"}
-                {r.plot_size ? ` · ${r.plot_size}` : ""}
+                {r.plots?.estates?.name ?? r.property_type ?? "—"}
+                {r.plots?.plot_number ? ` · Plot ${r.plots.plot_number}` : r.plot_size ? ` · ${r.plot_size}` : ""}
               </Td>
               <Td>
                 <Select value={r.status} onValueChange={(v) => setStatus(r, v)}>
@@ -1045,12 +1086,9 @@ export function ReservationsModule() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => {
-                      setActive(r);
-                      setNotes(r.admin_notes ?? "");
-                    }}
+                    onClick={() => openReservation(r)}
                   >
-                    Notes
+                    Manage
                   </Button>
                   <Button
                     size="sm"
@@ -1068,7 +1106,7 @@ export function ReservationsModule() {
       )}
 
       <Dialog open={!!active} onOpenChange={(v) => !v && setActive(null)}>
-        <DialogContent>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="font-serif text-navy">{active?.full_name}</DialogTitle>
           </DialogHeader>
@@ -1079,6 +1117,40 @@ export function ReservationsModule() {
                   “{active.message}”
                 </div>
               )}
+              <Field label="Link to client account">
+                <Select value={clientUserId || "__none__"} onValueChange={(value) => setClientUserId(value === "__none__" ? "" : value)}>
+                  <SelectTrigger aria-label="Client account"><SelectValue placeholder="Choose client" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">No client account linked</SelectItem>
+                    {clients.map((client) => <SelectItem key={client.id} value={client.user_id}>{client.full_name} — {client.email}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </Field>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <Field label="Estate">
+                  <Select value={estateId || "__none__"} onValueChange={(value) => { setEstateId(value === "__none__" ? "" : value); setPlotId(""); }}>
+                    <SelectTrigger aria-label="Estate"><SelectValue placeholder="Choose estate" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">No estate selected</SelectItem>
+                      {estates.map((estate) => <SelectItem key={estate.id} value={estate.id}>{estate.name}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </Field>
+                <Field label="Plot to hold">
+                  <Select value={plotId || "__none__"} onValueChange={(value) => setPlotId(value === "__none__" ? "" : value)} disabled={!estateId}>
+                    <SelectTrigger aria-label="Plot"><SelectValue placeholder="Choose plot" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="__none__">Release / no plot hold</SelectItem>
+                      {plots.filter((plot) => plot.estate_id === estateId && (plot.status === "available" || plot.id === active.plot_id)).map((plot) => (
+                        <SelectItem key={plot.id} value={plot.id}>Plot {plot.plot_number}{plot.block_number ? ` · Block ${plot.block_number}` : ""} · {plot.size_sqm} sqm</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </Field>
+              </div>
+              <Field label="Hold until">
+                <Input type="date" value={reservedUntil} onChange={(event) => setReservedUntil(event.target.value)} />
+              </Field>
               <Field label="Admin notes">
                 <Textarea rows={3} value={notes} onChange={(e) => setNotes(e.target.value)} />
               </Field>
@@ -1086,7 +1158,7 @@ export function ReservationsModule() {
                 onClick={saveNotes}
                 className="w-full rounded-full bg-gold font-bold text-gold-foreground hover:bg-gold/90"
               >
-                Save notes
+                {plotId ? "Save and hold plot" : "Save reservation"}
               </Button>
             </div>
           )}

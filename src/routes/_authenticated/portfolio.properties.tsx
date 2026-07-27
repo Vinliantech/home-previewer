@@ -114,10 +114,10 @@ function MyProperties() {
                     onDone={() => qc.invalidateQueries({ queryKey: ["portfolio"] })}
                   />
                 )}
-                {(investment as any).certificate_number && (
+                {investment.certificate_number && (
                   <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-medium text-emerald-700">
                     <Award className="h-4 w-4 shrink-0" />
-                    Certificate: <b>{(investment as any).certificate_number}</b>
+                    Certificate: <b>{investment.certificate_number}</b>
                   </div>
                 )}
               </div>

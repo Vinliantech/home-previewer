@@ -1,9 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, CheckCircle2, Eye, Handshake, LayoutDashboard, Loader2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Handshake, LayoutDashboard, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { DEMO_ENABLED, DEMO_PASSWORD, enableDemo } from "@/lib/demo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -161,8 +160,6 @@ function ClientAuth() {
               </Link>
             </p>
 
-            {DEMO_ENABLED && <DemoAccess />}
-
             <div className="mt-6 border-t border-white/10 pt-5">
               <Link
                 to="/affiliate/auth"
@@ -182,51 +179,6 @@ function ClientAuth() {
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-function DemoAccess() {
-  const navigate = useNavigate();
-  const [demoPassword, setDemoPassword] = useState("");
-
-  function startDemo(e: React.FormEvent) {
-    e.preventDefault();
-    if (demoPassword !== DEMO_PASSWORD) {
-      toast.error("Incorrect demo password.");
-      return;
-    }
-    enableDemo("client");
-    toast.success("Demo mode active — viewing sample data.");
-    navigate({ to: "/portfolio" });
-  }
-
-  return (
-    <div className="mt-6 rounded-xl border border-white/15 bg-white/[0.04] p-4">
-      <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-white/60">
-        <Eye className="h-3.5 w-3.5 text-gold" /> Demo access
-      </div>
-      <p className="mt-2 text-xs leading-5 text-white/55">
-        Preview the client dashboard with sample data — no account needed.
-      </p>
-      <form onSubmit={startDemo} className="mt-3 flex gap-2">
-        <Input
-          type="password"
-          placeholder="Demo password"
-          value={demoPassword}
-          onChange={(e) => setDemoPassword(e.target.value)}
-          className="h-9 bg-white/5 text-sm text-white placeholder:text-white/40"
-          aria-label="Demo password"
-        />
-        <Button
-          type="submit"
-          size="sm"
-          variant="outline"
-          className="h-9 shrink-0 border-white/25 bg-transparent font-bold text-white hover:border-gold hover:bg-transparent hover:text-gold"
-        >
-          View demo
-        </Button>
-      </form>
     </div>
   );
 }

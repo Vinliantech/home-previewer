@@ -33,7 +33,6 @@ import {
   StatusBadge,
 } from "@/components/portfolio/kit";
 import { supabase } from "@/integrations/supabase/client";
-import { DEMO_NAME, isDemoActive } from "@/lib/demo";
 
 export const Route = createFileRoute("/_authenticated/portfolio/")({
   component: Overview,
@@ -52,10 +51,6 @@ function Overview() {
   const [firstName, setFirstName] = useState("");
 
   useEffect(() => {
-    if (isDemoActive()) {
-      setFirstName(DEMO_NAME.split(" ")[0]);
-      return;
-    }
     supabase.auth.getUser().then(({ data: authData }) => {
       const name = (authData.user?.user_metadata?.full_name as string) ?? "";
       setFirstName(name.split(" ")[0] ?? "");

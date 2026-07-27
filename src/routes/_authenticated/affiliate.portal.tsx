@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { LogOut, Home, Loader2, Camera } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { blockInDemo, demoAffiliate, disableDemo, isDemoActive } from "@/lib/demo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -19,6 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { fmtNaira, fmtDate, memberId, statusPillClass, getYouTubeId } from "@/lib/affiliate";
+import { submitAffiliateReferral } from "@/lib/affiliate.functions";
 
 type AffiliateProfile = {
   id: string;
@@ -35,6 +35,15 @@ type AffiliateProfile = {
   sort_code: string | null;
   commission_rate: number;
   status: string;
+  supervisor_staff_id?: string | null;
+  supervisor?: {
+    id: string;
+    full_name: string;
+    position: string | null;
+    department: string | null;
+    email: string;
+    phone: string | null;
+  } | null;
 };
 
 export const Route = createFileRoute("/_authenticated/affiliate/portal")({
@@ -55,14 +64,9 @@ function AffiliateDashboard() {
   const [notAffiliate, setNotAffiliate] = useState(false);
 
   async function loadProfile() {
-    if (isDemoActive()) {
-      setProfile(demoAffiliate.profile as AffiliateProfile);
-      setLoading(false);
-      return;
-    }
     const { data } = await (supabase as any)
       .from("affiliate_profiles")
-      .select("*")
+      .select("*, supervisor:staff_members!affiliate_profiles_supervisor_staff_id_fkey(id, full_name, position, department, email, phone)")
       .eq("user_id", user.id)
       .maybeSingle();
     if (!data) {
@@ -78,11 +82,7 @@ function AffiliateDashboard() {
   }, []);
 
   async function signOut() {
-    if (isDemoActive()) {
-      disableDemo();
-    } else {
-      await supabase.auth.signOut();
-    }
+    await supabase.auth.signOut();
     toast.success("Signed out");
     navigate({ to: "/affiliate/auth", replace: true });
   }
@@ -180,16 +180,6 @@ function AffiliateBody({
   const [videos, setVideos] = useState<any[]>([]);
 
   async function reload() {
-    if (isDemoActive()) {
-      setProperties(demoAffiliate.properties);
-      setLeads(demoAffiliate.leads);
-      setCommissions(demoAffiliate.commissions);
-      setPayouts(demoAffiliate.payouts);
-      setEarnings(demoAffiliate.earnings);
-      setLeaderboard(demoAffiliate.leaderboard);
-      setVideos(demoAffiliate.videos);
-      return;
-    }
     const sb = supabase as any;
     const [p, l, c, po, e, lb, tv] = await Promise.all([
       sb.from("available_properties").select("*").eq("is_active", true).order("property_name"),
@@ -344,7 +334,6 @@ function ProfileForm({ profile, onChange }: { profile: AffiliateProfile; onChang
 
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    if (blockInDemo()) return;
     const { error } = await (supabase as any)
       .from("affiliate_profiles")
       .update(form)
@@ -357,7 +346,6 @@ function ProfileForm({ profile, onChange }: { profile: AffiliateProfile; onChang
   async function uploadAvatar(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (blockInDemo()) return;
     if (file.size > 5 * 1024 * 1024) return toast.error("Image must be under 5 MB");
     if (!file.type.startsWith("image/")) return toast.error("Choose an image file");
     setUploading(true);
@@ -396,6 +384,26 @@ function ProfileForm({ profile, onChange }: { profile: AffiliateProfile; onChang
 
   return (
     <div className="space-y-6">
+      <Card className="border-gold/30 bg-navy text-white">
+        <CardHeader>
+          <CardTitle className="font-serif text-gold">Your Kay-Steph supervisor</CardTitle>
+          <CardDescription className="text-white/60">
+            The staff member assigned to support your referrals and client follow-up.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {profile.supervisor ? (
+            <div className="grid gap-2 text-sm sm:grid-cols-2">
+              <p><span className="text-white/50">Name</span><br /><b>{profile.supervisor.full_name}</b></p>
+              <p><span className="text-white/50">Role</span><br />{profile.supervisor.position ?? profile.supervisor.department ?? "Affiliate supervisor"}</p>
+              <p><span className="text-white/50">Email</span><br /><a className="text-gold underline" href={`mailto:${profile.supervisor.email}`}>{profile.supervisor.email}</a></p>
+              <p><span className="text-white/50">Phone</span><br />{profile.supervisor.phone ?? "Available through the office"}</p>
+            </div>
+          ) : (
+            <p className="text-sm text-white/70">A supervisor has not been assigned yet. The affiliate desk will continue to support you.</p>
+          )}
+        </CardContent>
+      </Card>
       <Card className="border-gold/30">
         <CardContent className="flex flex-col items-center gap-6 py-6 sm:flex-row">
           <div className="relative">
@@ -532,22 +540,30 @@ function ReferForm({
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (blockInDemo()) return;
     setSubmitting(true);
-    const { error } = await (supabase as any).from("client_leads").insert({
-      affiliate_id: profile.id,
-      client_full_name: f.client_full_name,
-      client_email: f.client_email,
-      client_phone: f.client_phone,
-      property_of_interest: f.property_of_interest || null,
-      client_budget_min: f.client_budget_min ? Number(f.client_budget_min) : null,
-      client_budget_max: f.client_budget_max ? Number(f.client_budget_max) : null,
-      client_requirements: f.client_requirements || null,
-      contact_method: f.contact_method,
-    });
+    // Goes through the server so the referral is recorded AND handed to the CRM
+    // pipeline (dedupe, adviser assignment, follow-up task) in one step.
+    try {
+      await submitAffiliateReferral({
+        data: {
+          clientFullName: f.client_full_name,
+          clientEmail: f.client_email,
+          clientPhone: f.client_phone,
+          propertyOfInterest: f.property_of_interest || undefined,
+          clientBudgetMin: f.client_budget_min ? Number(f.client_budget_min) : null,
+          clientBudgetMax: f.client_budget_max ? Number(f.client_budget_max) : null,
+          clientRequirements: f.client_requirements || undefined,
+          contactMethod: f.contact_method,
+        },
+      });
+    } catch (error) {
+      setSubmitting(false);
+      return toast.error(
+        error instanceof Error ? error.message : "The referral could not be submitted.",
+      );
+    }
     setSubmitting(false);
-    if (error) return toast.error(error.message);
-    toast.success("Referral submitted");
+    toast.success("Referral submitted — an adviser will follow up.");
     setF({
       client_full_name: "",
       client_email: "",
@@ -758,7 +774,6 @@ function PayoutsPanel({
     if (!amt || amt <= 0) return toast.error("Enter a valid amount");
     if (earnings && amt > Number(earnings.pending_payout))
       return toast.error("Amount exceeds approved balance");
-    if (blockInDemo()) return;
     setSubmitting(true);
     const { error } = await (supabase as any).from("payout_requests").insert({
       affiliate_id: profile.id,

@@ -10,9 +10,17 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { PageHero, PageShell, SectionHeading } from "@/components/site/PageShell";
-import { WHATSAPP_URL, properties } from "@/lib/properties";
+import { WHATSAPP_URL, mergeCatalogueProperties } from "@/lib/properties";
+import { listPublicPropertyCatalogue } from "@/lib/invest.functions";
 
 export const Route = createFileRoute("/market-report")({
+  loader: async () => {
+    try {
+      return await listPublicPropertyCatalogue();
+    } catch {
+      return { properties: [] };
+    }
+  },
   head: () => ({
     meta: [
       { title: "Abuja Market Report | District Prices & Trends — Kay-Steph" },
@@ -90,6 +98,9 @@ const drivers = [
 ];
 
 function MarketReportPage() {
+  const { properties: catalogueRows } = Route.useLoaderData();
+  const properties = mergeCatalogueProperties(catalogueRows);
+
   return (
     <PageShell>
       <PageHero
@@ -151,7 +162,9 @@ function MarketReportPage() {
                       </Link>
                     </td>
                     <td className="px-5 py-4 text-muted-foreground">{property.location}</td>
-                    <td className="px-5 py-4 text-muted-foreground">{property.propertyType}</td>
+                    <td className="px-5 py-4 text-muted-foreground">
+                      {property.propertyTypes.join(", ") || "To be announced"}
+                    </td>
                     <td className="px-5 py-4 font-semibold text-navy">
                       {property.price}
                       <span className="block text-xs font-normal text-muted-foreground">

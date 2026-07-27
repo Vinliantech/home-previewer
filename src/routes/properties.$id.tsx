@@ -1,32 +1,36 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-  ArrowLeft,
-  MapPin,
-  Phone,
-  MessageCircle,
-  CheckCircle2,
-  Calendar,
-} from "lucide-react";
+import { ArrowLeft, MapPin, Phone, MessageCircle, CheckCircle2, Calendar } from "lucide-react";
 import logoImg from "@/assets/logo.png";
 import {
-  getProperty,
-  properties,
+  getCatalogueProperty,
+  mergeCatalogueProperties,
   PHONE_1,
   PHONE_1_DISPLAY,
   WHATSAPP_URL,
   ADDRESS_LINES,
   type Property,
 } from "@/lib/properties";
+import { listPublicPropertyCatalogue } from "@/lib/invest.functions";
 
 export const Route = createFileRoute("/properties/$id")({
-  loader: ({ params }) => {
-    const property = getProperty(params.id);
+  loader: async ({ params }) => {
+    let catalogueRows: Awaited<ReturnType<typeof listPublicPropertyCatalogue>>["properties"] = [];
+    try {
+      const result = await listPublicPropertyCatalogue();
+      catalogueRows = result.properties;
+    } catch {
+      // The shipped catalogue remains available if the database is temporarily unreachable.
+    }
+    const property = getCatalogueProperty(params.id, catalogueRows);
     if (!property) throw notFound();
-    return { property };
+    return { id: property.id, properties: catalogueRows };
   },
   head: ({ loaderData }) => {
-    if (!loaderData) {
+    const p = loaderData
+      ? getCatalogueProperty(loaderData.id, loaderData.properties)
+      : undefined;
+    if (!p) {
       return {
         meta: [
           { title: "Property not found — Kay-Steph Group" },
@@ -34,7 +38,6 @@ export const Route = createFileRoute("/properties/$id")({
         ],
       };
     }
-    const p = loaderData.property;
     const title = `${p.title} — ${p.location} · Kay-Steph Group`;
     const description = `${p.tagline}. ${p.highlight}`;
     return {
@@ -72,8 +75,11 @@ function PropertyNotFound() {
 }
 
 function PropertyDetail() {
-  const { property: p } = Route.useLoaderData() as { property: Property };
-  const others = properties.filter((x) => x.id !== p.id).slice(0, 3);
+  const { id, properties: catalogueRows } = Route.useLoaderData();
+  const p = getCatalogueProperty(id, catalogueRows) as Property;
+  const others = mergeCatalogueProperties(catalogueRows)
+    .filter((property) => property.id !== p.id)
+    .slice(0, 3);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -146,6 +152,27 @@ function PropertyDetail() {
               ))}
             </div>
 
+            {p.gallery.length > 0 && (
+              <>
+                <h2 className="mt-12 font-serif text-3xl font-bold text-navy">Gallery</h2>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  {p.gallery.map((src, i) => (
+                    <img
+                      key={src}
+                      src={src}
+                      alt={`${p.title} — view ${i + 1}`}
+                      loading="lazy"
+                      width={800}
+                      height={600}
+                      className={`w-full rounded-2xl border border-border object-cover ${
+                        i === 0 ? "sm:col-span-2 aspect-[16/10]" : "aspect-[4/3]"
+                      }`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
+
             <h2 className="mt-12 font-serif text-3xl font-bold text-navy">What's included</h2>
             <ul className="mt-4 grid gap-3 sm:grid-cols-2">
               {p.features.map((f) => (
@@ -155,9 +182,11 @@ function PropertyDetail() {
               ))}
             </ul>
 
-            <h2 className="mt-12 font-serif text-3xl font-bold text-navy">Units & Pricing</h2>
-            <div className="mt-4 overflow-hidden rounded-2xl border border-border">
-              <table className="w-full text-left text-sm">
+            {p.units.length > 0 && (
+              <>
+                <h2 className="mt-12 font-serif text-3xl font-bold text-navy">Units & Pricing</h2>
+                <div className="mt-4 overflow-hidden rounded-2xl border border-border">
+                  <table className="w-full text-left text-sm">
                 <thead className="bg-navy text-navy-foreground">
                   <tr>
                     <th className="px-5 py-3 font-medium">Unit</th>
@@ -173,7 +202,9 @@ function PropertyDetail() {
                   ))}
                 </tbody>
               </table>
-            </div>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Reservation form */}
@@ -258,13 +289,7 @@ function PropertyDetail() {
   );
 }
 
-function ReserveForm({
-  propertyTitle,
-  units,
-}: {
-  propertyTitle: string;
-  units: string[];
-}) {
+function ReserveForm({ propertyTitle, units }: { propertyTitle: string; units: string[] }) {
   const initialUnit = units[0] ?? "";
   const [form, setForm] = useState({
     name: "",

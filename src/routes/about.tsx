@@ -10,8 +10,10 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { PageHero, PageShell, SectionHeading } from "@/components/site/PageShell";
-import storyImg from "@/assets/guzape-dream-homes.jpg";
+import storyImg from "@/assets/about/dream-house-guzape.jpg";
 import plotsImg from "@/assets/estate-plots.jpg";
+import teamCultureImg from "@/assets/about/team-site-visit.jpg";
+import ceoImg from "@/assets/about/ceo-portrait.jpg";
 import { ADDRESS_LINES, WHATSAPP_URL } from "@/lib/properties";
 
 export const Route = createFileRoute("/about")({
@@ -144,12 +146,11 @@ function AboutPage() {
               and tokenized units, verified investors join the same projects — with the same
               documentation — from far smaller tickets.
             </p>
-            <div className="mt-10 grid grid-cols-2 gap-6 border-t border-border pt-8 sm:grid-cols-4">
+            <div className="mt-10 grid grid-cols-3 gap-4 border-t border-border pt-8 sm:gap-6">
               {[
-                { value: "5", label: "Active projects" },
-                { value: "4", label: "Abuja districts" },
-                { value: "5", label: "Ownership routes" },
-                { value: "1", label: "Accountable team" },
+                { value: "6", label: "Active projects" },
+                { value: "6", label: "Abuja districts" },
+                { value: "3", label: "Ownership routes" },
               ].map((stat) => (
                 <div key={stat.label}>
                   <div className="font-serif text-3xl font-bold text-gold">{stat.value}</div>
@@ -185,8 +186,85 @@ function AboutPage() {
         </div>
       </section>
 
-      {/* Milestones */}
+      {/* Founder's note — editorial two-column, photo left with gold accent bar */}
+      <section className="bg-background py-20">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[0.85fr_1.15fr] lg:items-center lg:gap-16">
+          <div className="relative mx-auto w-full max-w-md lg:mx-0">
+            <span className="absolute -left-4 bottom-8 hidden h-2/3 w-2.5 bg-gold lg:block" />
+            <img
+              src={ceoImg}
+              alt="Dr. Kolawole E. Omolayo, Chief Executive Officer of Kay-Steph Group"
+              width={1200}
+              height={857}
+              loading="lazy"
+              className="relative aspect-[4/3] w-full rounded-sm object-cover shadow-md"
+            />
+          </div>
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-gold">
+              From the Chief Executive
+            </p>
+            <h2 className="mt-4 font-serif text-3xl font-bold leading-tight text-navy sm:text-4xl">
+              A company built on proof, not promises.
+            </h2>
+            <p className="mt-6 leading-7 text-muted-foreground">
+              Kay-Steph was founded on a simple conviction: that owning property in Abuja should be
+              transparent, dependable and within reach of far more people than the market has
+              traditionally allowed. Every project we take on is chosen for enduring value and
+              delivered with the documentation to back it up.
+            </p>
+            <p className="mt-4 leading-7 text-muted-foreground">
+              We build where we live, we put every commitment in writing, and we stay accountable
+              long after handover. That is the standard our clients — many of them investing from
+              across the diaspora — have come to expect of us.
+            </p>
+            <p className="mt-6 font-serif text-lg font-bold text-navy">Dr. Kolawole E. Omolayo</p>
+            <p className="text-sm text-muted-foreground">Chief Executive Officer</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Our people — editorial two-column, photo right with gold accent bar */}
       <section className="bg-cream py-20">
+        <div className="mx-auto grid max-w-6xl gap-10 px-4 sm:px-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:gap-16">
+          <div className="order-2 lg:order-1">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-gold">Our people</p>
+            <h2 className="mt-4 font-serif text-3xl font-bold leading-tight text-navy sm:text-4xl">
+              Hard work meets a hands-on team.
+            </h2>
+            <p className="mt-6 leading-7 text-muted-foreground">
+              Behind every Kay-Steph transaction is a single, tightly-run team based in Guzape —
+              advisers, engineers, surveyors and legal minds who walk the sites they sell and know
+              the files they manage. No call centres, no hand-offs into the void.
+            </p>
+            <p className="mt-4 leading-7 text-muted-foreground">
+              We stay close to the ground on every project, because the confidence we ask our
+              clients to place in us has to be earned in person — on site, in writing and in the
+              quality of what we deliver.
+            </p>
+            <Link
+              to="/team"
+              className="mt-8 inline-flex min-h-11 items-center gap-2 rounded-full bg-navy px-6 py-3 text-sm font-bold text-white hover:bg-navy/90"
+            >
+              Meet the team <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="relative order-1 mx-auto w-full max-w-lg lg:order-2 lg:mx-0">
+            <span className="absolute -left-4 bottom-8 hidden h-2/3 w-2.5 bg-gold lg:block" />
+            <img
+              src={teamCultureImg}
+              alt="The Kay-Steph Group team on a site visit in Abuja"
+              width={1400}
+              height={933}
+              loading="lazy"
+              className="relative aspect-[3/2] w-full rounded-sm object-cover shadow-md"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* Milestones */}
+      <section className="bg-background py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <SectionHeading eyebrow="What defines us" title="Four things to know about Kay-Steph." />
           <div className="mt-14 grid gap-5 md:grid-cols-2">
@@ -209,7 +287,7 @@ function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="bg-background py-20">
+      <section className="bg-cream py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <SectionHeading
             eyebrow="Our core values"

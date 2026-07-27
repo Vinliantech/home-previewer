@@ -15,6 +15,8 @@ import {
   Wallet,
   BarChart3,
   UsersRound,
+  Banknote,
+  DoorOpen,
   MapPin,
   Landmark,
   FileText,
@@ -25,10 +27,11 @@ import {
   CalendarCheck,
   TrendingUp,
   Coins,
+  Newspaper,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { blockInDemo, demoAdmin, demoAdminPools, disableDemo, isDemoActive } from "@/lib/demo";
+import { resetClientPassword } from "@/lib/client-admin.functions";
 import { adminListPools, adminReviewPool } from "@/lib/pools.functions";
 import { POOL_STATUS_LABEL, poolProgressPct, type PoolStatus } from "@/lib/pools";
 import { fmtNGN } from "@/lib/invest";
@@ -46,11 +49,38 @@ import {
   ReceiptsModule,
 } from "@/components/admin/finance-ops";
 import { DocumentsModule, SupportModule, UserRolesModule } from "@/components/admin/support-ops";
+import { StaffModule } from "@/components/admin/staff-ops";
+import {
+  TokenizedExitsModule,
+  TokenizedInvestmentsModule,
+  TokenizedKycModule,
+  TokenizedPayoutsModule,
+  TokenizedPropertiesModule,
+  TokenizedRentalModule,
+  TokenizedValuationsModule,
+  TokenizedWithdrawalsModule,
+} from "@/components/admin/tokenized-ops";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -60,14 +90,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { fmtNaira, fmtDate, statusPillClass, getYouTubeId } from "@/lib/affiliate";
+import { clientNumber } from "@/lib/client-number";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   head: () => ({
     meta: [{ title: "Super Admin — Kay-Steph Group" }, { name: "robots", content: "noindex" }],
   }),
+  validateSearch: (search: Record<string, unknown>): { tab?: string } => ({
+    tab: typeof search.tab === "string" ? search.tab : undefined,
+  }),
   beforeLoad: async ({ context }) => {
-    // Demo sessions view sample data only; the real role check still guards live data.
-    if (isDemoActive()) return;
     const { data: isAdmin } = await supabase.rpc("is_admin", { _user_id: context.user.id });
     if (!isAdmin) throw redirect({ to: "/admin/auth" });
   },
@@ -75,45 +107,29 @@ export const Route = createFileRoute("/_authenticated/admin")({
 });
 
 function AdminDashboard() {
+  const { tab: initialTab } = Route.useSearch();
+  const [section, setSection] = useState(initialTab ?? "overview");
   const navigate = useNavigate();
   const [summary, setSummary] = useState<any>(null);
   const [affiliates, setAffiliates] = useState<any[]>([]);
+  const [staff, setStaff] = useState<any[]>([]);
   const [leads, setLeads] = useState<any[]>([]);
   const [commissions, setCommissions] = useState<any[]>([]);
   const [payouts, setPayouts] = useState<any[]>([]);
   const [videos, setVideos] = useState<any[]>([]);
   const [clients, setClients] = useState<any[]>([]);
+  const [editClient, setEditClient] = useState<any | null>(null);
   const [pools, setPools] = useState<any[]>([]);
   const [estateSummary, setEstateSummary] = useState<any>(null);
 
   const loadAll = useCallback(async () => {
-    if (isDemoActive()) {
-      setSummary(demoAdmin.summary);
-      setAffiliates(demoAdmin.affiliates);
-      setLeads(demoAdmin.leads);
-      setCommissions(demoAdmin.commissions);
-      setPayouts(demoAdmin.payouts);
-      setVideos(demoAdmin.videos);
-      setClients(demoAdmin.clients);
-      setPools(demoAdminPools.pools);
-      setEstateSummary({
-        total_estates: 3,
-        total_plots: 48,
-        available_plots: 12,
-        allocated_plots: 31,
-        total_reservations: 27,
-        pending_reservations: 6,
-        pending_applications: 4,
-        pending_receipts: 5,
-        total_revenue: 512_000_000,
-        open_tickets: 3,
-      });
-      return;
-    }
     const sb = supabase as any;
-    const [sumRes, affRes, leadRes, commRes, payRes, vidRes, cliRes] = await Promise.all([
+    const [sumRes, affRes, leadRes, commRes, payRes, vidRes, cliRes, staffRes] = await Promise.all([
       sb.rpc("get_admin_summary"),
-      sb.from("affiliate_profiles").select("*").order("created_at", { ascending: false }),
+      sb
+        .from("affiliate_profiles")
+        .select("*, supervisor:staff_members!affiliate_profiles_supervisor_staff_id_fkey(id, full_name, position, department, status)")
+        .order("created_at", { ascending: false }),
       sb
         .from("client_leads")
         .select("*, affiliate_profiles(full_name, affiliate_code)")
@@ -130,6 +146,7 @@ function AdminDashboard() {
         .order("requested_at", { ascending: false }),
       sb.from("training_videos").select("*").order("created_at", { ascending: false }),
       sb.from("profiles").select("*").order("created_at", { ascending: false }),
+      sb.from("staff_members").select("id, full_name, position, department, status").order("full_name"),
     ]);
     if (sumRes.data && sumRes.data[0]) setSummary(sumRes.data[0]);
     if (affRes.data) setAffiliates(affRes.data);
@@ -138,6 +155,7 @@ function AdminDashboard() {
     if (payRes.data) setPayouts(payRes.data);
     if (vidRes.data) setVideos(vidRes.data);
     if (cliRes.data) setClients(cliRes.data);
+    if (staffRes.data) setStaff(staffRes.data);
     // Group pools are a newer feature; tolerate a missing migration gracefully.
     try {
       const pr = await adminListPools();
@@ -155,7 +173,6 @@ function AdminDashboard() {
   }, []);
 
   const reviewPool = async (id: string, approve: boolean) => {
-    if (blockInDemo()) return;
     try {
       await adminReviewPool({ data: { pool_id: id, approve } });
       toast.success(approve ? "Pool approved and opened" : "Pool rejected");
@@ -170,18 +187,35 @@ function AdminDashboard() {
   }, [loadAll]);
 
   async function signOut() {
-    if (isDemoActive()) {
-      disableDemo();
-    } else {
-      await supabase.auth.signOut();
-    }
+    await supabase.auth.signOut();
     toast.success("Signed out");
     navigate({ to: "/admin/auth", replace: true });
   }
 
   // Affiliate actions
+  /**
+   * Verification is set through an RPC, not a table write: the profiles UPDATE
+   * policy has no WITH CHECK, so the RPC is what actually proves the caller is
+   * an admin and records the decision in the audit log.
+   */
+  const reviewClient = async (userId: string, decision: "approved" | "rejected") => {
+    let reason: string | null = null;
+    if (decision === "rejected") {
+      reason =
+        window.prompt("Why is this account being rejected? The client will see this.")?.trim() ||
+        null;
+      if (!reason) return toast.error("A rejection needs a reason the client can act on.");
+    }
+    const { error } = await (supabase as any).rpc("review_client_verification", {
+      _user_id: userId,
+      _decision: decision,
+      _reason: reason,
+    });
+    if (error) return toast.error(error.message);
+    toast.success(decision === "approved" ? "Client approved" : "Client rejected");
+    loadAll();
+  };
   const setAffiliateStatus = async (id: string, status: string) => {
-    if (blockInDemo()) return;
     const { error } = await (supabase as any)
       .from("affiliate_profiles")
       .update({ status })
@@ -191,7 +225,6 @@ function AdminDashboard() {
     loadAll();
   };
   const setAffiliateRate = async (id: string, rate: number) => {
-    if (blockInDemo()) return;
     const { error } = await (supabase as any)
       .from("affiliate_profiles")
       .update({ commission_rate: rate })
@@ -200,14 +233,26 @@ function AdminDashboard() {
     toast.success("Rate updated");
     loadAll();
   };
+  const setAffiliateSupervisor = async (id: string, staffId: string | null) => {
+    const { data: auth } = await supabase.auth.getUser();
+    const { error } = await (supabase as any)
+      .from("affiliate_profiles")
+      .update({
+        supervisor_staff_id: staffId,
+        supervisor_assigned_at: staffId ? new Date().toISOString() : null,
+        supervisor_assigned_by: staffId ? auth.user?.id ?? null : null,
+      })
+      .eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(staffId ? "Supervisor assigned" : "Supervisor removed");
+    loadAll();
+  };
   const setLeadStatus = async (id: string, status: string) => {
-    if (blockInDemo()) return;
     const { error } = await (supabase as any).from("client_leads").update({ status }).eq("id", id);
     if (error) return toast.error(error.message);
     loadAll();
   };
   const createCommission = async (lead: any) => {
-    if (blockInDemo()) return;
     const saleStr = window.prompt(`Sale amount (₦) for ${lead.client_full_name}:`);
     if (!saleStr) return;
     const sale = Number(saleStr.replace(/[^\d.]/g, ""));
@@ -232,7 +277,6 @@ function AdminDashboard() {
     id: string,
     status: "pending" | "approved" | "paid" | "rejected",
   ) => {
-    if (blockInDemo()) return;
     const patch: any = { status };
     if (status === "approved") patch.approved_at = new Date().toISOString();
     if (status === "paid") patch.paid_at = new Date().toISOString();
@@ -245,7 +289,6 @@ function AdminDashboard() {
     id: string,
     status: "pending" | "processing" | "completed" | "rejected",
   ) => {
-    if (blockInDemo()) return;
     const patch: any = { status };
     if (status === "completed") patch.processed_at = new Date().toISOString();
     const { error } = await (supabase as any).from("payout_requests").update(patch).eq("id", id);
@@ -255,7 +298,6 @@ function AdminDashboard() {
   };
 
   async function backup() {
-    if (blockInDemo()) return;
     const sb = supabase as any;
     toast.info("Building backup…");
     const tables = [
@@ -285,7 +327,13 @@ function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-[#f4f6f9] text-slate-800">
-      <Tabs defaultValue="overview" orientation="vertical" className="min-h-screen">
+      <Tabs
+        value={section}
+        onValueChange={setSection}
+        activationMode="manual"
+        orientation="vertical"
+        className="min-h-screen"
+      >
         {/* Top bar */}
         <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
           <div className="mx-auto flex h-16 max-w-[1440px] items-center justify-between gap-3 px-4 sm:px-6">
@@ -302,13 +350,13 @@ function AdminDashboard() {
             </Link>
             <div className="flex items-center gap-2">
               <Link
+                to="/content"
+                className="hidden items-center gap-2 rounded-full border border-navy/20 px-4 py-1.5 text-sm font-medium text-navy hover:border-gold hover:text-gold lg:inline-flex"
+              >
+                <Newspaper className="h-4 w-4" /> Blog & Content
+              </Link>
+              <Link
                 to="/crm"
-                onClick={(e) => {
-                  if (isDemoActive()) {
-                    e.preventDefault();
-                    toast.info("The CRM workspace is not included in the demo.");
-                  }
-                }}
                 className="hidden items-center gap-2 rounded-full border border-navy/20 px-4 py-1.5 text-sm font-medium text-navy hover:border-gold hover:text-gold sm:inline-flex"
               >
                 CRM Workspace
@@ -367,6 +415,16 @@ function AdminDashboard() {
                   count={pools.length}
                 />
 
+                <SideGroup label="Property Investments" />
+                <SideItem value="tk-investments" icon={Coins} label="Investments" />
+                <SideItem value="tk-kyc" icon={Shield} label="Investor KYC" />
+                <SideItem value="tk-properties" icon={Building2} label="Properties" />
+                <SideItem value="tk-valuations" icon={TrendingUp} label="Valuations" />
+                <SideItem value="tk-rental" icon={Banknote} label="Rental Income" />
+                <SideItem value="tk-payouts" icon={Wallet} label="Rental Payouts" />
+                <SideItem value="tk-withdrawals" icon={CreditCard} label="Withdrawals" />
+                <SideItem value="tk-exits" icon={DoorOpen} label="Exit Requests" />
+
                 <SideGroup label="Growth" />
                 <SideItem
                   value="affiliates"
@@ -377,10 +435,11 @@ function AdminDashboard() {
                 <SideItem value="leads" icon={ClipboardList} label="Leads" count={leads.length} />
                 <SideItem value="training" icon={Video} label="Training" count={videos.length} />
 
-                <SideGroup label="Support & System" />
+                <SideGroup label="People & System" />
+                <SideItem value="staff" icon={UsersRound} label="Staff" />
+                <SideItem value="roles" icon={UserCog} label="User Roles" />
                 <SideItem value="support" icon={LifeBuoy} label="Support Tickets" />
                 <SideItem value="documents" icon={Layers} label="Documents" />
-                <SideItem value="roles" icon={UserCog} label="User Roles" />
                 <SideItem value="backup" icon={Database} label="Data Backup" />
               </TabsList>
 
@@ -391,30 +450,18 @@ function AdminDashboard() {
                 </div>
                 <div className="flex gap-1 overflow-x-auto lg:flex-col lg:gap-0.5 lg:overflow-visible">
                   <Link
-                    to="/admin-invest"
-                    onClick={(e) => {
-                      if (isDemoActive()) {
-                        e.preventDefault();
-                        toast.info("The tokenized investment admin is not included in the demo.");
-                      }
-                    }}
-                    className="flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-navy lg:w-full"
-                  >
-                    <Coins className="h-4 w-4" />
-                    <span className="flex-1 text-left">Tokenized Properties</span>
-                  </Link>
-                  <Link
                     to="/crm"
-                    onClick={(e) => {
-                      if (isDemoActive()) {
-                        e.preventDefault();
-                        toast.info("The CRM workspace is not included in the demo.");
-                      }
-                    }}
                     className="flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-navy lg:w-full"
                   >
                     <BarChart3 className="h-4 w-4" />
                     <span className="flex-1 text-left">CRM Workspace</span>
+                  </Link>
+                  <Link
+                    to="/content"
+                    className="flex shrink-0 items-center gap-2.5 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-navy lg:w-full"
+                  >
+                    <Newspaper className="h-4 w-4" />
+                    <span className="flex-1 text-left">Blog & Content</span>
                   </Link>
                 </div>
               </div>
@@ -545,6 +592,7 @@ function AdminDashboard() {
                         <TableHead>Email</TableHead>
                         <TableHead>Phone</TableHead>
                         <TableHead>Rate</TableHead>
+                        <TableHead>Staff supervisor</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
@@ -575,6 +623,37 @@ function AdminDashboard() {
                             />
                           </TableCell>
                           <TableCell>
+                            <Select
+                              value={a.supervisor_staff_id ?? "__unassigned__"}
+                              onValueChange={(value) =>
+                                setAffiliateSupervisor(
+                                  a.id,
+                                  value === "__unassigned__" ? null : value,
+                                )
+                              }
+                            >
+                              <SelectTrigger className="h-9 min-w-48" aria-label="Affiliate supervisor">
+                                <SelectValue placeholder="Assign staff" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {/* A live affiliate must keep a supervisor —
+                                    the database rejects clearing it — so the
+                                    option is only offered before approval. */}
+                                {a.status !== "active" && (
+                                  <SelectItem value="__unassigned__">Not assigned</SelectItem>
+                                )}
+                                {staff
+                                  .filter((member) => member.status === "active")
+                                  .map((member) => (
+                                    <SelectItem key={member.id} value={member.id}>
+                                      {member.full_name}
+                                      {member.position ? ` — ${member.position}` : ""}
+                                    </SelectItem>
+                                  ))}
+                              </SelectContent>
+                            </Select>
+                          </TableCell>
+                          <TableCell>
                             <span className={statusPillClass(a.status)}>{a.status}</span>
                           </TableCell>
                           <TableCell className="space-x-2 whitespace-nowrap">
@@ -582,10 +661,21 @@ function AdminDashboard() {
                               <Button
                                 size="sm"
                                 variant="outline"
+                                disabled={!a.supervisor_staff_id}
+                                title={
+                                  a.supervisor_staff_id
+                                    ? undefined
+                                    : "Assign a staff supervisor first"
+                                }
                                 onClick={() => setAffiliateStatus(a.id, "active")}
                               >
                                 Approve
                               </Button>
+                            )}
+                            {a.status !== "active" && !a.supervisor_staff_id && (
+                              <span className="text-xs text-muted-foreground">
+                                Assign a supervisor to approve
+                              </span>
                             )}
                             {a.status !== "suspended" && (
                               <Button
@@ -603,7 +693,7 @@ function AdminDashboard() {
                       {!affiliates.length && (
                         <TableRow>
                           <TableCell
-                            colSpan={7}
+                            colSpan={8}
                             className="py-10 text-center text-muted-foreground"
                           >
                             No affiliates yet.
@@ -877,16 +967,21 @@ function AdminDashboard() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Registered</TableHead>
+                        <TableHead>Client no.</TableHead>
                         <TableHead>Name</TableHead>
                         <TableHead>Email</TableHead>
                         <TableHead>Phone</TableHead>
                         <TableHead>ID status</TableHead>
+                        <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {clients.map((c) => (
                         <TableRow key={c.id}>
                           <TableCell>{fmtDate(c.created_at)}</TableCell>
+                          <TableCell className="font-mono text-xs text-navy">
+                            {clientNumber(c.client_number)}
+                          </TableCell>
                           <TableCell className="font-medium">{c.full_name || "—"}</TableCell>
                           <TableCell className="text-xs text-muted-foreground">{c.email}</TableCell>
                           <TableCell className="text-xs text-muted-foreground">
@@ -896,13 +991,48 @@ function AdminDashboard() {
                             <span className={statusPillClass(c.id_verification_status)}>
                               {c.id_verification_status || "pending"}
                             </span>
+                            {c.id_verification_status === "rejected" && c.id_rejection_reason ? (
+                              <p className="mt-1 max-w-56 text-xs text-red-600">
+                                {c.id_rejection_reason}
+                              </p>
+                            ) : null}
+                          </TableCell>
+                          <TableCell className="space-x-1 whitespace-nowrap">
+                            {c.id_verification_status !== "approved" && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => reviewClient(c.user_id, "approved")}
+                              >
+                                Approve
+                              </Button>
+                            )}
+                            {c.id_verification_status !== "rejected" && (
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-red-600"
+                                onClick={() => reviewClient(c.user_id, "rejected")}
+                              >
+                                Reject
+                              </Button>
+                            )}
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => {
+                                setEditClient(c);
+                              }}
+                            >
+                              View details
+                            </Button>
                           </TableCell>
                         </TableRow>
                       ))}
                       {!clients.length && (
                         <TableRow>
                           <TableCell
-                            colSpan={5}
+                            colSpan={7}
                             className="py-10 text-center text-muted-foreground"
                           >
                             No client accounts yet.
@@ -913,6 +1043,11 @@ function AdminDashboard() {
                   </Table>
                 </CardContent>
               </Card>
+              <ClientEditDialog
+                client={editClient}
+                onClose={() => setEditClient(null)}
+                onSaved={loadAll}
+              />
             </TabsContent>
 
             <TabsContent value="pools">
@@ -1051,9 +1186,42 @@ function AdminDashboard() {
             <TabsContent value="accounts" className="mt-0">
               <CompanyAccountsModule />
             </TabsContent>
+            <TabsContent value="tk-investments" className="mt-0">
+              <TokenizedInvestmentsModule />
+            </TabsContent>
+            <TabsContent value="tk-kyc" className="mt-0">
+              <TokenizedKycModule />
+            </TabsContent>
+            <TabsContent value="tk-properties" className="mt-0">
+              <TokenizedPropertiesModule />
+            </TabsContent>
+            <TabsContent value="tk-valuations" className="mt-0">
+              <TokenizedValuationsModule />
+            </TabsContent>
+            <TabsContent value="tk-rental" className="mt-0">
+              <TokenizedRentalModule />
+            </TabsContent>
+            <TabsContent value="tk-payouts" className="mt-0">
+              <TokenizedPayoutsModule />
+            </TabsContent>
+            <TabsContent value="tk-withdrawals" className="mt-0">
+              <TokenizedWithdrawalsModule />
+            </TabsContent>
+            <TabsContent value="tk-exits" className="mt-0">
+              <TokenizedExitsModule />
+            </TabsContent>
+
             <TabsContent value="documents" className="mt-0">
               <DocumentsModule />
             </TabsContent>
+            <TabsContent value="staff" className="mt-0 space-y-6">
+              <PageHeader
+                title="Staff"
+                description="The people behind Kay-Steph: their position, department and platform access."
+              />
+              <StaffModule />
+            </TabsContent>
+
             <TabsContent value="roles" className="mt-0">
               <UserRolesModule />
             </TabsContent>
@@ -1126,7 +1294,6 @@ function TrainingAdmin({ videos, reload }: { videos: any[]; reload: () => void }
     if (!form.title.trim() || !form.youtube_url.trim())
       return toast.error("Title and YouTube URL required");
     if (!getYouTubeId(form.youtube_url)) return toast.error("Enter a valid YouTube URL");
-    if (blockInDemo()) return;
     setSubmitting(true);
     const {
       data: { user },
@@ -1146,7 +1313,6 @@ function TrainingAdmin({ videos, reload }: { videos: any[]; reload: () => void }
   }
 
   const toggle = async (id: string, is_published: boolean) => {
-    if (blockInDemo()) return;
     const { error } = await (supabase as any)
       .from("training_videos")
       .update({ is_published: !is_published })
@@ -1155,7 +1321,6 @@ function TrainingAdmin({ videos, reload }: { videos: any[]; reload: () => void }
     reload();
   };
   const remove = async (id: string) => {
-    if (blockInDemo()) return;
     if (!window.confirm("Delete this video?")) return;
     const { error } = await (supabase as any).from("training_videos").delete().eq("id", id);
     if (error) return toast.error(error.message);
@@ -1254,6 +1419,202 @@ function TrainingAdmin({ videos, reload }: { videos: any[]; reload: () => void }
           <p className="text-sm text-muted-foreground md:col-span-2">No training videos yet.</p>
         )}
       </div>
+    </div>
+  );
+}
+
+/**
+ * Edits a client's account record. profiles is the source of truth for who a
+ * client is: the sync_client_details trigger propagates name/phone changes to
+ * the CRM lead and any affiliate-submitted record, so a correction made here
+ * shows up everywhere. The login email is deliberately read-only — it is the
+ * auth identity and the key those records are matched on.
+ */
+function ClientEditDialog({
+  client,
+  onClose,
+  onSaved,
+}: {
+  client: any | null;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [resetting, setResetting] = useState(false);
+  const [resetLink, setResetLink] = useState("");
+  const [related, setRelated] = useState<{
+    applications: any[];
+    reservations: any[];
+    plans: any[];
+    allocations: any[];
+  }>({ applications: [], reservations: [], plans: [], allocations: [] });
+
+  useEffect(() => {
+    if (client) {
+      setFullName(client.full_name ?? "");
+      setPhone(client.phone ?? "");
+      setAddress(client.address ?? "");
+      setResetLink("");
+      const sb = supabase as any;
+      Promise.all([
+        sb.from("client_applications").select("*").eq("email", client.email).order("created_at", { ascending: false }),
+        sb.from("reservations").select("*, plots(plot_number, estates(name))").eq("email", client.email).order("created_at", { ascending: false }),
+        sb.from("payment_requirements").select("*").eq("user_id", client.user_id).order("created_at", { ascending: false }),
+        sb.from("plot_allocations").select("*, plots(plot_number, estates(name))").eq("user_id", client.user_id).order("allocation_date", { ascending: false }),
+      ]).then(([applications, reservations, plans, allocations]) => {
+        setRelated({
+          applications: applications.data ?? [],
+          reservations: reservations.data ?? [],
+          plans: plans.data ?? [],
+          allocations: allocations.data ?? [],
+        });
+      });
+    }
+  }, [client]);
+
+  async function issuePasswordReset() {
+    if (!client) return;
+    setResetting(true);
+    try {
+      const result = await resetClientPassword({ data: { profileId: client.id } });
+      setResetLink(result.resetLink);
+      toast.success(
+        result.emailSent
+          ? `Password reset emailed to ${client.email}`
+          : "Reset link created. Copy it below and send it securely to the client.",
+      );
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Could not create the reset link.");
+    }
+    setResetting(false);
+  }
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault();
+    if (!client) return;
+    if (!fullName.trim()) return void toast.error("Enter the client's full name.");
+    setSaving(true);
+    const { error } = await (supabase as any)
+      .from("profiles")
+      .update({
+        full_name: fullName.trim(),
+        phone: phone.trim() || null,
+        address: address.trim() || null,
+      })
+      .eq("id", client.id);
+    setSaving(false);
+    if (error) return void toast.error(error.message);
+    // Best-effort audit record; the update itself already succeeded.
+    await (supabase as any)
+      .rpc("log_admin_action", {
+        _action: "client_profile_updated",
+        _entity_type: "profile",
+        _entity_id: client.id,
+        _details: { full_name: fullName.trim(), phone: phone.trim() || null },
+      })
+      .then(null, () => undefined);
+    toast.success("Client updated — CRM and affiliate records synced");
+    onClose();
+    onSaved();
+  }
+
+  return (
+    <Dialog open={Boolean(client)} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-[760px]">
+        <DialogHeader>
+          <DialogTitle>Client details</DialogTitle>
+          <DialogDescription>
+            One connected view of the account, applications, reservations, allocations and plan.
+          </DialogDescription>
+        </DialogHeader>
+        <form onSubmit={save} className="space-y-3">
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-slate-600">Full name *</Label>
+            <Input value={fullName} onChange={(e) => setFullName(e.target.value)} required />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-slate-600">
+              Email (login — read only)
+            </Label>
+            <Input value={client?.email ?? ""} readOnly disabled />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-slate-600">Phone</Label>
+            <Input value={phone} onChange={(e) => setPhone(e.target.value)} />
+          </div>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold text-slate-600">Address</Label>
+            <Input value={address} onChange={(e) => setAddress(e.target.value)} />
+          </div>
+          <div className="grid gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm sm:grid-cols-3">
+            <div><span className="block text-xs text-slate-500">Registered</span>{fmtDate(client?.created_at)}</div>
+            <div><span className="block text-xs text-slate-500">ID verification</span><span className="capitalize">{client?.id_verification_status ?? "pending"}</span></div>
+            <div><span className="block text-xs text-slate-500">Client ID</span><span className="font-mono text-xs">{client?.user_id?.slice(0, 12)}…</span></div>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={saving} className="bg-navy text-white hover:bg-navy/90">
+              {saving ? "Saving…" : "Save changes"}
+            </Button>
+          </DialogFooter>
+        </form>
+
+        <div className="space-y-4 border-t pt-5">
+          <h3 className="font-serif text-lg font-semibold text-navy">Connected records</h3>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <RelatedBlock title={`Applications (${related.applications.length})`}>
+              {related.applications.length ? related.applications.map((item) => (
+                <p key={item.id}><b>{item.application_ref_no ?? "Application"}</b> · {item.payment_mode ?? "—"} · <span className="capitalize">{item.status}</span></p>
+              )) : <p>No application linked.</p>}
+            </RelatedBlock>
+            <RelatedBlock title={`Reservations (${related.reservations.length})`}>
+              {related.reservations.length ? related.reservations.map((item) => (
+                <p key={item.id}><b>{item.plots?.estates?.name ?? item.property_type ?? "Property"}</b>{item.plots?.plot_number ? ` · Plot ${item.plots.plot_number}` : ""} · <span className="capitalize">{item.status}</span></p>
+              )) : <p>No reservation linked.</p>}
+            </RelatedBlock>
+            <RelatedBlock title={`Payment plans (${related.plans.length})`}>
+              {related.plans.length ? related.plans.map((item) => (
+                <p key={item.id}><b>{String(item.purchase_model ?? "full_purchase").replace(/_/g, " ")}</b> · {item.term_months ?? 3} months · {fmtNGN(item.amount_paid)} / {fmtNGN(item.amount_required)}</p>
+              )) : <p>No payment plan linked.</p>}
+            </RelatedBlock>
+            <RelatedBlock title={`Allocations (${related.allocations.length})`}>
+              {related.allocations.length ? related.allocations.map((item) => (
+                <p key={item.id}><b>{item.plots?.estates?.name ?? "Estate"}</b> · Plot {item.plots?.plot_number ?? "—"} · <span className="capitalize">{item.status}</span></p>
+              )) : <p>No plot allocated.</p>}
+            </RelatedBlock>
+          </div>
+        </div>
+
+        <div className="space-y-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <div>
+            <h3 className="font-semibold text-navy">Account security</h3>
+            <p className="text-xs leading-5 text-slate-600">Send a one-time recovery link. The admin never sees or sets the client's password.</p>
+          </div>
+          <Button type="button" variant="outline" onClick={issuePasswordReset} disabled={resetting}>
+            {resetting ? "Creating secure link…" : "Send password reset"}
+          </Button>
+          {resetLink && (
+            <div className="flex gap-2">
+              <Input value={resetLink} readOnly aria-label="Password reset link" />
+              <Button type="button" onClick={() => navigator.clipboard.writeText(resetLink).then(() => toast.success("Reset link copied"))}>Copy</Button>
+            </div>
+          )}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function RelatedBlock({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="rounded-lg border border-slate-200 p-3">
+      <p className="mb-2 text-xs font-bold uppercase tracking-wide text-gold">{title}</p>
+      <div className="space-y-1 text-xs leading-5 text-slate-600">{children}</div>
     </div>
   );
 }

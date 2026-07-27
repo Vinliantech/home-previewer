@@ -16,49 +16,94 @@ const enquirySchema = z.object({
   propertyInterest: z.string().trim().max(160).optional(),
   budget: z.string().trim().max(60).optional(),
   message: z.string().trim().min(10, "Tell us a little more about your enquiry").max(2000),
-  // Honeypot: hidden field real users never fill.
+  consentGiven: z.boolean().refine(Boolean, "Please agree to the contact and privacy notice."),
   company: z.string().max(0).optional(),
 });
 
 export type EnquiryInput = z.infer<typeof enquirySchema>;
 
-const SUBJECT_INVESTMENT_TYPE: Record<string, "full_purchase" | "fractional" | null> = {
+const SUBJECT_INVESTMENT_TYPE: Record<
+  EnquiryInput["subject"],
+  "full_purchase" | "fractional" | "not_decided"
+> = {
   buy_property: "full_purchase",
   invest: "fractional",
-  site_inspection: null,
-  existing_investment: null,
-  partnership: null,
-  other: null,
+  site_inspection: "full_purchase",
+  existing_investment: "not_decided",
+  partnership: "not_decided",
+  other: "not_decided",
+};
+
+const SUBJECT_SOURCE: Record<
+  EnquiryInput["subject"],
+  "website_contact_form" | "website_property_enquiry" | "website_investment_form"
+> = {
+  buy_property: "website_property_enquiry",
+  invest: "website_investment_form",
+  site_inspection: "website_property_enquiry",
+  existing_investment: "website_contact_form",
+  partnership: "website_contact_form",
+  other: "website_contact_form",
+};
+
+const BUDGETS: Record<string, [number | null, number | null]> = {
+  "Below ₦50M": [null, 50_000_000],
+  "₦50M – ₦100M": [50_000_000, 100_000_000],
+  "₦100M – ₦250M": [100_000_000, 250_000_000],
+  "₦250M – ₦500M": [250_000_000, 500_000_000],
+  "Above ₦500M": [500_000_000, null],
+  "Not sure yet": [null, null],
 };
 
 export const submitEnquiry = createServerFn({ method: "POST" })
   .validator((input) => enquirySchema.parse(input))
   .handler(async ({ data }) => {
-    const FRIENDLY_ERROR =
+    const friendlyError =
       "We could not submit your enquiry. Please try again or contact us on WhatsApp.";
 
     try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { error } = await supabaseAdmin.from("leads").insert({
-        full_name: data.fullName,
+      const source = SUBJECT_SOURCE[data.subject];
+      const investmentType = SUBJECT_INVESTMENT_TYPE[data.subject];
+      const [budgetMin, budgetMax] = data.budget
+        ? (BUDGETS[data.budget] ?? [null, null])
+        : [null, null];
+      const now = new Date().toISOString();
+
+      const { captureLead } = await import("@/lib/crm-capture.server");
+      const result = await captureLead({
+        source,
+        fullName: data.fullName,
         email: data.email,
         phone: data.phone,
-        property_name: data.propertyInterest || null,
-        investment_type: SUBJECT_INVESTMENT_TYPE[data.subject],
-        notes: data.message,
-        raw_payload: {
-          source: "website_contact_form",
+        propertyName: data.propertyInterest,
+        budgetMin,
+        budgetMax,
+        investmentType,
+        message: data.message,
+        consentGiven: data.consentGiven,
+        capturedAt: now,
+        rawPayload: {
+          source,
           subject: data.subject,
           property_interest: data.propertyInterest ?? null,
           budget: data.budget ?? null,
-          submitted_at: new Date().toISOString(),
+          submitted_at: now,
+        },
+        interestMetadata: { subject: data.subject },
+        acknowledgement: {
+          investmentLabel:
+            data.subject === "invest" ? "fractional or group property investment" : null,
         },
       });
-      if (error) throw new Error(error.message);
+
+      return {
+        ok: true,
+        leadId: result.leadId,
+        merged: result.merged,
+        acknowledgementSent: result.acknowledgementSent,
+      };
     } catch (error) {
       console.error("[enquiry] lead submission failed:", error);
-      throw new Error(FRIENDLY_ERROR);
+      throw new Error(friendlyError);
     }
-
-    return { ok: true };
   });

@@ -22,6 +22,7 @@ const whyKayStephMenu = [
   { label: "About Kay-Steph", to: "/about" },
   { label: "Our Team", to: "/team" },
   { label: "Services", to: "/services" },
+  { label: "Youth Network", to: "/events/youth-network" },
   { label: "Blog", to: "/blog" },
   { label: "Market Report", to: "/market-report" },
   { label: "Careers", to: "/careers" },

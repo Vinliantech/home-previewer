@@ -77,8 +77,10 @@ export type PoolMember = {
   is_founder: boolean;
   joined_at: string | null;
   created_at: string;
-  /** Optional joined display name from a profile lookup. */
+  /** Name resolved by get_pool_members; profiles is not directly readable. */
   display_name?: string | null;
+  /** True for the row belonging to the signed-in member. */
+  is_self?: boolean;
 };
 
 export function poolProgressPct(committed: number, target: number): number {

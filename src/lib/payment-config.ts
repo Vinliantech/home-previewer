@@ -1,12 +1,12 @@
-// Static bank details displayed to investors for off-platform deposits.
-// Update these values once the operations team confirms the live account.
-export const investmentBankAccount = {
-  bankName: "Kay-Steph Group Holdings",
-  accountName: "Kay-Steph Investment Trust",
-  accountNumber: "0000000000",
-  sortCode: "000000",
-  swift: "KSGRPNGLA",
-  reference: "Use your registered email as the payment reference",
-} as const;
+type InvestmentBankAccount = {
+  bankName: string;
+  accountName: string;
+  accountNumber: string;
+};
 
-export type InvestmentBankAccount = typeof investmentBankAccount;
+const bankName = import.meta.env.VITE_INVESTMENT_BANK_NAME?.trim();
+const accountName = import.meta.env.VITE_INVESTMENT_ACCOUNT_NAME?.trim();
+const accountNumber = import.meta.env.VITE_INVESTMENT_ACCOUNT_NUMBER?.trim();
+
+export const investmentBankAccount: InvestmentBankAccount | null =
+  bankName && accountName && accountNumber ? { bankName, accountName, accountNumber } : null;

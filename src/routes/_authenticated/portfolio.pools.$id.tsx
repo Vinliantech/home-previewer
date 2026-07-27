@@ -23,7 +23,6 @@ import {
   type PoolStatus,
 } from "@/lib/pools";
 import { fmtNGN } from "@/lib/invest";
-import { blockInDemo, demoPools, isDemoActive } from "@/lib/demo";
 import { DashCard, PageHeader, StatCard, StatusBadge, fmtDate } from "@/components/portfolio/kit";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -43,15 +42,11 @@ const MILESTONES: { key: PoolStatus; label: string }[] = [
 
 function PoolDetailPage() {
   const { id } = Route.useParams();
-  const demo = isDemoActive();
   const qc = useQueryClient();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["pools", "detail", id],
-    queryFn: () =>
-      demo
-        ? Promise.resolve(demoPools.detail[id] ?? demoPools.detail.__first)
-        : getPoolDetail({ data: { pool_id: id } }),
+    queryFn: () => getPoolDetail({ data: { pool_id: id } }),
   });
 
   if (isLoading) {
@@ -77,7 +72,9 @@ function PoolDetailPage() {
   const { pool, members, summary, is_founder } = data;
   const pct = poolProgressPct(summary.committed, pool.target_amount);
   const typedMembers = members as PoolMember[];
-  const iAmMember = demo ? Boolean(data.i_am_member) : false; // real membership is enforced server-side; join CTA covers non-members
+  // get_pool_members flags the caller's own row, so an existing member is no
+  // longer shown a Join button they cannot use.
+  const iAmMember = data.i_am_member === true;
   const canJoin =
     pool.visibility === "open" &&
     ["open", "threshold_met"].includes(pool.status) &&
@@ -216,7 +213,12 @@ function PoolDetailPage() {
                   <td className="px-5 py-3">
                     <span className="inline-flex items-center gap-1.5 font-medium text-navy">
                       {m.is_founder && <Crown className="h-3.5 w-3.5 text-gold" />}
-                      {m.display_name ?? m.invited_email ?? "Verified member"}
+                      {m.display_name ?? m.invited_email ?? "Member"}
+                      {m.is_self && (
+                        <span className="rounded-full bg-navy/5 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-navy/70">
+                          You
+                        </span>
+                      )}
                     </span>
                   </td>
                   <td className="px-5 py-3 tabular-nums text-navy">{fmtNGN(m.committed_amount)}</td>
@@ -302,7 +304,6 @@ function JoinPanel({
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (blockInDemo()) return;
     const value = Number(amount);
     if (!value) return void toast.error("Enter your intended contribution.");
     if (minContribution > 0 && value < minContribution) {
@@ -361,7 +362,6 @@ function InvitePanel({ poolId, onInvited }: { poolId: string; onInvited: () => v
 
   function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (blockInDemo()) return;
     if (!email.trim()) return void toast.error("Enter an email address.");
     mut.mutate({ data: { pool_id: poolId, email: email.trim() } });
   }

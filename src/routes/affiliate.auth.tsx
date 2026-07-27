@@ -1,9 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Loader2, ArrowLeft, CheckCircle2, Eye, LayoutDashboard } from "lucide-react";
+import { Loader2, ArrowLeft, CheckCircle2, LayoutDashboard } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { DEMO_ENABLED, DEMO_PASSWORD, enableDemo } from "@/lib/demo";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -152,58 +151,12 @@ function AffiliateAuth() {
             </div>
 
             <GoogleButton />
-
-            {DEMO_ENABLED && <DemoAccess />}
           </div>
         </div>
       </section>
     </div>
   );
 }
-
-function DemoAccess() {
-  const navigate = useNavigate();
-  const [demoPassword, setDemoPassword] = useState("");
-
-  function startDemo(e: React.FormEvent) {
-    e.preventDefault();
-    if (demoPassword !== DEMO_PASSWORD) {
-      toast.error("Incorrect demo password.");
-      return;
-    }
-    enableDemo("affiliate");
-    toast.success("Demo mode active — viewing sample affiliate data.");
-    navigate({ to: "/affiliate/portal" });
-  }
-
-  return (
-    <div className="mt-8 border border-white/15 bg-[#141414] p-4">
-      <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.3em] text-white/50">
-        <Eye className="h-3.5 w-3.5 text-[#d4a53a]" /> Demo access
-      </div>
-      <p className="mt-2 text-xs leading-5 text-white/45">
-        Preview the affiliate dashboard with sample data — no account needed.
-      </p>
-      <form onSubmit={startDemo} className="mt-3 flex gap-2">
-        <Input
-          type="password"
-          placeholder="Demo password"
-          value={demoPassword}
-          onChange={(e) => setDemoPassword(e.target.value)}
-          className="h-10 rounded-none border-0 border-b border-white/15 bg-[#1a1a1a] px-3 text-sm text-white placeholder:text-white/40 focus-visible:border-[#d4a53a] focus-visible:ring-0"
-          aria-label="Demo password"
-        />
-        <Button
-          type="submit"
-          className="h-10 shrink-0 rounded-none border border-[#d4a53a]/60 bg-transparent text-[10px] font-semibold uppercase tracking-[0.25em] text-[#d4a53a] hover:bg-[#d4a53a] hover:text-black"
-        >
-          View demo
-        </Button>
-      </form>
-    </div>
-  );
-}
-
 const fieldClass =
   "h-14 rounded-none border-0 border-b border-white/15 bg-[#1a1a1a] px-4 text-sm text-white placeholder:text-white/40 focus-visible:border-[#d4a53a] focus-visible:ring-0";
 const submitClass =

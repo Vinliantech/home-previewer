@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { CheckCircle2, ExternalLink, Landmark, Loader2, Plus, Receipt, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { blockInDemo, demoEstateOps, demoFinanceOps, isDemoActive } from "@/lib/demo";
 import { fmtNGN } from "@/lib/invest";
 import { DashCard, EmptyState, StatCard, StatusBadge, fmtDate } from "@/components/portfolio/kit";
 import { Button } from "@/components/ui/button";
@@ -88,22 +87,17 @@ function requirementStatus(required: number, paid: number): string {
 
 /* ============================ PENDING RECEIPTS ============================ */
 export function ReceiptsModule() {
-  const demo = isDemoActive();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
 
   async function load() {
     setLoading(true);
-    if (demo) {
-      setRows(demoFinanceOps.receipts);
-    } else {
-      const { data } = await sb()
-        .from("documents")
-        .select("*, profiles(full_name, email)")
-        .not("approval_status", "is", null)
-        .order("created_at", { ascending: false });
-      setRows(data ?? []);
-    }
+    const { data } = await sb()
+      .from("documents")
+      .select("*, profiles(full_name, email)")
+      .not("approval_status", "is", null)
+      .order("created_at", { ascending: false });
+    setRows(data ?? []);
     setLoading(false);
   }
   useEffect(() => {
@@ -111,7 +105,6 @@ export function ReceiptsModule() {
   }, []);
 
   async function review(r: Row, approval_status: "approved" | "rejected") {
-    if (blockInDemo()) return;
     const { data: auth } = await sb().auth.getUser();
     const { error } = await sb()
       .from("documents")
@@ -232,9 +225,10 @@ export function ReceiptsModule() {
 
 /* ============================ PAYMENT PLANS ============================ */
 export function PaymentPlansModule() {
-  const demo = isDemoActive();
   const [rows, setRows] = useState<Row[]>([]);
   const [clients, setClients] = useState<Row[]>([]);
+  const [properties, setProperties] = useState<Row[]>([]);
+  const [pools, setPools] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Row | null>(null);
@@ -243,24 +237,35 @@ export function PaymentPlansModule() {
     payment_category: "",
     amount_required: "",
     amount_paid: "",
+    purchase_model: "full_purchase",
+    term_preset: "3",
+    term_months: "3",
+    catalogue_property_id: "",
+    group_pool_id: "",
+    start_date: "",
+    next_due_date: "",
+    notes: "",
   });
 
   async function load() {
     setLoading(true);
-    if (demo) {
-      setRows(demoFinanceOps.requirements);
-      setClients(demoEstateOps.profiles);
-    } else {
-      const [r, c] = await Promise.all([
-        sb()
-          .from("payment_requirements")
-          .select("*, profiles(full_name, email)")
-          .order("created_at", { ascending: false }),
-        sb().from("profiles").select("id, user_id, full_name, email").order("full_name"),
-      ]);
-      setRows(r.data ?? []);
-      setClients(c.data ?? []);
-    }
+    const [r, c, p, g] = await Promise.all([
+      sb()
+        .from("payment_requirements")
+        .select("*, available_properties(property_name), group_pools(name)")
+        .order("created_at", { ascending: false }),
+      sb().from("profiles").select("id, user_id, full_name, email").order("full_name"),
+      sb().from("available_properties").select("id, property_name, location").eq("is_active", true).order("property_name"),
+      sb().from("group_pools").select("id, name, property_name, status").order("created_at", { ascending: false }),
+    ]);
+    const clientRows = c.data ?? [];
+    setRows((r.data ?? []).map((item: Row) => ({
+      ...item,
+      profiles: clientRows.find((client: Row) => client.user_id === item.user_id) ?? null,
+    })));
+    setClients(clientRows);
+    setProperties(p.data ?? []);
+    setPools(g.data ?? []);
     setLoading(false);
   }
   useEffect(() => {
@@ -269,7 +274,11 @@ export function PaymentPlansModule() {
 
   function startAdd() {
     setEditing(null);
-    setForm({ user_id: "", payment_category: "", amount_required: "", amount_paid: "" });
+    setForm({
+      user_id: "", payment_category: "", amount_required: "", amount_paid: "",
+      purchase_model: "full_purchase", term_preset: "3", term_months: "3",
+      catalogue_property_id: "", group_pool_id: "", start_date: "", next_due_date: "", notes: "",
+    });
     setOpen(true);
   }
   function startEdit(r: Row) {
@@ -279,22 +288,42 @@ export function PaymentPlansModule() {
       payment_category: r.payment_category,
       amount_required: String(r.amount_required ?? ""),
       amount_paid: String(r.amount_paid ?? ""),
+      purchase_model: r.purchase_model ?? "full_purchase",
+      term_preset: [3, 6, 12, 24].includes(Number(r.term_months)) ? String(r.term_months) : "custom",
+      term_months: String(r.term_months ?? 3),
+      catalogue_property_id: r.catalogue_property_id ?? "",
+      group_pool_id: r.group_pool_id ?? "",
+      start_date: r.start_date ?? "",
+      next_due_date: r.next_due_date ?? "",
+      notes: r.notes ?? "",
     });
     setOpen(true);
   }
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    if (blockInDemo()) return;
     if (!form.user_id || !form.payment_category)
       return void toast.error("Choose a client and category.");
     const required = Number(form.amount_required) || 0;
     const paid = Number(form.amount_paid) || 0;
+    const termMonths = Number(form.term_months);
+    if (!Number.isInteger(termMonths) || termMonths < 1 || termMonths > 60)
+      return void toast.error("Payment term must be between 1 and 60 months.");
+    const { data: auth } = await supabase.auth.getUser();
     const payload = {
       user_id: form.user_id,
       payment_category: form.payment_category,
       amount_required: required,
       amount_paid: paid,
       status: requirementStatus(required, paid),
+      purchase_model: form.purchase_model,
+      term_months: termMonths,
+      installment_frequency_months: 1,
+      catalogue_property_id: form.purchase_model === "full_purchase" ? form.catalogue_property_id || null : null,
+      group_pool_id: form.purchase_model === "group_buy" ? form.group_pool_id || null : null,
+      start_date: form.start_date || null,
+      next_due_date: form.next_due_date || null,
+      notes: form.notes.trim() || null,
+      updated_by: auth.user?.id ?? null,
     };
     const { error } = editing
       ? await sb().from("payment_requirements").update(payload).eq("id", editing.id)
@@ -330,10 +359,13 @@ export function PaymentPlansModule() {
         />
       ) : (
         <TableShell
+          min={1080}
           head={
             <>
               <Th>Client</Th>
               <Th>Category</Th>
+              <Th>Purchase</Th>
+              <Th>Term</Th>
               <Th>Required</Th>
               <Th>Paid</Th>
               <Th>Balance</Th>
@@ -351,6 +383,11 @@ export function PaymentPlansModule() {
                   <div className="text-xs text-slate-500">{r.profiles?.email}</div>
                 </Td>
                 <Td className="text-slate-600">{r.payment_category}</Td>
+                <Td className="text-slate-600">
+                  <div className="capitalize">{String(r.purchase_model ?? "full_purchase").replace(/_/g, " ")}</div>
+                  <div className="text-xs text-slate-400">{r.available_properties?.property_name ?? r.group_pools?.name ?? "—"}</div>
+                </Td>
+                <Td className="whitespace-nowrap text-slate-600">{r.term_months ?? 3} months</Td>
                 <Td className="tabular-nums text-navy">{fmtNGN(r.amount_required)}</Td>
                 <Td className="tabular-nums text-emerald-700">{fmtNGN(r.amount_paid)}</Td>
                 <Td className={`tabular-nums ${balance > 0 ? "text-rose-600" : "text-slate-500"}`}>
@@ -371,7 +408,7 @@ export function PaymentPlansModule() {
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent>
+        <DialogContent className="max-h-[92vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader>
             <DialogTitle className="font-serif text-navy">
               {editing ? "Edit payment plan item" : "Add payment plan item"}
@@ -414,6 +451,58 @@ export function PaymentPlansModule() {
               </Select>
             </Field>
             <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Purchase model *">
+                <Select value={form.purchase_model} onValueChange={(value) => setForm({ ...form, purchase_model: value })}>
+                  <SelectTrigger aria-label="Purchase model"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="full_purchase">Full purchase</SelectItem>
+                    <SelectItem value="group_buy">Group buy</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+              <Field label="Payment term *">
+                <Select
+                  value={form.term_preset}
+                  onValueChange={(value) => setForm({ ...form, term_preset: value, term_months: value === "custom" ? form.term_months : value })}
+                >
+                  <SelectTrigger aria-label="Payment term"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="3">3 months</SelectItem>
+                    <SelectItem value="6">6 months</SelectItem>
+                    <SelectItem value="12">1 year</SelectItem>
+                    <SelectItem value="24">2 years</SelectItem>
+                    <SelectItem value="custom">Custom term</SelectItem>
+                  </SelectContent>
+                </Select>
+              </Field>
+            </div>
+            {form.term_preset === "custom" && (
+              <Field label="Custom number of months (1–60)">
+                <Input type="number" min="1" max="60" value={form.term_months} onChange={(event) => setForm({ ...form, term_months: event.target.value })} />
+              </Field>
+            )}
+            {form.purchase_model === "full_purchase" ? (
+              <Field label="Property">
+                <Select value={form.catalogue_property_id || "__none__"} onValueChange={(value) => setForm({ ...form, catalogue_property_id: value === "__none__" ? "" : value })}>
+                  <SelectTrigger aria-label="Property"><SelectValue placeholder="Choose property" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">No property selected</SelectItem>
+                    {properties.map((property) => <SelectItem key={property.id} value={property.id}>{property.property_name}{property.location ? ` — ${property.location}` : ""}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </Field>
+            ) : (
+              <Field label="Group-buy pool">
+                <Select value={form.group_pool_id || "__none__"} onValueChange={(value) => setForm({ ...form, group_pool_id: value === "__none__" ? "" : value })}>
+                  <SelectTrigger aria-label="Group-buy pool"><SelectValue placeholder="Choose pool" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="__none__">No pool selected</SelectItem>
+                    {pools.map((pool) => <SelectItem key={pool.id} value={pool.id}>{pool.name}{pool.property_name ? ` — ${pool.property_name}` : ""}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+              </Field>
+            )}
+            <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Amount required (₦)">
                 <Input
                   type="number"
@@ -429,6 +518,11 @@ export function PaymentPlansModule() {
                 />
               </Field>
             </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Plan start date"><Input type="date" value={form.start_date} onChange={(event) => setForm({ ...form, start_date: event.target.value })} /></Field>
+              <Field label="Next due date"><Input type="date" value={form.next_due_date} onChange={(event) => setForm({ ...form, next_due_date: event.target.value })} /></Field>
+            </div>
+            <Field label="Plan notes"><Textarea rows={3} value={form.notes} onChange={(event) => setForm({ ...form, notes: event.target.value })} /></Field>
             <Button
               type="submit"
               className="w-full rounded-full bg-gold font-bold text-gold-foreground hover:bg-gold/90"
@@ -444,7 +538,6 @@ export function PaymentPlansModule() {
 
 /* ============================ COMPANY ACCOUNTS ============================ */
 export function CompanyAccountsModule() {
-  const demo = isDemoActive();
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
@@ -459,15 +552,11 @@ export function CompanyAccountsModule() {
 
   async function load() {
     setLoading(true);
-    if (demo) {
-      setRows(demoFinanceOps.accounts);
-    } else {
-      const { data } = await sb()
-        .from("company_account")
-        .select("*")
-        .order("created_at", { ascending: false });
-      setRows(data ?? []);
-    }
+    const { data } = await sb()
+      .from("company_account")
+      .select("*")
+      .order("created_at", { ascending: false });
+    setRows(data ?? []);
     setLoading(false);
   }
   useEffect(() => {
@@ -492,7 +581,6 @@ export function CompanyAccountsModule() {
   }
   async function save(e: React.FormEvent) {
     e.preventDefault();
-    if (blockInDemo()) return;
     if (!form.bank_name.trim() || !form.account_name.trim() || !form.account_number.trim())
       return void toast.error("Bank, account name and number are required.");
     const payload = {
@@ -511,7 +599,6 @@ export function CompanyAccountsModule() {
     load();
   }
   async function remove(r: Row) {
-    if (blockInDemo()) return;
     if (!window.confirm(`Delete ${r.bank_name} account ${r.account_number}?`)) return;
     const { error } = await sb().from("company_account").delete().eq("id", r.id);
     if (error) return void toast.error(error.message);

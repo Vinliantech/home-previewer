@@ -5,11 +5,11 @@ import {
   Award,
   Bell,
   Building2,
+  CalendarCheck,
   ChevronDown,
   Coins,
   DoorOpen,
   FileBarChart2,
-  FileText,
   Headset,
   Home,
   LayoutDashboard,
@@ -25,7 +25,6 @@ import {
   X,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { DEMO_EMAIL, DEMO_NAME, disableDemo, isDemoActive } from "@/lib/demo";
 import { getMyKyc, getMyNotifications } from "@/lib/invest.functions";
 import {
   DropdownMenu,
@@ -56,6 +55,7 @@ const navGroups: { label: string | null; items: NavItem[] }[] = [
     items: [
       { to: "/portfolio/opportunities", label: "Opportunities", icon: Building2 },
       { to: "/portfolio/properties", label: "My Properties", icon: Home },
+      { to: "/portfolio/plans", label: "Reservations & Plans", icon: CalendarCheck },
       { to: "/portfolio/tokens", label: "My Tokens", icon: Coins },
       { to: "/portfolio/pools", label: "Group Pools", icon: UsersRound },
     ],
@@ -72,7 +72,6 @@ const navGroups: { label: string | null; items: NavItem[] }[] = [
   {
     label: "Documents",
     items: [
-      { to: "/portfolio/documents", label: "Documents", icon: FileText },
       { to: "/portfolio/certificates", label: "Certificates", icon: Award },
       { to: "/portfolio/exit-requests", label: "Exit Requests", icon: DoorOpen },
     ],
@@ -93,13 +92,8 @@ function PortfolioLayout() {
   const loc = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [user, setUser] = useState<{ email: string; name: string } | null>(null);
-  const demo = isDemoActive();
 
   useEffect(() => {
-    if (demo) {
-      setUser({ email: DEMO_EMAIL, name: DEMO_NAME });
-      return;
-    }
     supabase.auth.getUser().then(({ data }) => {
       if (data.user) {
         setUser({
@@ -108,7 +102,7 @@ function PortfolioLayout() {
         });
       }
     });
-  }, [demo]);
+  }, []);
 
   // Close the mobile drawer on navigation.
   useEffect(() => setMobileOpen(false), [loc.pathname]);
@@ -126,11 +120,7 @@ function PortfolioLayout() {
   const showKycBanner = kycStatus !== "verified" && loc.pathname !== "/portfolio/kyc";
 
   async function signOut() {
-    if (demo) {
-      disableDemo();
-    } else {
-      await supabase.auth.signOut();
-    }
+    await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
   }
 
@@ -314,26 +304,9 @@ function PortfolioLayout() {
         </header>
 
         {/* Demo banner */}
-        {demo && (
-          <div className="border-b border-violet-200 bg-violet-50 px-4 py-2.5 sm:px-6 print:hidden">
-            <div className="flex items-center gap-2 text-sm font-medium text-violet-800">
-              <span className="rounded-full bg-violet-600 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-white">
-                Demo
-              </span>
-              You are viewing sample data. Actions like withdrawals and uploads are disabled.
-              <button
-                type="button"
-                onClick={signOut}
-                className="ml-auto shrink-0 font-bold underline-offset-2 hover:underline"
-              >
-                Exit demo
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* KYC banner */}
-        {!demo && showKycBanner && (
+        {showKycBanner && (
           <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 sm:px-6 print:hidden">
             <Link
               to="/portfolio/kyc"
