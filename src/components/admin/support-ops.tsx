@@ -689,7 +689,7 @@ export function UserRolesModule() {
   }
   async function revoke(r: Row) {
     if (!window.confirm(`Remove ${roleLabel(r.role)} from ${r.email}?`)) return;
-    const { error } = await supabase.rpc("revoke_user_role", {
+    const { error } = await (supabase as any).rpc("revoke_user_role", {
       _user_id: r.user_id,
       _role: r.role,
     });
