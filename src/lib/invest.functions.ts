@@ -268,7 +268,7 @@ export const uploadPaymentEvidence = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("submit_investment_payment_evidence", {
       _investment_id: data.investment_id,
       _evidence_url: data.evidence_url,
-      _reference: data.reference ?? null,
+      _reference: data.reference ?? "",
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -459,7 +459,7 @@ export const adminReviewKyc = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("admin_review_investor_kyc", {
       _profile_id: data.id,
       _status: data.status,
-      _notes: data.notes ?? null,
+      _notes: data.notes ?? "",
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -535,7 +535,7 @@ export const adminCreateProperty = createServerFn({ method: "POST" })
     const payload = { ...data, current_value: data.initial_value, created_by: context.userId };
     const { error, data: ins } = await context.supabase
       .from("tokenized_properties")
-      .insert(payload)
+      .insert(payload as any)
       .select("id")
       .single();
     if (error) throw new Error(error.message);
@@ -550,7 +550,7 @@ export const adminUpdateProperty = createServerFn({ method: "POST" })
     const { id, ...payload } = data;
     const { error } = await context.supabase
       .from("tokenized_properties")
-      .update(payload)
+      .update(payload as any)
       .eq("id", id);
     if (error) throw new Error(error.message);
     return { id };
@@ -605,7 +605,7 @@ export const adminApproveInvestment = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("admin_approve_investment", {
       _investment_id: data.id,
       _approved_amount: data.approved_amount,
-      _notes: data.notes ?? null,
+      _notes: data.notes ?? "",
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -618,7 +618,7 @@ export const adminRejectInvestment = createServerFn({ method: "POST" })
     await ensureAdmin(context);
     const { error } = await context.supabase.rpc("admin_reject_investment", {
       _investment_id: data.id,
-      _notes: data.notes ?? null,
+      _notes: data.notes ?? "",
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -644,9 +644,9 @@ export const adminRecordValuation = createServerFn({ method: "POST" })
       _property_id: data.property_id,
       _new_value: data.new_value,
       _valuation_date: data.valuation_date,
-      _valuer: data.valuer ?? null,
-      _report_url: data.report_url ?? null,
-      _notes: data.notes ?? null,
+      _valuer: data.valuer ?? "",
+      _report_url: data.report_url ?? "",
+      _notes: data.notes ?? "",
     });
     if (error) throw new Error(error.message);
     return { ok: true, change: Number(change ?? 0) };
@@ -681,7 +681,7 @@ export const adminRecordRentalIncome = createServerFn({ method: "POST" })
       _taxes: data.taxes,
       _other_expenses: data.other_expenses,
       _distribution_date: data.distribution_date,
-      _notes: data.notes ?? null,
+      _notes: data.notes ?? "",
     });
     if (error) throw new Error(error.message);
     return { ok: true, net };
@@ -694,7 +694,7 @@ export const adminMarkPayoutPaid = createServerFn({ method: "POST" })
     await ensureAdmin(context);
     const { error } = await context.supabase.rpc("admin_mark_rental_payout_paid", {
       _payout_id: data.id,
-      _reference: data.reference ?? null,
+      _reference: data.reference ?? "",
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -749,7 +749,7 @@ export const adminApproveWithdrawal = createServerFn({ method: "POST" })
     await ensureAdmin(context);
     const { error } = await context.supabase.rpc("admin_approve_withdrawal", {
       _withdrawal_id: data.id,
-      _reference: data.reference ?? null,
+      _reference: data.reference ?? "",
     });
     if (error) throw new Error(error.message);
     return { ok: true };
@@ -822,7 +822,7 @@ export const adminUpdateExit = createServerFn({ method: "POST" })
     const { error } = await context.supabase.rpc("admin_update_exit_request", {
       _exit_id: data.id,
       _status: data.status,
-      _notes: data.notes ?? null,
+      _notes: data.notes ?? "",
     });
     if (error) throw new Error(error.message);
     return { ok: true };
