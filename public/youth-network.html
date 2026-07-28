@@ -339,10 +339,15 @@
 <script>
   document.getElementById('yr').textContent = new Date().getFullYear();
 
-  // The main Kay-Steph app that saves the registration and sends the Brevo
-  // confirmation + reference number. Change this to your production domain
-  // (e.g. https://kaystephgroup.com) once DNS is fully propagated.
-  const API_ENDPOINT = 'https://kaystephgroup.com/api/public/youth-network';
+  // Backend endpoint that saves the registration to the database and sends
+  // the Brevo confirmation email + admin notification with the reference
+  // number. This is CORS-open, so it works from any subdomain you host this
+  // HTML file on (cPanel, Netlify, etc.).
+  //
+  // Uses the stable Lovable production URL so it keeps working while
+  // kaystephgroup.com DNS propagates. Once your custom domain is live you
+  // can switch to: https://kaystephgroup.com/api/public/youth-network
+  const API_ENDPOINT = 'https://sweet-home-preview.lovable.app/api/public/youth-network';
 
   const form = document.getElementById('workshop-form');
   const success = document.getElementById('form-success');
