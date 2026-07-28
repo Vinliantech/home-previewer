@@ -146,6 +146,7 @@ function Kyc() {
         photoUrl = path;
       }
 
+      if (!idDocUrl || !photoUrl) throw new Error("Both identity files are required.");
       await mutation.mutateAsync({
         data: { ...form, id_doc_url: idDocUrl, photo_url: photoUrl },
       });

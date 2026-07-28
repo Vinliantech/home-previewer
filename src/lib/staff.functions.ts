@@ -1,9 +1,10 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createClientFn } from "@/lib/client-function";
 import { z } from "zod";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { STAFF_ROLES } from "@/lib/roles";
 import type { Database } from "@/integrations/supabase/types";
+import { invokeEdgeFunction } from "@/integrations/supabase/edge";
 
 /**
  * Staff directory administration.
@@ -51,7 +52,7 @@ function normaliseEmail(email: string) {
 }
 
 /** Everyone in the directory, with their permission roles attached. */
-export const listStaff = createServerFn({ method: "GET" })
+export const listStaff = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase } = context;
@@ -81,188 +82,44 @@ export const listStaff = createServerFn({ method: "GET" })
  * set-password link. The link is generated (not sent) by Supabase so the
  * message goes out through our own branded Resend template.
  */
-export const inviteStaff = createServerFn({ method: "POST" })
+export const inviteStaff = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) => inviteSchema.parse(input))
-  .handler(async ({ data, context }) => {
-    await assertPlatformAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const email = normaliseEmail(data.email);
-    const siteUrl = process.env.SITE_URL ?? "";
-    let userId: string | null = null;
-    let actionLink: string | null = null;
-
-    const invited = await supabaseAdmin.auth.admin.generateLink({
-      type: "invite",
-      email,
-      options: siteUrl ? { redirectTo: `${siteUrl}/admin/auth` } : undefined,
-    });
-
-    if (invited.error) {
-      // Already has an account (a client being promoted to staff, or a
-      // re-invite): link the existing user and send a password-reset link
-      // instead of failing the whole invite.
-      const recovery = await supabaseAdmin.auth.admin.generateLink({
-        type: "recovery",
-        email,
-        options: siteUrl ? { redirectTo: `${siteUrl}/admin/auth` } : undefined,
-      });
-      if (recovery.error) throw new Error(recovery.error.message);
-      userId = recovery.data.user?.id ?? null;
-      actionLink = recovery.data.properties?.action_link ?? null;
-    } else {
-      userId = invited.data.user?.id ?? null;
-      actionLink = invited.data.properties?.action_link ?? null;
-    }
-
-    const now = new Date().toISOString();
-    const { data: member, error } = await supabaseAdmin
-      .from("staff_members")
-      .insert({
-        user_id: userId,
-        full_name: data.fullName,
-        email,
-        phone: data.phone || null,
-        whatsapp_number: data.whatsappNumber || null,
-        position: data.position || null,
-        department: data.department || null,
-        started_on: data.startedOn || null,
-        notes: data.notes || null,
-        status: "invited",
-        // Recorded as an intention only. Nothing reaches user_roles until an
-        // admin approves the person who actually signs in — an invite landing
-        // in the wrong inbox must not hand out access on its own.
-        intended_role: data.role,
-        invited_by: context.userId,
-        invited_at: now,
-      })
-      .select("id")
-      .single();
-    if (error) {
-      // staff_members_email_key_idx is the authority on duplicates; checking
-      // first would only open a race between the check and the insert.
-      if (error.code === "23505") throw new Error("That email is already in the staff directory.");
-      throw new Error(error.message);
-    }
-
-    let emailSent = false;
-    if (actionLink) {
-      const { sendStaffInvite } = await import("@/lib/crm-email.server");
-      const result = await sendStaffInvite({
-        to: email,
-        fullName: data.fullName,
-        position: data.position || null,
-        roleLabel: data.role.replace(/_/g, " "),
-        actionLink,
-      });
-      emailSent = result.ok;
-    }
-
-    return { ok: true, staffId: member.id, emailSent, inviteLink: actionLink };
-  });
+  .handler(({ data }) =>
+    invokeEdgeFunction<{
+      ok: true;
+      staffId: string;
+      emailSent: boolean;
+      inviteLink: string | null;
+    }>("staff-workflows", "invite", { ...data, email: normaliseEmail(data.email) }),
+  );
 
 /** Re-issues the set-password link for someone who has not signed in yet. */
-export const resendStaffInvite = createServerFn({ method: "POST" })
+export const resendStaffInvite = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) => z.object({ staffId: z.string().uuid() }).parse(input))
-  .handler(async ({ data, context }) => {
-    await assertPlatformAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: member, error } = await supabaseAdmin
-      .from("staff_members")
-      .select("id, full_name, email, position, status")
-      .eq("id", data.staffId)
-      .single();
-    if (error || !member) throw new Error("Staff member not found.");
-
-    const siteUrl = process.env.SITE_URL ?? "";
-    const link = await supabaseAdmin.auth.admin.generateLink({
-      type: member.status === "invited" ? "invite" : "recovery",
-      email: member.email,
-      options: siteUrl ? { redirectTo: `${siteUrl}/admin/auth` } : undefined,
-    });
-    if (link.error) throw new Error(link.error.message);
-    const actionLink = link.data.properties?.action_link ?? null;
-    if (!actionLink) throw new Error("Could not generate an invite link.");
-
-    await supabaseAdmin
-      .from("staff_members")
-      .update({ invited_at: new Date().toISOString() })
-      .eq("id", member.id);
-
-    const { sendStaffInvite } = await import("@/lib/crm-email.server");
-    const result = await sendStaffInvite({
-      to: member.email,
-      fullName: member.full_name,
-      position: member.position,
-      roleLabel: null,
-      actionLink,
-    });
-    return { ok: true, emailSent: result.ok, inviteLink: actionLink };
-  });
+  .handler(({ data }) =>
+    invokeEdgeFunction<{ ok: true; emailSent: boolean; inviteLink: string }>(
+      "staff-workflows",
+      "resend_invite",
+      data,
+    ),
+  );
 
 /** Edits the human record, and the permission role when one is supplied. */
-export const updateStaff = createServerFn({ method: "POST" })
+export const updateStaff = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) => updateSchema.parse(input))
-  .handler(async ({ data, context }) => {
-    await assertPlatformAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const { data: member, error: readError } = await supabaseAdmin
-      .from("staff_members")
-      .select("id, user_id, status")
-      .eq("id", data.staffId)
-      .single();
-    if (readError || !member) throw new Error("Staff member not found.");
-
-    const { error } = await supabaseAdmin
-      .from("staff_members")
-      .update({
-        full_name: data.fullName,
-        position: data.position || null,
-        department: data.department || null,
-        phone: data.phone || null,
-        whatsapp_number: data.whatsappNumber || null,
-        started_on: data.startedOn || null,
-        notes: data.notes || null,
-        ...(data.role ? { intended_role: data.role } : {}),
-        ...(data.status ? { status: data.status } : {}),
-      })
-      .eq("id", data.staffId);
-    if (error) throw new Error(error.message);
-
-    const nextStatus = data.status ?? member.status;
-    if (data.role && member.user_id && nextStatus === "active") {
-      // Only an already-approved account has its role written through. For a
-      // pending one the edit records the intention; approval is what grants it,
-      // otherwise editing would quietly bypass the approval gate.
-      await supabaseAdmin
-        .from("user_roles")
-        .delete()
-        .eq("user_id", member.user_id)
-        .in("role", STAFF_ROLES);
-      await supabaseAdmin.from("user_roles").insert({ user_id: member.user_id, role: data.role });
-    }
-
-    // A suspended account keeps its record but loses every staff permission.
-    if (data.status === "suspended" && member.user_id) {
-      await supabaseAdmin
-        .from("user_roles")
-        .delete()
-        .eq("user_id", member.user_id)
-        .in("role", STAFF_ROLES);
-    }
-
-    return { ok: true };
-  });
+  .handler(({ data }) =>
+    invokeEdgeFunction<{ ok: true }>("staff-workflows", "update", data),
+  );
 
 /**
  * Grants access to someone who has signed in and is waiting. The role comes
  * from the record (or an explicit override), and approve_staff_member re-checks
  * admin rights in the database.
  */
-export const approveStaff = createServerFn({ method: "POST" })
+export const approveStaff = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z.object({ staffId: z.string().uuid(), role: z.enum(STAFF_ROLES).optional() }).parse(input),
@@ -277,7 +134,7 @@ export const approveStaff = createServerFn({ method: "POST" })
   });
 
 /** Declines a pending staff member. The record is kept for the audit trail. */
-export const rejectStaff = createServerFn({ method: "POST" })
+export const rejectStaff = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -295,7 +152,7 @@ export const rejectStaff = createServerFn({ method: "POST" })
   });
 
 /** Open role/position requests raised by staff, newest first. */
-export const listStaffChangeRequests = createServerFn({ method: "GET" })
+export const listStaffChangeRequests = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
@@ -308,7 +165,7 @@ export const listStaffChangeRequests = createServerFn({ method: "GET" })
   });
 
 /** Approving a request applies it; declining records why. */
-export const reviewStaffChangeRequest = createServerFn({ method: "POST" })
+export const reviewStaffChangeRequest = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -319,61 +176,14 @@ export const reviewStaffChangeRequest = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data, context }) => {
-    await assertPlatformAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-
-    const { data: request, error: readError } = await supabaseAdmin
-      .from("staff_change_requests")
-      .select("*, staff_members(id, user_id, status)")
-      .eq("id", data.requestId)
-      .single();
-    if (readError || !request) throw new Error("Request not found.");
-
-    if (data.approve) {
-      const member = request.staff_members as unknown as {
-        id: string;
-        user_id: string | null;
-        status: string;
-      };
-      await supabaseAdmin
-        .from("staff_members")
-        .update({
-          ...(request.requested_position ? { position: request.requested_position } : {}),
-          ...(request.requested_department ? { department: request.requested_department } : {}),
-          ...(request.requested_role ? { intended_role: request.requested_role } : {}),
-        })
-        .eq("id", member.id);
-
-      if (request.requested_role && member.user_id && member.status === "active") {
-        await supabaseAdmin
-          .from("user_roles")
-          .delete()
-          .eq("user_id", member.user_id)
-          .in("role", STAFF_ROLES);
-        await supabaseAdmin
-          .from("user_roles")
-          .insert({ user_id: member.user_id, role: request.requested_role });
-      }
-    }
-
-    const { error } = await supabaseAdmin
-      .from("staff_change_requests")
-      .update({
-        status: data.approve ? "approved" : "rejected",
-        reviewed_by: context.userId,
-        reviewed_at: new Date().toISOString(),
-        review_note: data.note || null,
-      })
-      .eq("id", data.requestId);
-    if (error) throw new Error(error.message);
-    return { ok: true };
-  });
+  .handler(({ data }) =>
+    invokeEdgeFunction<{ ok: true }>("staff-workflows", "review_change", data),
+  );
 
 /* ============================ SELF-SERVICE ============================ */
 
 /** The signed-in staff member's own record. RLS scopes this to themselves. */
-export const myStaffProfile = createServerFn({ method: "GET" })
+export const myStaffProfile = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
@@ -401,7 +211,7 @@ export const myStaffProfile = createServerFn({ method: "GET" })
   });
 
 /** Staff keep their own phone numbers current; nothing else is self-writable. */
-export const updateMyStaffContact = createServerFn({ method: "POST" })
+export const updateMyStaffContact = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -421,7 +231,7 @@ export const updateMyStaffContact = createServerFn({ method: "POST" })
   });
 
 /** Asks an admin for a different role or position. Grants nothing by itself. */
-export const requestStaffChange = createServerFn({ method: "POST" })
+export const requestStaffChange = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -445,31 +255,12 @@ export const requestStaffChange = createServerFn({ method: "POST" })
   });
 
 /** Removes the directory entry and every staff permission it granted. */
-export const removeStaff = createServerFn({ method: "POST" })
+export const removeStaff = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) => z.object({ staffId: z.string().uuid() }).parse(input))
-  .handler(async ({ data, context }) => {
-    await assertPlatformAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: member } = await supabaseAdmin
-      .from("staff_members")
-      .select("id, user_id")
-      .eq("id", data.staffId)
-      .maybeSingle();
-    if (member?.user_id) {
-      if (member.user_id === context.userId) {
-        throw new Error("You cannot remove your own staff access.");
-      }
-      await supabaseAdmin
-        .from("user_roles")
-        .delete()
-        .eq("user_id", member.user_id)
-        .in("role", STAFF_ROLES);
-    }
-    const { error } = await supabaseAdmin.from("staff_members").delete().eq("id", data.staffId);
-    if (error) throw new Error(error.message);
-    return { ok: true };
-  });
+  .handler(({ data }) =>
+    invokeEdgeFunction<{ ok: true }>("staff-workflows", "remove", data),
+  );
 
 // Re-exported for existing importers; the canonical source is @/lib/roles.
 export type { StaffRole } from "@/lib/roles";

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Clock3, Edit3, MailCheck, Plus, Send, XCircle } from "lucide-react";
 import { toast } from "sonner";
@@ -68,7 +68,7 @@ function AutomationsWorkspace() {
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [deliveries, setDeliveries] = useState<Delivery[]>([]);
   const [loading, setLoading] = useState(true);
-  const toggle = useServerFn(toggleAutomationSequence);
+  const toggle = useClientFn(toggleAutomationSequence);
 
   const refresh = useCallback(async () => {
     const [sequenceResult, templateResult, stepResult, enrollmentResult, deliveryResult] =
@@ -371,7 +371,7 @@ function AutomationsWorkspace() {
 }
 
 function TemplateDialog({ template, onSaved }: { template?: EmailTemplate; onSaved: () => void }) {
-  const save = useServerFn(saveEmailTemplate);
+  const save = useClientFn(saveEmailTemplate);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({
@@ -494,7 +494,7 @@ function NewSequenceDialog({
   templates: EmailTemplate[];
   onCreated: () => void;
 }) {
-  const create = useServerFn(createAutomationSequence);
+  const create = useClientFn(createAutomationSequence);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [name, setName] = useState("");

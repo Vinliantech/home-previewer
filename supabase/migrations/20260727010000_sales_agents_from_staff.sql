@@ -145,7 +145,7 @@ CREATE OR REPLACE FUNCTION public.list_assignable_staff()
 RETURNS TABLE (
   id uuid,
   full_name text,
-  position text,
+  "position" text,
   department text
 )
 LANGUAGE sql
@@ -153,7 +153,7 @@ STABLE
 SECURITY DEFINER
 SET search_path = public
 AS $$
-  SELECT sm.id, sm.full_name, sm.position, sm.department
+  SELECT sm.id, sm.full_name, sm.position AS "position", sm.department
   FROM public.staff_members sm
   WHERE public.is_crm_admin(auth.uid())
     AND sm.status = 'active'

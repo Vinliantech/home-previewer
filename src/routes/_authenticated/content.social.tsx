@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import {
   CalendarClock,
   CheckCircle2,
@@ -316,7 +316,7 @@ function SocialComposer({
   onClose: () => void;
   onSaved: () => Promise<void>;
 }) {
-  const save = useServerFn(saveSocialPublication);
+  const save = useClientFn(saveSocialPublication);
   const [postId, setPostId] = useState(value?.post?.id ?? "");
   const [platform, setPlatform] = useState<SocialPublicationRecord["platform"]>(
     value?.platform ?? "linkedin",

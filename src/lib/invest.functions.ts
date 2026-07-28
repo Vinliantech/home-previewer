@@ -1,4 +1,4 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createClientFn } from "@/lib/client-function";
 import { z } from "zod";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
@@ -6,14 +6,23 @@ import type { Database } from "@/integrations/supabase/types";
 
 // Public (SSR) client
 function publicClient() {
-  return createClient<Database>(process.env.SUPABASE_URL!, process.env.SUPABASE_PUBLISHABLE_KEY!, {
+  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+  const publishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+
+  if (!supabaseUrl || !publishableKey) {
+    throw new Error(
+      "Missing VITE_SUPABASE_URL or VITE_SUPABASE_PUBLISHABLE_KEY.",
+    );
+  }
+
+  return createClient<Database>(supabaseUrl, publishableKey, {
     auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
   });
 }
 
 // ============= PUBLIC =============
 
-export const listPublicPropertyCatalogue = createServerFn({ method: "GET" }).handler(async () => {
+export const listPublicPropertyCatalogue = createClientFn({ method: "GET" }).handler(async () => {
   const sb = publicClient();
   // is_public must be filtered here, not in the browser. RLS on
   // tokenized_properties is USING (true), so anything selected is served to
@@ -28,7 +37,7 @@ export const listPublicPropertyCatalogue = createServerFn({ method: "GET" }).han
   return { properties: data ?? [] };
 });
 
-export const getPublicCatalogueProperty = createServerFn({ method: "GET" })
+export const getPublicCatalogueProperty = createClientFn({ method: "GET" })
   .validator((input) => z.object({ slug: z.string().min(1).max(180) }).parse(input))
   .handler(async ({ data }) => {
     const sb = publicClient();
@@ -44,7 +53,7 @@ export const getPublicCatalogueProperty = createServerFn({ method: "GET" })
     return { property: property ?? null };
   });
 
-export const listOpenProperties = createServerFn({ method: "GET" }).handler(async () => {
+export const listOpenProperties = createClientFn({ method: "GET" }).handler(async () => {
   const sb = publicClient();
   const { data, error } = await sb
     .from("tokenized_properties")
@@ -87,7 +96,7 @@ export const listOpenProperties = createServerFn({ method: "GET" }).handler(asyn
   return { properties: data ?? [], funding };
 });
 
-export const getPropertyDetail = createServerFn({ method: "GET" })
+export const getPropertyDetail = createClientFn({ method: "GET" })
   .validator((i) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data }) => {
     const sb = publicClient();
@@ -121,7 +130,7 @@ export const getPropertyDetail = createServerFn({ method: "GET" })
     };
   });
 
-export const verifyCertificate = createServerFn({ method: "GET" })
+export const verifyCertificate = createClientFn({ method: "GET" })
   .validator((i) => z.object({ token: z.string().min(4) }).parse(i))
   .handler(async ({ data }) => {
     const sb = publicClient();
@@ -151,7 +160,7 @@ export const verifyCertificate = createServerFn({ method: "GET" })
 
 // ============= INVESTOR =============
 
-export const getMyKyc = createServerFn({ method: "GET" })
+export const getMyKyc = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data } = await context.supabase
@@ -162,7 +171,7 @@ export const getMyKyc = createServerFn({ method: "GET" })
     return { kyc: data ?? null };
   });
 
-export const submitKyc = createServerFn({ method: "POST" })
+export const submitKyc = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) =>
     z
@@ -197,7 +206,7 @@ export const submitKyc = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const createInvestment = createServerFn({ method: "POST" })
+export const createInvestment = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) =>
     z
@@ -253,7 +262,7 @@ export const createInvestment = createServerFn({ method: "POST" })
     return { id: ins.id };
   });
 
-export const uploadPaymentEvidence = createServerFn({ method: "POST" })
+export const uploadPaymentEvidence = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) =>
     z
@@ -274,7 +283,7 @@ export const uploadPaymentEvidence = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const getMyPortfolio = createServerFn({ method: "GET" })
+export const getMyPortfolio = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data: investments } = await context.supabase
@@ -306,7 +315,7 @@ export const getMyPortfolio = createServerFn({ method: "GET" })
     };
   });
 
-export const getMyTransactions = createServerFn({ method: "GET" })
+export const getMyTransactions = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data } = await context.supabase
@@ -318,7 +327,7 @@ export const getMyTransactions = createServerFn({ method: "GET" })
     return { transactions: data ?? [] };
   });
 
-export const requestWithdrawal = createServerFn({ method: "POST" })
+export const requestWithdrawal = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) =>
     z
@@ -349,7 +358,7 @@ export const requestWithdrawal = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const requestExit = createServerFn({ method: "POST" })
+export const requestExit = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) =>
     z
@@ -370,7 +379,7 @@ export const requestExit = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const getMyCertificates = createServerFn({ method: "GET" })
+export const getMyCertificates = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data: certs } = await context.supabase
@@ -382,7 +391,7 @@ export const getMyCertificates = createServerFn({ method: "GET" })
     return { certificates: certs ?? [] };
   });
 
-export const getMyNotifications = createServerFn({ method: "GET" })
+export const getMyNotifications = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { data } = await context.supabase
@@ -394,7 +403,7 @@ export const getMyNotifications = createServerFn({ method: "GET" })
     return { notifications: data ?? [] };
   });
 
-export const markNotificationRead = createServerFn({ method: "POST" })
+export const markNotificationRead = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) => z.object({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
@@ -431,7 +440,7 @@ async function getInvestorSummaries(context: AuthenticatedContext, investorIds: 
   return new Map((data ?? []).map((profile) => [profile.user_id, profile]));
 }
 
-export const adminListKyc = createServerFn({ method: "GET" })
+export const adminListKyc = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await ensureAdmin(context);
@@ -443,7 +452,7 @@ export const adminListKyc = createServerFn({ method: "GET" })
     return { kyc: data ?? [] };
   });
 
-export const adminReviewKyc = createServerFn({ method: "POST" })
+export const adminReviewKyc = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) =>
     z
@@ -527,7 +536,7 @@ const adminPropertyInput = z.object({
   home_order: z.number().int().min(0),
 });
 
-export const adminCreateProperty = createServerFn({ method: "POST" })
+export const adminCreateProperty = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) => adminPropertyInput.parse(i))
   .handler(async ({ data, context }) => {
@@ -542,7 +551,7 @@ export const adminCreateProperty = createServerFn({ method: "POST" })
     return { id: ins.id };
   });
 
-export const adminUpdateProperty = createServerFn({ method: "POST" })
+export const adminUpdateProperty = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) => adminPropertyInput.extend({ id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
@@ -556,7 +565,7 @@ export const adminUpdateProperty = createServerFn({ method: "POST" })
     return { id };
   });
 
-export const adminListProperties = createServerFn({ method: "GET" })
+export const adminListProperties = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await ensureAdmin(context);
@@ -568,7 +577,7 @@ export const adminListProperties = createServerFn({ method: "GET" })
     return { properties: data ?? [] };
   });
 
-export const adminListInvestments = createServerFn({ method: "GET" })
+export const adminListInvestments = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await ensureAdmin(context);
@@ -589,7 +598,7 @@ export const adminListInvestments = createServerFn({ method: "GET" })
     };
   });
 
-export const adminApproveInvestment = createServerFn({ method: "POST" })
+export const adminApproveInvestment = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) =>
     z
@@ -611,7 +620,7 @@ export const adminApproveInvestment = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const adminRejectInvestment = createServerFn({ method: "POST" })
+export const adminRejectInvestment = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) => z.object({ id: z.string().uuid(), notes: z.string().optional() }).parse(i))
   .handler(async ({ data, context }) => {
@@ -624,7 +633,7 @@ export const adminRejectInvestment = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const adminRecordValuation = createServerFn({ method: "POST" })
+export const adminRecordValuation = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) =>
     z
@@ -652,7 +661,7 @@ export const adminRecordValuation = createServerFn({ method: "POST" })
     return { ok: true, change: Number(change ?? 0) };
   });
 
-export const adminRecordRentalIncome = createServerFn({ method: "POST" })
+export const adminRecordRentalIncome = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) =>
     z
@@ -687,7 +696,7 @@ export const adminRecordRentalIncome = createServerFn({ method: "POST" })
     return { ok: true, net };
   });
 
-export const adminMarkPayoutPaid = createServerFn({ method: "POST" })
+export const adminMarkPayoutPaid = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) => z.object({ id: z.string().uuid(), reference: z.string().optional() }).parse(i))
   .handler(async ({ data, context }) => {
@@ -700,7 +709,7 @@ export const adminMarkPayoutPaid = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const adminListRentalPayouts = createServerFn({ method: "GET" })
+export const adminListRentalPayouts = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await ensureAdmin(context);
@@ -721,7 +730,7 @@ export const adminListRentalPayouts = createServerFn({ method: "GET" })
     };
   });
 
-export const adminListWithdrawals = createServerFn({ method: "GET" })
+export const adminListWithdrawals = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await ensureAdmin(context);
@@ -742,7 +751,7 @@ export const adminListWithdrawals = createServerFn({ method: "GET" })
     };
   });
 
-export const adminApproveWithdrawal = createServerFn({ method: "POST" })
+export const adminApproveWithdrawal = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) => z.object({ id: z.string().uuid(), reference: z.string().optional() }).parse(i))
   .handler(async ({ data, context }) => {
@@ -755,7 +764,7 @@ export const adminApproveWithdrawal = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const adminRejectWithdrawal = createServerFn({ method: "POST" })
+export const adminRejectWithdrawal = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -775,7 +784,7 @@ export const adminRejectWithdrawal = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const adminListExits = createServerFn({ method: "GET" })
+export const adminListExits = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await ensureAdmin(context);
@@ -796,7 +805,7 @@ export const adminListExits = createServerFn({ method: "GET" })
     };
   });
 
-export const adminUpdateExit = createServerFn({ method: "POST" })
+export const adminUpdateExit = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) =>
     z
@@ -828,7 +837,7 @@ export const adminUpdateExit = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const adminAnalytics = createServerFn({ method: "GET" })
+export const adminAnalytics = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await ensureAdmin(context);

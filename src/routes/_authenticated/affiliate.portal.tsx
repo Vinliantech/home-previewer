@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { LogOut, Home, Loader2, Camera } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { createSignedDocumentUrl } from "@/integrations/supabase/edge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -356,10 +357,7 @@ function ProfileForm({ profile, onChange }: { profile: AffiliateProfile; onChang
         .from("avatars")
         .upload(path, file, { cacheControl: "3600", upsert: true });
       if (upErr) throw upErr;
-      const { data: signed } = await supabase.storage
-        .from("avatars")
-        .createSignedUrl(path, 60 * 60 * 24 * 365);
-      const url = signed?.signedUrl ?? path;
+      const url = await createSignedDocumentUrl("avatars", path, 60 * 60 * 24 * 365);
       const { error: updErr } = await (supabase as any)
         .from("affiliate_profiles")
         .update({ avatar_url: url })

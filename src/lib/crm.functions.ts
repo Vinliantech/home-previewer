@@ -1,7 +1,8 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createClientFn } from "@/lib/client-function";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { advanceLeadStatus, type LeadStatus } from "@/lib/crm";
+import { createEdgeFn, createEdgeQuery } from "@/integrations/supabase/edge";
 
 const investmentTypes = [
   "full_purchase",
@@ -77,7 +78,7 @@ const taskTypes = [
 ] as const;
 
 /** Assign a lead to a specific adviser. RLS limits this action to permitted CRM users. */
-export const assignLead = createServerFn({ method: "POST" })
+export const assignLead = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z.object({ leadId: z.string().uuid(), agentId: z.string().uuid() }).parse(input),
@@ -125,7 +126,7 @@ export const assignLead = createServerFn({ method: "POST" })
   });
 
 /** Auto-assign by configured rules, with round-robin as the fallback. */
-export const autoAssignLead = createServerFn({ method: "POST" })
+export const autoAssignLead = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) => z.object({ leadId: z.string().uuid() }).parse(input))
   .handler(async ({ data, context }) => {
@@ -214,7 +215,7 @@ export const autoAssignLead = createServerFn({ method: "POST" })
     return { ok: true, agentId };
   });
 
-export const updateLeadStatus = createServerFn({ method: "POST" })
+export const updateLeadStatus = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z.object({ leadId: z.string().uuid(), status: z.enum(leadStatuses) }).parse(input),
@@ -228,7 +229,7 @@ export const updateLeadStatus = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const updateLeadGrade = createServerFn({ method: "POST" })
+export const updateLeadGrade = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -260,7 +261,7 @@ export const updateLeadGrade = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const addLeadNote = createServerFn({ method: "POST" })
+export const addLeadNote = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z.object({ leadId: z.string().uuid(), body: z.string().trim().min(2).max(3000) }).parse(input),
@@ -280,7 +281,7 @@ export const addLeadNote = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const createFollowUpTask = createServerFn({ method: "POST" })
+export const createFollowUpTask = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -321,7 +322,7 @@ export const createFollowUpTask = createServerFn({ method: "POST" })
     return { ok: true, taskId: task.id };
   });
 
-export const completeFollowUpTask = createServerFn({ method: "POST" })
+export const completeFollowUpTask = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -347,7 +348,7 @@ export const completeFollowUpTask = createServerFn({ method: "POST" })
   });
 
 /** Convert a qualified lead to a deal opportunity. */
-export const convertToOpportunity = createServerFn({ method: "POST" })
+export const convertToOpportunity = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -401,7 +402,7 @@ export const convertToOpportunity = createServerFn({ method: "POST" })
   });
 
 /** Manual intake uses the same lead record and preserves every later enquiry as activity. */
-export const createManualLead = createServerFn({ method: "POST" })
+export const createManualLead = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -510,7 +511,7 @@ export const createManualLead = createServerFn({ method: "POST" })
     return { ok: true, leadId, merged };
   });
 
-export const createCrmEvent = createServerFn({ method: "POST" })
+export const createCrmEvent = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -551,7 +552,7 @@ export const createCrmEvent = createServerFn({ method: "POST" })
     return { ok: true, eventId: event.id };
   });
 
-export const toggleAutomationSequence = createServerFn({ method: "POST" })
+export const toggleAutomationSequence = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z.object({ sequenceId: z.string().uuid(), active: z.boolean() }).parse(input),
@@ -565,7 +566,7 @@ export const toggleAutomationSequence = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const saveEmailTemplate = createServerFn({ method: "POST" })
+export const saveEmailTemplate = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -609,7 +610,7 @@ export const saveEmailTemplate = createServerFn({ method: "POST" })
     return { ok: true, templateId: template.id };
   });
 
-export const createAutomationSequence = createServerFn({ method: "POST" })
+export const createAutomationSequence = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -650,75 +651,15 @@ export const createAutomationSequence = createServerFn({ method: "POST" })
     return { ok: true, sequenceId: sequence.id };
   });
 
-export const getCrmIntegrationStatus = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
-    // Environment variables staying non-empty says nothing about whether the
-    // connection still works — a Meta page access token expires while every
-    // variable remains set. The last captured lead is the signal that matters.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- crm_last_capture_at enters the generated types after the migration runs.
-    const sb = context.supabase as any;
-    const { data: lastMetaCapture } = await sb.rpc("crm_last_capture_at", {
-      _source: "facebook_lead_ads",
-    });
+export const getCrmIntegrationStatus = createEdgeQuery<{
+  meta: { configured: boolean; required: string[]; lastCaptureAt: string | null };
+  email: { configured: boolean; provider: string; required: string[] };
+  whatsapp: { configured: boolean; required: string[]; built: true };
+}>("admin-workflows", "integration_status");
 
-    return {
-      meta: {
-        configured: Boolean(
-          process.env.META_APP_SECRET &&
-          process.env.META_PAGE_ACCESS_TOKEN &&
-          process.env.META_WEBHOOK_VERIFY_TOKEN &&
-          process.env.META_GRAPH_API_VERSION,
-        ),
-        lastCaptureAt: (lastMetaCapture as string | null) ?? null,
-        required: [
-          "META_APP_SECRET",
-          "META_PAGE_ACCESS_TOKEN",
-          "META_WEBHOOK_VERIFY_TOKEN",
-          "META_GRAPH_API_VERSION",
-        ],
-      },
-      email: {
-        configured: Boolean(process.env.RESEND_API_KEY && process.env.CRM_EMAIL_FROM),
-        provider: "Resend",
-        required: ["RESEND_API_KEY", "CRM_EMAIL_FROM"],
-      },
-      whatsapp: {
-        configured: Boolean(
-          process.env.WHATSAPP_ACCESS_TOKEN && process.env.WHATSAPP_PHONE_NUMBER_ID,
-        ),
-        // Nothing sends a WhatsApp message anywhere in the codebase: these
-        // variables are read here and nowhere else. Reported so the panel
-        // cannot show a confident green badge for a capability that does not
-        // exist yet.
-        built: false,
-        required: ["WHATSAPP_ACCESS_TOKEN", "WHATSAPP_PHONE_NUMBER_ID"],
-      },
-    };
-  });
-
-export const sendTestCrmEmail = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
-  .validator((input) => z.object({ email: z.string().email() }).parse(input))
-  .handler(async ({ data, context }) => {
-    const { data: roles } = await context.supabase
-      .from("user_roles")
-      .select("role")
-      .eq("user_id", context.userId);
-    const allowed = (roles ?? []).some((row) => row.role === "admin" || row.role === "super_admin");
-    if (!allowed) throw new Error("Only CRM administrators can send provider tests.");
-    const { sendCrmEmail } = await import("@/lib/crm-email.server");
-    const result = await sendCrmEmail({
-      to: data.email,
-      subject: "Kay-Steph CRM email connection test",
-      html: "<p>Your Kay-Steph CRM transactional email connection is working.</p>",
-      text: "Your Kay-Steph CRM transactional email connection is working.",
-    });
-    if (!result.ok)
-      throw new Error(
-        result.reason === "not_configured"
-          ? "Email provider is not configured."
-          : "Test email could not be sent.",
-      );
-    return { ok: true };
-  });
+export const sendTestCrmEmail = createEdgeFn<
+  { email: string },
+  { ok: true }
+>("admin-workflows", "test_email", (input) =>
+  z.object({ email: z.string().email() }).parse(input),
+);

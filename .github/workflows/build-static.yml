@@ -1,0 +1,43 @@
+name: Build static HostAfrica artifact
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      VITE_SUPABASE_PROJECT_ID: ufhwetpowavyryiortlm
+      VITE_SUPABASE_URL: https://ufhwetpowavyryiortlm.supabase.co
+      VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
+      VITE_PUBLIC_SITE_URL: https://kaystephgroup.com
+      VITE_INVESTMENT_BANK_NAME: ${{ vars.VITE_INVESTMENT_BANK_NAME }}
+      VITE_INVESTMENT_ACCOUNT_NAME: ${{ vars.VITE_INVESTMENT_ACCOUNT_NAME }}
+      VITE_INVESTMENT_ACCOUNT_NUMBER: ${{ vars.VITE_INVESTMENT_ACCOUNT_NUMBER }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Require the production Supabase publishable key
+        run: node -e 'if (!process.env.VITE_SUPABASE_PUBLISHABLE_KEY) throw new Error("Configure the VITE_SUPABASE_PUBLISHABLE_KEY repository secret")'
+      - run: npm test
+      - run: npm run typecheck
+      - run: npm run check:edge
+      - run: npm run build:verify
+      - uses: actions/upload-artifact@v4
+        with:
+          name: hostafrica-public-html
+          path: dist/
+          if-no-files-found: error
+          retention-days: 14

@@ -20,7 +20,6 @@ import { Route as FaqRouteImport } from './routes/faq'
 import { Route as MarketReportRouteImport } from './routes/market-report'
 import { Route as RegisterRouteImport } from './routes/register'
 import { Route as ServicesRouteImport } from './routes/services'
-import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as TeamRouteImport } from './routes/team'
 import { Route as WhyKaystephRouteImport } from './routes/why-kaysteph'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
@@ -85,7 +84,6 @@ import { Route as BlogCategorySlugRouteImport } from './routes/blog.category.$sl
 import { Route as AuthenticatedCrmLeadsLeadIdRouteImport } from './routes/_authenticated/crm.leads.$leadId'
 import { Route as AuthenticatedPortfolioPoolsIndexRouteImport } from './routes/_authenticated/portfolio.pools.index'
 import { Route as AuthenticatedPortfolioPoolsIdRouteImport } from './routes/_authenticated/portfolio.pools.$id'
-import { Route as ApiPublicMetaWebhookRouteImport } from './routes/api/public/meta/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -139,11 +137,6 @@ const RegisterRoute = RegisterRouteImport.update({
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
-  id: '/sitemap.xml',
-  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TeamRoute = TeamRouteImport.update({
@@ -501,11 +494,6 @@ const AuthenticatedPortfolioPoolsIdRoute =
     path: '/pools/$id',
     getParentRoute: () => AuthenticatedPortfolioRoute,
   } as any)
-const ApiPublicMetaWebhookRoute = ApiPublicMetaWebhookRouteImport.update({
-  id: '/api/public/meta/webhook',
-  path: '/api/public/meta/webhook',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -518,7 +506,6 @@ export interface FileRoutesByFullPath {
   '/market-report': typeof MarketReportRoute
   '/register': typeof RegisterRoute
   '/services': typeof ServicesRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -582,7 +569,6 @@ export interface FileRoutesByFullPath {
   '/portfolio/': typeof AuthenticatedPortfolioIndexRoute
   '/crm/leads/$leadId': typeof AuthenticatedCrmLeadsLeadIdRoute
   '/portfolio/pools/$id': typeof AuthenticatedPortfolioPoolsIdRoute
-  '/api/public/meta/webhook': typeof ApiPublicMetaWebhookRoute
   '/portfolio/pools/': typeof AuthenticatedPortfolioPoolsIndexRoute
 }
 export interface FileRoutesByTo {
@@ -596,7 +582,6 @@ export interface FileRoutesByTo {
   '/market-report': typeof MarketReportRoute
   '/register': typeof RegisterRoute
   '/services': typeof ServicesRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
   '/admin': typeof AuthenticatedAdminRoute
@@ -657,7 +642,6 @@ export interface FileRoutesByTo {
   '/portfolio': typeof AuthenticatedPortfolioIndexRoute
   '/crm/leads/$leadId': typeof AuthenticatedCrmLeadsLeadIdRoute
   '/portfolio/pools/$id': typeof AuthenticatedPortfolioPoolsIdRoute
-  '/api/public/meta/webhook': typeof ApiPublicMetaWebhookRoute
   '/portfolio/pools': typeof AuthenticatedPortfolioPoolsIndexRoute
 }
 export interface FileRoutesById {
@@ -673,7 +657,6 @@ export interface FileRoutesById {
   '/market-report': typeof MarketReportRoute
   '/register': typeof RegisterRoute
   '/services': typeof ServicesRoute
-  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/team': typeof TeamRoute
   '/why-kaysteph': typeof WhyKaystephRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
@@ -737,7 +720,6 @@ export interface FileRoutesById {
   '/_authenticated/portfolio/': typeof AuthenticatedPortfolioIndexRoute
   '/_authenticated/crm/leads/$leadId': typeof AuthenticatedCrmLeadsLeadIdRoute
   '/_authenticated/portfolio/pools/$id': typeof AuthenticatedPortfolioPoolsIdRoute
-  '/api/public/meta/webhook': typeof ApiPublicMetaWebhookRoute
   '/_authenticated/portfolio/pools/': typeof AuthenticatedPortfolioPoolsIndexRoute
 }
 export interface FileRouteTypes {
@@ -753,7 +735,6 @@ export interface FileRouteTypes {
     | '/market-report'
     | '/register'
     | '/services'
-    | '/sitemap.xml'
     | '/team'
     | '/why-kaysteph'
     | '/admin'
@@ -817,7 +798,6 @@ export interface FileRouteTypes {
     | '/portfolio/'
     | '/crm/leads/$leadId'
     | '/portfolio/pools/$id'
-    | '/api/public/meta/webhook'
     | '/portfolio/pools/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -831,7 +811,6 @@ export interface FileRouteTypes {
     | '/market-report'
     | '/register'
     | '/services'
-    | '/sitemap.xml'
     | '/team'
     | '/why-kaysteph'
     | '/admin'
@@ -892,7 +871,6 @@ export interface FileRouteTypes {
     | '/portfolio'
     | '/crm/leads/$leadId'
     | '/portfolio/pools/$id'
-    | '/api/public/meta/webhook'
     | '/portfolio/pools'
   id:
     | '__root__'
@@ -907,7 +885,6 @@ export interface FileRouteTypes {
     | '/market-report'
     | '/register'
     | '/services'
-    | '/sitemap.xml'
     | '/team'
     | '/why-kaysteph'
     | '/_authenticated/admin'
@@ -971,7 +948,6 @@ export interface FileRouteTypes {
     | '/_authenticated/portfolio/'
     | '/_authenticated/crm/leads/$leadId'
     | '/_authenticated/portfolio/pools/$id'
-    | '/api/public/meta/webhook'
     | '/_authenticated/portfolio/pools/'
   fileRoutesById: FileRoutesById
 }
@@ -987,7 +963,6 @@ export interface RootRouteChildren {
   MarketReportRoute: typeof MarketReportRoute
   RegisterRoute: typeof RegisterRoute
   ServicesRoute: typeof ServicesRoute
-  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TeamRoute: typeof TeamRoute
   WhyKaystephRoute: typeof WhyKaystephRoute
   AdminAuthRoute: typeof AdminAuthRoute
@@ -1002,7 +977,6 @@ export interface RootRouteChildren {
   AffiliateIndexRoute: typeof AffiliateIndexRoute
   InvestIndexRoute: typeof InvestIndexRoute
   PropertiesIndexRoute: typeof PropertiesIndexRoute
-  ApiPublicMetaWebhookRoute: typeof ApiPublicMetaWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -1082,13 +1056,6 @@ declare module '@tanstack/react-router' {
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof ServicesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/sitemap.xml': {
-      id: '/sitemap.xml'
-      path: '/sitemap.xml'
-      fullPath: '/sitemap.xml'
-      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/team': {
@@ -1539,13 +1506,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedPortfolioPoolsIdRouteImport
       parentRoute: typeof AuthenticatedPortfolioRoute
     }
-    '/api/public/meta/webhook': {
-      id: '/api/public/meta/webhook'
-      path: '/api/public/meta/webhook'
-      fullPath: '/api/public/meta/webhook'
-      preLoaderRoute: typeof ApiPublicMetaWebhookRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -1727,7 +1687,6 @@ const rootRouteChildren: RootRouteChildren = {
   MarketReportRoute: MarketReportRoute,
   RegisterRoute: RegisterRoute,
   ServicesRoute: ServicesRoute,
-  SitemapDotxmlRoute: SitemapDotxmlRoute,
   TeamRoute: TeamRoute,
   WhyKaystephRoute: WhyKaystephRoute,
   AdminAuthRoute: AdminAuthRoute,
@@ -1742,18 +1701,7 @@ const rootRouteChildren: RootRouteChildren = {
   AffiliateIndexRoute: AffiliateIndexRoute,
   InvestIndexRoute: InvestIndexRoute,
   PropertiesIndexRoute: PropertiesIndexRoute,
-  ApiPublicMetaWebhookRoute: ApiPublicMetaWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

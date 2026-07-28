@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { createSignedDocumentUrl } from "@/integrations/supabase/edge";
 import { ROLE_HINTS, roleLabel, type StaffRole } from "@/lib/roles";
 import { clientNumber } from "@/lib/client-number";
 import {
@@ -311,11 +312,12 @@ async function openClientDocument(row: { storage_path?: string | null; file_url?
     window.open(reference, "_blank", "noopener,noreferrer");
     return;
   }
-  const { data, error } = await supabase.storage
-    .from("client-documents")
-    .createSignedUrl(reference, 60);
-  if (error || !data) return toast.error("That document could not be opened.");
-  window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  try {
+    const url = await createSignedDocumentUrl("client-documents", reference, 60);
+    window.open(url, "_blank", "noopener,noreferrer");
+  } catch {
+    toast.error("That document could not be opened.");
+  }
 }
 
 const ADMIN_DOCUMENT_KINDS = [

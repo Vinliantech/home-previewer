@@ -125,11 +125,10 @@ In-app only for v1 (write to `investor_notifications`). Email/SMS/WhatsApp scaff
 
 ## 8. Technical notes
 
-- Uses TanStack `createServerFn` + existing Supabase auth middleware pattern.
-- Certificate PDFs generated server-side with `pdf-lib`; QR encoded with `qrcode` (both Worker-compatible).
-- Publishable-key server client for public property lists during SSR.
-- Public route loaders never call `requireSupabaseAuth`.
-- Single migration for all schema; grants included per table.
+- Uses a static Vite React client with TanStack Router.
+- Privileged operations and provider integrations run in authenticated Supabase Edge Functions.
+- Public data reads use the Supabase publishable key and database RLS.
+- Database changes are maintained as an ordered, fresh-install-compatible migration chain.
 - Seed data added via migration: 3 sample tokenized properties + default SPV so the /invest page isn't empty on first load.
 
 Approve to build.

@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { createSignedDocumentUrl } from "@/integrations/supabase/edge";
 import { Button } from "@/components/ui/button";
 import { clientNumber } from "@/lib/client-number";
 
@@ -423,11 +424,12 @@ async function openClientDocument(document: {
     return;
   }
 
-  const { data, error } = await supabase.storage
-    .from("client-documents")
-    .createSignedUrl(reference, 60);
-  if (error || !data) return toast.error("That document could not be opened.");
-  window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  try {
+    const url = await createSignedDocumentUrl("client-documents", reference, 60);
+    window.open(url, "_blank", "noopener,noreferrer");
+  } catch {
+    toast.error("That document could not be opened.");
+  }
 }
 
 function DocumentStatus({ status }: { status: string | null }) {

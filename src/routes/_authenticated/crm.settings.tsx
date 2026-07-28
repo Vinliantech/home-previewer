@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import { useCallback, useEffect, useState } from "react";
 import {
   CheckCircle2,
@@ -74,8 +74,8 @@ type Audit = {
 };
 
 function SettingsPage() {
-  const statusFn = useServerFn(getCrmIntegrationStatus);
-  const testEmailFn = useServerFn(sendTestCrmEmail);
+  const statusFn = useClientFn(getCrmIntegrationStatus);
+  const testEmailFn = useClientFn(sendTestCrmEmail);
   const [integrations, setIntegrations] = useState<IntegrationStatus>({
     meta: { configured: false, required: [] },
     email: { configured: false, provider: "Resend", required: [] },
@@ -149,10 +149,7 @@ function SettingsPage() {
     }
   }
 
-  const webhookUrl =
-    typeof window === "undefined"
-      ? "/api/public/meta/webhook"
-      : `${window.location.origin}/api/public/meta/webhook`;
+  const webhookUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/meta-leads-webhook`;
 
   return (
     <div className="space-y-5">
@@ -784,10 +781,10 @@ type CaptureFailure = {
 };
 
 function MetaRecoveryPanel({ configured }: { configured: boolean }) {
-  const listFn = useServerFn(listLeadCaptureFailures);
-  const retryFn = useServerFn(retryLeadCapture);
-  const importFn = useServerFn(importMetaFormLeads);
-  const syncFn = useServerFn(syncMetaCampaignInsights);
+  const listFn = useClientFn(listLeadCaptureFailures);
+  const retryFn = useClientFn(retryLeadCapture);
+  const importFn = useClientFn(importMetaFormLeads);
+  const syncFn = useClientFn(syncMetaCampaignInsights);
 
   const [failures, setFailures] = useState<CaptureFailure[]>([]);
   const [busyId, setBusyId] = useState<string | null>(null);
@@ -948,9 +945,9 @@ type BrevoSettings = Awaited<ReturnType<typeof getBrevoSettings>>;
  * there is nothing here for a compromised admin session to read back.
  */
 function BrevoPanel() {
-  const loadFn = useServerFn(getBrevoSettings);
-  const saveFn = useServerFn(saveBrevoSettings);
-  const saveKeyFn = useServerFn(saveBrevoApiKey);
+  const loadFn = useClientFn(getBrevoSettings);
+  const saveFn = useClientFn(saveBrevoSettings);
+  const saveKeyFn = useClientFn(saveBrevoApiKey);
 
   const [settings, setSettings] = useState<BrevoSettings | null>(null);
   const [form, setForm] = useState({
@@ -1106,8 +1103,8 @@ type WorkshopRegistration = {
 };
 
 function WorkshopRegistrationsPanel() {
-  const listFn = useServerFn(listWorkshopRegistrations);
-  const retryFn = useServerFn(retryWorkshopConfirmation);
+  const listFn = useClientFn(listWorkshopRegistrations);
+  const retryFn = useClientFn(retryWorkshopConfirmation);
   const [rows, setRows] = useState<WorkshopRegistration[]>([]);
   const [loading, setLoading] = useState(true);
   const [retrying, setRetrying] = useState<string | null>(null);

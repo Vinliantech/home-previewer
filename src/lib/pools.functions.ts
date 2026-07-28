@@ -1,4 +1,4 @@
-import { createServerFn } from "@tanstack/react-start";
+import { createClientFn } from "@/lib/client-function";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { PoolDetailResult, PoolListResult } from "@/lib/pools";
@@ -13,7 +13,7 @@ type AnyClient = {
 };
 
 /** List the pools the signed-in user founded or joined, with progress summaries. */
-export const getMyPools = createServerFn({ method: "GET" })
+export const getMyPools = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const sb = context.supabase as unknown as AnyClient;
@@ -61,7 +61,7 @@ export const getMyPools = createServerFn({ method: "GET" })
   });
 
 /** Open pools any verified investor can join. */
-export const listOpenPools = createServerFn({ method: "GET" })
+export const listOpenPools = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const sb = context.supabase as unknown as AnyClient;
@@ -93,7 +93,7 @@ export const listOpenPools = createServerFn({ method: "GET" })
   });
 
 /** One pool with its members (RLS shows members to co-members and the founder). */
-export const getPoolDetail = createServerFn({ method: "GET" })
+export const getPoolDetail = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .validator((i) => z.object({ pool_id: z.string().uuid() }).parse(i))
   .handler(async ({ data, context }) => {
@@ -147,7 +147,7 @@ const createSchema = z.object({
   founder_commitment: z.number().min(0).optional(),
 });
 
-export const createPool = createServerFn({ method: "POST" })
+export const createPool = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) => createSchema.parse(i))
   .handler(async ({ data, context }) => {
@@ -168,7 +168,7 @@ export const createPool = createServerFn({ method: "POST" })
     return { id: id as string };
   });
 
-export const joinPool = createServerFn({ method: "POST" })
+export const joinPool = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) =>
     z.object({ pool_id: z.string().uuid(), amount: z.number().positive() }).parse(i),
@@ -183,7 +183,7 @@ export const joinPool = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const invitePoolMember = createServerFn({ method: "POST" })
+export const invitePoolMember = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) => z.object({ pool_id: z.string().uuid(), email: z.string().email() }).parse(i))
   .handler(async ({ data, context }) => {
@@ -198,7 +198,7 @@ export const invitePoolMember = createServerFn({ method: "POST" })
 
 // ===================== Admin =====================
 
-export const adminListPools = createServerFn({ method: "GET" })
+export const adminListPools = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const sb = context.supabase as unknown as AnyClient;
@@ -226,7 +226,7 @@ export const adminListPools = createServerFn({ method: "GET" })
     } as PoolListResult;
   });
 
-export const adminReviewPool = createServerFn({ method: "POST" })
+export const adminReviewPool = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((i) =>
     z

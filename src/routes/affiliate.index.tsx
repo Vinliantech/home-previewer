@@ -4,7 +4,6 @@ import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/affiliate/")({
-  ssr: false,
   head: () => ({
     meta: [
       { title: "Affiliate Portal — Kay-Steph Group" },

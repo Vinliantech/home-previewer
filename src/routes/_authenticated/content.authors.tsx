@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import { Edit3, ExternalLink, Linkedin, Mail, Plus, ShieldCheck, UserRoundPen } from "lucide-react";
 import { toast } from "sonner";
 import { useContentWorkspace } from "@/components/content/ContentWorkspaceContext";
@@ -178,7 +178,7 @@ function AuthorDialog({
   onSaved: () => Promise<void>;
 }) {
   const original = value && value !== "new" ? value : null;
-  const save = useServerFn(saveContentAuthor);
+  const save = useClientFn(saveContentAuthor);
   const [form, setForm] = useState({
     fullName: original?.fullName ?? "",
     slug: original?.slug ?? "",

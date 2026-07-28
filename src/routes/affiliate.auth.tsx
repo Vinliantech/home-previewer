@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/affiliate/auth")({
-  ssr: false,
   head: () => ({
     meta: [
       { title: "Partner Sign In — Kay-Steph Affiliate Portal" },

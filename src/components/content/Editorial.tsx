@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import {
   ArrowRight,
   BookOpen,
@@ -105,7 +105,7 @@ export function NewsletterForm({
   compact?: boolean;
   dark?: boolean;
 }) {
-  const subscribe = useServerFn(subscribeToBlogNewsletter);
+  const subscribe = useClientFn(subscribeToBlogNewsletter);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [interests, setInterests] = useState<string[]>([

@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import { Check, Eye, MessageSquare, Search, ShieldAlert, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -31,7 +31,7 @@ export const Route = createFileRoute("/_authenticated/content/comments")({
 
 function ContentComments() {
   const { comments, refresh } = useContentWorkspace();
-  const moderate = useServerFn(moderateContentComment);
+  const moderate = useClientFn(moderateContentComment);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState("all");
   const [working, setWorking] = useState<string | null>(null);

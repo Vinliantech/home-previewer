@@ -1,7 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any -- Supabase types are regenerated after the content migration is applied. */
-import { createServerFn } from "@tanstack/react-start";
+import { createClientFn } from "@/lib/client-function";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { supabase } from "@/integrations/supabase/client";
+import { invokeEdgeFunction } from "@/integrations/supabase/edge";
 import {
   CONTENT_BLOCK_TYPES,
   CONTENT_POST_FORMATS,
@@ -205,10 +207,9 @@ function mapPublicPost(row: any): ContentPost {
   };
 }
 
-export const getPublicContentIndex = createServerFn({ method: "GET" }).handler(async () => {
+export const getPublicContentIndex = createClientFn({ method: "GET" }).handler(async () => {
   try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const sb = supabaseAdmin as any;
+    const sb = supabase as any;
     const [postsResult, categoriesResult, authorsResult, tagsResult] = await Promise.all([
       sb
         .from("blog_posts")
@@ -234,12 +235,11 @@ export const getPublicContentIndex = createServerFn({ method: "GET" }).handler(a
   }
 });
 
-export const getPublicContentPost = createServerFn({ method: "GET" })
+export const getPublicContentPost = createClientFn({ method: "GET" })
   .validator((input) => z.object({ slug: z.string().trim().min(1).max(140) }).parse(input))
   .handler(async ({ data }) => {
     try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const sb = supabaseAdmin as any;
+      const sb = supabase as any;
       const { data: post, error } = await sb
         .from("blog_posts")
         .select(publicPostSelect())
@@ -267,7 +267,7 @@ export const getPublicContentPost = createServerFn({ method: "GET" })
     }
   });
 
-export const getContentWorkspaceData = createServerFn({ method: "GET" })
+export const getContentWorkspaceData = createClientFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const sb = context.supabase as any;
@@ -309,7 +309,7 @@ export const getContentWorkspaceData = createServerFn({ method: "GET" })
     };
   });
 
-export const saveContentPost = createServerFn({ method: "POST" })
+export const saveContentPost = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) => postInputSchema.parse(input))
   .handler(async ({ data, context }) => {
@@ -406,7 +406,7 @@ export const saveContentPost = createServerFn({ method: "POST" })
     return { ok: true, postId, readingTime };
   });
 
-export const updateContentPostStatus = createServerFn({ method: "POST" })
+export const updateContentPostStatus = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -434,7 +434,7 @@ export const updateContentPostStatus = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const saveContentCategory = createServerFn({ method: "POST" })
+export const saveContentCategory = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -473,7 +473,7 @@ export const saveContentCategory = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const saveContentTag = createServerFn({ method: "POST" })
+export const saveContentTag = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -500,7 +500,7 @@ export const saveContentTag = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const saveContentAuthor = createServerFn({ method: "POST" })
+export const saveContentAuthor = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -543,7 +543,7 @@ export const saveContentAuthor = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const registerContentMedia = createServerFn({ method: "POST" })
+export const registerContentMedia = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -607,7 +607,7 @@ export const registerContentMedia = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const moderateContentComment = createServerFn({ method: "POST" })
+export const moderateContentComment = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -632,7 +632,7 @@ export const moderateContentComment = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const saveSocialPublication = createServerFn({ method: "POST" })
+export const saveSocialPublication = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z
@@ -665,7 +665,7 @@ export const saveSocialPublication = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const saveContentSetting = createServerFn({ method: "POST" })
+export const saveContentSetting = createClientFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .validator((input) =>
     z.object({ key: z.string().min(2).max(100), value: z.record(z.unknown()) }).parse(input),
@@ -683,7 +683,7 @@ export const saveContentSetting = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const subscribeToBlogNewsletter = createServerFn({ method: "POST" })
+export const subscribeToBlogNewsletter = createClientFn({ method: "POST" })
   .validator((input) =>
     z
       .object({
@@ -698,109 +698,15 @@ export const subscribeToBlogNewsletter = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const sb = supabaseAdmin as any;
-    const normalizedEmail = data.email.toLowerCase();
-    const [{ data: post }, { data: category }] = await Promise.all([
-      data.sourcePostSlug
-        ? sb
-            .from("blog_posts")
-            .select("id, title, primary_category_id")
-            .eq("slug", data.sourcePostSlug)
-            .maybeSingle()
-        : Promise.resolve({ data: null }),
-      data.sourceCategorySlug
-        ? sb
-            .from("blog_categories")
-            .select("id, name")
-            .eq("slug", data.sourceCategorySlug)
-            .maybeSingle()
-        : Promise.resolve({ data: null }),
-    ]);
+  .handler(({ data }) =>
+    invokeEdgeFunction<{ ok: true; merged: boolean }>(
+      "public-workflows",
+      "newsletter",
+      data,
+    ),
+  );
 
-    const { captureLead } = await import("@/lib/crm-capture.server");
-    const capture = await captureLead({
-      source: "website_contact_form",
-      sourceReference: post?.id ?? category?.id ?? null,
-      sourceDetail: post?.title
-        ? `Blog newsletter: ${post.title}`
-        : category?.name
-          ? `Blog category newsletter: ${category.name}`
-          : "Blog newsletter",
-      fullName: data.fullName,
-      email: normalizedEmail,
-      investmentType: "not_decided",
-      preferredContactMethod: "email",
-      message: `Newsletter interests: ${data.interests.join(", ")}`,
-      consentGiven: true,
-      interestMetadata: {
-        blog_post_id: post?.id ?? null,
-        blog_category_id: category?.id ?? post?.primary_category_id ?? null,
-        campaign_source: data.campaignSource ?? "organic_blog",
-        newsletter_interests: data.interests,
-      },
-    });
-
-    const { data: existing } = await sb
-      .from("newsletter_subscribers")
-      .select("id, interests")
-      .ilike("email", normalizedEmail)
-      .maybeSingle();
-    const now = new Date().toISOString();
-    if (existing) {
-      const interests = Array.from(new Set([...(existing.interests ?? []), ...data.interests]));
-      await sb
-        .from("newsletter_subscribers")
-        .update({
-          full_name: data.fullName,
-          interests,
-          consent_given: true,
-          consent_at: now,
-          consent_source: "blog",
-          source_post_id: post?.id ?? null,
-          source_category_id: category?.id ?? post?.primary_category_id ?? null,
-          campaign_source: data.campaignSource ?? "organic_blog",
-          lead_id: capture.leadId,
-          status: "active",
-          unsubscribed_at: null,
-        })
-        .eq("id", existing.id);
-    } else {
-      await sb.from("newsletter_subscribers").insert({
-        full_name: data.fullName,
-        email: normalizedEmail,
-        interests: data.interests,
-        consent_given: true,
-        consent_at: now,
-        consent_source: "blog",
-        source_post_id: post?.id ?? null,
-        source_category_id: category?.id ?? post?.primary_category_id ?? null,
-        campaign_source: data.campaignSource ?? "organic_blog",
-        lead_id: capture.leadId,
-        status: "active",
-      });
-    }
-    await sb.from("blog_engagement_events").insert({
-      post_id: post?.id ?? null,
-      category_id: category?.id ?? post?.primary_category_id ?? null,
-      event_type: "newsletter_signup",
-      lead_id: capture.leadId,
-      campaign_source: data.campaignSource ?? "organic_blog",
-      metadata: { interests: data.interests },
-    });
-    await sb.from("lead_activities").insert({
-      lead_id: capture.leadId,
-      activity_type: "automation",
-      body: post?.title
-        ? `Subscribed to the newsletter from ${post.title}.`
-        : "Subscribed to the Kay-Steph Journal newsletter.",
-      meta: { interests: data.interests, blog_post_id: post?.id ?? null },
-    });
-    return { ok: true, merged: capture.merged };
-  });
-
-export const trackBlogEngagement = createServerFn({ method: "POST" })
+export const trackBlogEngagement = createClientFn({ method: "POST" })
   .validator((input) =>
     z
       .object({
@@ -819,63 +725,18 @@ export const trackBlogEngagement = createServerFn({ method: "POST" })
         ]),
         visitorId: z.string().max(160).optional(),
         sessionId: z.string().max(160).optional(),
-        isUnique: z.boolean().default(false),
+        isUnique: z.boolean().optional(),
         sourceUrl: z.string().max(2000).optional(),
         referrer: z.string().max(2000).optional(),
-        metadata: z.record(z.unknown()).default({}),
+        metadata: z.record(z.unknown()).optional(),
       })
       .parse(input),
   )
-  .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const sb = supabaseAdmin as any;
-    const { data: post } = await sb
-      .from("blog_posts")
-      .select("id, primary_category_id")
-      .eq("slug", data.postSlug)
-      .eq("status", "published")
-      .maybeSingle();
-    if (!post) return { ok: false };
-    await sb.from("blog_engagement_events").insert({
-      post_id: post.id,
-      category_id: post.primary_category_id,
-      event_type: data.eventType,
-      visitor_id: data.visitorId || null,
-      session_id: data.sessionId || null,
-      source_url: data.sourceUrl || null,
-      referrer: data.referrer || null,
-      metadata: data.metadata,
-    });
-    if (data.eventType === "view") {
-      await sb.rpc("increment_blog_post_view", {
-        _post_id: post.id,
-        _unique: data.isUnique,
-      });
-    } else if (data.eventType === "video_play") {
-      const { data: current } = await sb
-        .from("blog_posts")
-        .select("video_play_count")
-        .eq("id", post.id)
-        .single();
-      await sb
-        .from("blog_posts")
-        .update({ video_play_count: Number(current?.video_play_count ?? 0) + 1 })
-        .eq("id", post.id);
-    } else if (data.eventType === "social_share") {
-      const { data: current } = await sb
-        .from("blog_posts")
-        .select("social_share_count")
-        .eq("id", post.id)
-        .single();
-      await sb
-        .from("blog_posts")
-        .update({ social_share_count: Number(current?.social_share_count ?? 0) + 1 })
-        .eq("id", post.id);
-    }
-    return { ok: true };
-  });
+  .handler(({ data }) =>
+    invokeEdgeFunction<{ ok: boolean }>("public-workflows", "engagement", data),
+  );
 
-export const createBlogComment = createServerFn({ method: "POST" })
+export const createBlogComment = createClientFn({ method: "POST" })
   .validator((input) =>
     z
       .object({
@@ -888,24 +749,6 @@ export const createBlogComment = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const sb = supabaseAdmin as any;
-    const { data: post } = await sb
-      .from("blog_posts")
-      .select("id, comments_enabled")
-      .eq("slug", data.postSlug)
-      .eq("status", "published")
-      .maybeSingle();
-    if (!post?.comments_enabled) throw new Error("Comments are not enabled for this article.");
-    const { error } = await sb.from("blog_comments").insert({
-      post_id: post.id,
-      author_name: data.authorName,
-      author_email: data.authorEmail.toLowerCase(),
-      body: data.body,
-      status: "pending",
-      consent_given: true,
-    });
-    if (error) throw new Error("Your comment could not be submitted.");
-    return { ok: true };
-  });
+  .handler(({ data }) =>
+    invokeEdgeFunction<{ ok: true }>("public-workflows", "comment", data),
+  );

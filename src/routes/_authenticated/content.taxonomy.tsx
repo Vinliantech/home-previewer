@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import { Edit3, ExternalLink, FolderTree, Plus, Search, Tags } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -257,7 +257,7 @@ function CategoryDialog({
   onClose: () => void;
   onSaved: () => Promise<void>;
 }) {
-  const save = useServerFn(saveContentCategory);
+  const save = useClientFn(saveContentCategory);
   const original = value && value !== "new" ? value : null;
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
@@ -382,7 +382,7 @@ function TagDialog({
   onClose: () => void;
   onSaved: () => Promise<void>;
 }) {
-  const save = useServerFn(saveContentTag);
+  const save = useClientFn(saveContentTag);
   const original = value && value !== "new" ? value : null;
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");

@@ -1,1 +1,42 @@
-project_id = "gwbkmmrrfpvkybrsxgro"
+project_id = "ufhwetpowavyryiortlm"
+
+[auth]
+enabled = true
+site_url = "https://kaystephgroup.com"
+additional_redirect_urls = [
+  "https://kaystephgroup.com/**",
+  "https://www.kaystephgroup.com/**",
+  "http://localhost:5173/**",
+]
+
+# The application exposes Google sign-in on the affiliate login page.
+# Supply these values from Google Cloud before running `supabase config push`.
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
+redirect_uri = ""
+
+# JWT verification is performed inside each function with auth.getUser().
+# This supports both legacy JWT anon keys and Supabase's newer publishable keys
+# while keeping the public intake and Meta webhook endpoints intentionally open.
+[functions.public-workflows]
+verify_jwt = false
+
+[functions.secure-workflows]
+verify_jwt = false
+
+[functions.admin-workflows]
+verify_jwt = false
+
+[functions.staff-workflows]
+verify_jwt = false
+
+[functions.signed-document-url]
+verify_jwt = false
+
+[functions.whatsapp]
+verify_jwt = false
+
+[functions.meta-leads-webhook]
+verify_jwt = false

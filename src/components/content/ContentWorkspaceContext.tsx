@@ -8,7 +8,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import { getContentWorkspaceData } from "@/lib/content.functions";
 import {
   type ContentAuthor,
@@ -70,7 +70,7 @@ type ContentWorkspaceValue = {
 const ContentWorkspaceContext = createContext<ContentWorkspaceValue | null>(null);
 
 export function ContentWorkspaceProvider({ children }: { children: ReactNode }) {
-  const getWorkspace = useServerFn(getContentWorkspaceData);
+  const getWorkspace = useClientFn(getContentWorkspaceData);
   const emptyValue = useMemo(() => emptyWorkspace(), []);
   const [data, setData] =
     useState<Omit<ContentWorkspaceValue, "loading" | "refresh">>(emptyValue);

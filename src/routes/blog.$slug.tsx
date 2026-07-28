@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import {
   ArrowLeft,
   ArrowRight,
@@ -66,7 +66,7 @@ function BlogPostPage() {
   const post = loaderData.post as ContentPost | undefined;
   const liveRelated = loaderData.related as ContentPost[];
   const related = post ? liveRelated : [];
-  const track = useServerFn(trackBlogEngagement);
+  const track = useClientFn(trackBlogEngagement);
   const trackedSlug = useRef<string | null>(null);
 
   useEffect(() => {
@@ -481,7 +481,7 @@ function AdjacentPost({
 }
 
 function CommentForm({ post }: { post: ContentPost }) {
-  const submitComment = useServerFn(createBlogComment);
+  const submitComment = useClientFn(createBlogComment);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [body, setBody] = useState("");

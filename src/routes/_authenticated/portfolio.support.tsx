@@ -214,6 +214,7 @@ function SupportForm() {
           phone: phone || "0000000",
           subject: topic as (typeof TOPIC_OPTIONS)[number]["value"],
           message: `[Client portal support] ${message}`,
+          consentGiven: true,
         },
       });
       toast.success("Enquiry sent. We respond within one business day.");

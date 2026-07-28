@@ -1,5 +1,5 @@
 import { createFileRoute, Link, Outlet, useRouterState } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Download, Eye, Mail, Phone, Plus, Search, Upload, UsersRound } from "lucide-react";
 import { toast } from "sonner";
@@ -292,8 +292,8 @@ function LeadRow({
   agents: SalesAgent[];
   onChange: () => void;
 }) {
-  const changeStage = useServerFn(updateLeadStatus);
-  const assign = useServerFn(assignLead);
+  const changeStage = useClientFn(updateLeadStatus);
+  const assign = useClientFn(assignLead);
   const [busy, setBusy] = useState(false);
 
   async function handleStage(value: string) {
@@ -421,7 +421,7 @@ function LeadRow({
 }
 
 function AddLeadDialog({ agents, onCreated }: { agents: SalesAgent[]; onCreated: () => void }) {
-  const create = useServerFn(createManualLead);
+  const create = useClientFn(createManualLead);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({

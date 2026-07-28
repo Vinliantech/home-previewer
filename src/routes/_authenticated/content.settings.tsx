@@ -1,6 +1,6 @@
 import { useMemo, useState, type ReactNode } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import {
   Check,
   CircleHelp,
@@ -38,7 +38,7 @@ export const Route = createFileRoute("/_authenticated/content/settings")({
 function ContentSettings() {
   const { tab } = Route.useSearch();
   const { settings, refresh } = useContentWorkspace();
-  const saveSetting = useServerFn(saveContentSetting);
+  const saveSetting = useClientFn(saveContentSetting);
   const defaults = useMemo(() => settingDefaults(settings), [settings]);
   const [general, setGeneral] = useState(defaults.general);
   const [seo, setSeo] = useState(defaults.seo);

@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { createSignedDocumentUrl } from "@/integrations/supabase/edge";
 import type { Database, Json } from "@/integrations/supabase/types";
 import {
   adminAnalytics,
@@ -148,9 +149,7 @@ async function openPrivateFile(bucket: PrivateBucket, path: string) {
   try {
     let url = path;
     if (!/^https?:\/\//i.test(path)) {
-      const { data, error } = await supabase.storage.from(bucket).createSignedUrl(path, 60);
-      if (error) throw error;
-      url = data.signedUrl;
+      url = await createSignedDocumentUrl(bucket, path, 60);
     }
     const anchor = document.createElement("a");
     anchor.href = url;

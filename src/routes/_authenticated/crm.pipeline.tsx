@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Filter, Search, SlidersHorizontal } from "lucide-react";
 import { toast } from "sonner";
@@ -36,7 +36,7 @@ function Pipeline() {
   const [grade, setGrade] = useState<LeadGrade | "all">("all");
   const [phase, setPhase] = useState<(typeof PIPELINE_PHASES)[number] | "All">("All");
   const [dragging, setDragging] = useState<string | null>(null);
-  const changeStatus = useServerFn(updateLeadStatus);
+  const changeStatus = useClientFn(updateLeadStatus);
 
   const refresh = useCallback(async () => {
     const { data, error } = await supabase

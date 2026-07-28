@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CalendarDays, Check, Copy, MapPin, Plus, UsersRound, Video } from "lucide-react";
 import { toast } from "sonner";
@@ -232,7 +232,7 @@ function EventsWorkspace() {
 }
 
 function NewEventDialog({ onCreated }: { onCreated: () => void }) {
-  const create = useServerFn(createCrmEvent);
+  const create = useClientFn(createCrmEvent);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [form, setForm] = useState({

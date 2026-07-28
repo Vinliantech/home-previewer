@@ -19,7 +19,7 @@ dist-ssr
 .env.*
 !.env.example
 
-# Wrangler / Cloudflare
+# Generated artifacts from the retired worker deployment are never release inputs.
 .wrangler/
 .dev.vars
 

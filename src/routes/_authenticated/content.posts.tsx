@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import {
   Archive,
   CalendarClock,
@@ -51,7 +51,7 @@ export const Route = createFileRoute("/_authenticated/content/posts")({
 function ContentPosts() {
   const routeSearch = Route.useSearch();
   const { posts, categories, authors, refresh } = useContentWorkspace();
-  const mutateStatus = useServerFn(updateContentPostStatus);
+  const mutateStatus = useClientFn(updateContentPostStatus);
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState(routeSearch.status ?? "all");
   const [category, setCategory] = useState("all");

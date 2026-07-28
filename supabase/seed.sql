@@ -1,0 +1,5 @@
+-- No environment-independent production seed data is required.
+--
+-- Production records, auth users, and uploaded Storage objects must be moved
+-- separately from the schema migrations. Keep this file idempotent so
+-- `supabase db reset` and `supabase db push --include-seed` remain safe.

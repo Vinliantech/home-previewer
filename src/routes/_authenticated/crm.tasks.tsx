@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CalendarClock, Check, CheckCircle2, Clock3, Plus, Search } from "lucide-react";
 import { toast } from "sonner";
@@ -49,7 +49,7 @@ function TasksWorkspace() {
   const [query, setQuery] = useState("");
   const [agent, setAgent] = useState("all");
   const [loading, setLoading] = useState(true);
-  const complete = useServerFn(completeFollowUpTask);
+  const complete = useClientFn(completeFollowUpTask);
 
   const refresh = useCallback(async () => {
     const [taskResult, leadResult, agentResult] = await Promise.all([
@@ -250,7 +250,7 @@ function NewTaskDialog({
   agents: SalesAgent[];
   onCreated: () => void;
 }) {
-  const create = useServerFn(createFollowUpTask);
+  const create = useClientFn(createFollowUpTask);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [leadId, setLeadId] = useState("");

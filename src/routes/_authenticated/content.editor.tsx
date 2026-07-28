@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import {
   ArrowDown,
   ArrowLeft,
@@ -84,7 +84,7 @@ function ContentEditor() {
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(
     draft.contentBlocks[0]?.id ?? null,
   );
-  const savePost = useServerFn(saveContentPost);
+  const savePost = useClientFn(saveContentPost);
   const seoHealth = seoScore(draft);
   const readingTime = estimateReadingTime(draft.contentBlocks);
 

@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import { useCallback, useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -40,6 +40,7 @@ import {
   updateLeadGrade,
   updateLeadStatus,
 } from "@/lib/crm.functions";
+import { sendWhatsAppText } from "@/lib/whatsapp.functions";
 import {
   AdviserAvatar,
   CrmPageHeader,
@@ -107,10 +108,11 @@ function LeadProfile() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [note, setNote] = useState("");
-  const changeStatus = useServerFn(updateLeadStatus);
-  const changeGrade = useServerFn(updateLeadGrade);
-  const assign = useServerFn(assignLead);
-  const addNote = useServerFn(addLeadNote);
+  const changeStatus = useClientFn(updateLeadStatus);
+  const changeGrade = useClientFn(updateLeadGrade);
+  const assign = useClientFn(assignLead);
+  const addNote = useClientFn(addLeadNote);
+  const sendWhatsApp = useClientFn(sendWhatsAppText);
 
   const refresh = useCallback(async () => {
     const [leadResult, agentResult, activityResult, taskResult, deliveryResult] = await Promise.all(
@@ -207,17 +209,30 @@ function LeadProfile() {
             )}
             {(lead.whatsapp_number || lead.phone) && (
               <Button
-                asChild
                 variant="outline"
                 className="border-[#ccd6d1] bg-white text-[#315149]"
+                disabled={busy}
+                onClick={() => {
+                  const message = window.prompt(
+                    "Enter the WhatsApp message. Use an approved template for conversations outside the 24-hour customer-service window.",
+                  );
+                  if (!message?.trim()) return;
+                  const raw = lead.whatsapp_number || lead.phone || "";
+                  const digits = raw.replace(/\D/g, "");
+                  const to =
+                    digits.length === 11 && digits.startsWith("0")
+                      ? `234${digits.slice(1)}`
+                      : digits;
+                  void run(
+                    () =>
+                      sendWhatsApp({
+                        data: { to, message: message.trim(), leadId: lead.id },
+                      }),
+                    "WhatsApp message sent.",
+                  );
+                }}
               >
-                <a
-                  href={`https://wa.me/${(lead.whatsapp_number || lead.phone || "").replace(/\D/g, "")}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
-                </a>
+                <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
               </Button>
             )}
             {lead.email && (
@@ -538,7 +553,7 @@ function AddTaskDialog({
   agents: SalesAgent[];
   onCreated: () => void;
 }) {
-  const createTask = useServerFn(createFollowUpTask);
+  const createTask = useClientFn(createFollowUpTask);
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [title, setTitle] = useState("");

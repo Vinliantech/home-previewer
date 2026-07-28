@@ -10,13 +10,14 @@ affiliate portal, CRM, and administration dashboards.
 3. Add the production investment bank details only after the finance team verifies them.
 4. Start the app with `npm run dev`.
 
-The local development URL is `http://localhost:8080`.
+The local development URL is `http://localhost:5173`.
 
 ## Required database migration
 
-Apply all 31 files in `supabase/migrations` in filename order before using the
-investor, CRM or administration workflows. They are forward-only and idempotent.
-`DEPLOY.md` lists them with a one-line description each.
+Apply all 36 files in `supabase/migrations` in filename order before using the
+investor, CRM or administration workflows. The migration report contains the
+validated inventory and exact deployment commands:
+`docs/SUPABASE_MIGRATION_REPORT.md`.
 
 Two are easy to miss and the code depends on both:
 
@@ -26,7 +27,7 @@ Two are easy to miss and the code depends on both:
   admin. Without it the property pages fall back to the shipped catalogue and
   admin edits do not propagate.
 
-Deploy them through Lovable Cloud or the Supabase CLI used by your project.
+Deploy them through the Supabase CLI after linking the intended project.
 
 ## Payment configuration
 
@@ -44,12 +45,12 @@ the investor to Kay-Steph finance instead of displaying placeholder bank details
 ## Verification
 
 ```bash
-npx tsc --noEmit
-npm run build
+npm test
+npm run build:verify
 ```
 
-Run ESLint against the files you change. The original Lovable export still contains
-repository-wide formatting debt, so clean that baseline separately before making
-`npm run lint` a required CI gate.
+`npm run build` produces the static `dist/` directory. Private integrations
+run only in `supabase/functions`; configure them with Supabase secrets and
+follow `docs/PRODUCTION_CUTOVER_CHECKLIST.md`.
 
 Never commit `.env`, service-role keys, Meta secrets, KYC documents, or payment evidence.

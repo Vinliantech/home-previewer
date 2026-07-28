@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState, type ChangeEvent } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useServerFn } from "@tanstack/react-start";
+import { useClientFn } from "@/lib/client-function";
 import {
   Archive,
   File,
@@ -58,7 +58,7 @@ function ContentMediaLibrary() {
   const [externalOpen, setExternalOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
-  const register = useServerFn(registerContentMedia);
+  const register = useClientFn(registerContentMedia);
 
   const filtered = useMemo(
     () =>
@@ -336,7 +336,7 @@ function MediaDetail({
   onClose: () => void;
   onSaved: () => Promise<void>;
 }) {
-  const register = useServerFn(registerContentMedia);
+  const register = useClientFn(registerContentMedia);
   const [form, setForm] = useState({
     title: item?.title ?? "",
     altText: item?.altText ?? "",
@@ -499,7 +499,7 @@ function ExternalMediaDialog({
   onClose: () => void;
   onSaved: () => Promise<void>;
 }) {
-  const register = useServerFn(registerContentMedia);
+  const register = useClientFn(registerContentMedia);
   const [form, setForm] = useState({
     title: "",
     url: "",
