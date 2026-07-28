@@ -258,15 +258,50 @@
         <p class="hint">Your details are used only for this workshop. We do not share your information.</p>
 
         <!--
-          ================= BREVO FORM SLOT =================
-          Paste the embed HTML that Brevo gives you (Contacts → Forms → Share → HTML)
-          between the two markers below. The styling above will make the fields
-          match the Kay-Steph brand automatically.
+          Replace the form action below with your Brevo form action URL:
+          Brevo → Contacts → Forms → Share → HTML → copy the action URL from
+          <form action="..."> and paste it into the action attribute below.
         -->
-        <div id="brevo-slot">
-          <!-- BEGIN BREVO EMBED -->
-          <!-- Paste Brevo <form>…</form> here -->
-          <!-- END BREVO EMBED -->
+        <form id="workshop-form" action="https://YOUR_BREVO_FORM_ACTION_URL" method="POST" class="ks-form">
+          <div class="field">
+            <label for="full-name">Full name</label>
+            <input id="full-name" name="FULLNAME" type="text" required placeholder="e.g. John Doe" />
+          </div>
+
+          <div class="field">
+            <label for="email">Email address</label>
+            <input id="email" name="EMAIL" type="email" required placeholder="john@example.com" />
+          </div>
+
+          <div class="field">
+            <label for="phone">Phone number</label>
+            <input id="phone" name="PHONE" type="tel" required placeholder="e.g. 0801 234 5678" />
+          </div>
+
+          <div class="field">
+            <label for="location">City / Area</label>
+            <input id="location" name="LOCATION" type="text" placeholder="e.g. Abuja" />
+          </div>
+
+          <div class="field">
+            <label for="referral">How did you hear about us?</label>
+            <select id="referral" name="REFERRAL">
+              <option value="">Select an option</option>
+              <option value="Instagram">Instagram</option>
+              <option value="Facebook">Facebook</option>
+              <option value="WhatsApp">WhatsApp</option>
+              <option value="Friend">A friend</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <button type="submit" class="submit-btn">Register for the workshop →</button>
+        </form>
+
+        <div id="form-success" class="form-success" style="display:none;">
+          <div class="success-icon">✓</div>
+          <h4>Registration received</h4>
+          <p>Thank you for registering. The Kay-Steph team will confirm your place and send the arrival details shortly.</p>
         </div>
       </div>
     </div>
