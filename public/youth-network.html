@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Workshop 2.0 — Own Your Future | Kay-Steph Youth Network</title>
+<meta name="description" content="Workshop 2.0 — real estate as a career, a skill and a wealth tool. Saturday 8 August 2026 at Phoenix Apartment, Katampe, Abuja. Free registration for young people ready to build." />
+<meta property="og:title" content="Workshop 2.0 — Own Your Future | Kay-Steph Youth Network" />
+<meta property="og:description" content="The journey continues. 8 August 2026, Phoenix Apartment, Katampe, Abuja — build real estate knowledge, marketing skills and sales confidence." />
+<meta property="og:type" content="website" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --navy: #0a1a3a;
+    --navy-2: #0f2350;
+    --gold: #c9a24a;
+    --gold-2: #b48d34;
+    --bg: #f7f6f2;
+    --text: #1a1a1a;
+    --muted: #5b6474;
+    --border: #e6e3d9;
+  }
+  * { box-sizing: border-box; }
+  html,body { margin:0; padding:0; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  h1,h2,h3 { font-family: 'Playfair Display', Georgia, serif; letter-spacing: -0.01em; }
+  a { color: inherit; }
+  .container { max-width: 1140px; margin: 0 auto; padding: 0 20px; }
+
+  /* Header */
+  header.site {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(10,26,58,0.95); backdrop-filter: blur(8px);
+    color: #fff; border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  header.site .row { display: flex; align-items: center; justify-content: space-between; height: 70px; }
+  header.site .brand { font-family: 'Playfair Display', serif; font-weight: 800; font-size: 22px; letter-spacing: 0.02em; }
+  header.site .brand span { color: var(--gold); }
+  header.site nav a { margin-left: 22px; font-size: 14px; font-weight: 500; color: rgba(255,255,255,0.85); text-decoration: none; }
+  header.site nav a:hover { color: var(--gold); }
+  .cta-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--gold); color: #1a1200; font-weight: 700; font-size: 14px;
+    padding: 12px 22px; border-radius: 999px; text-decoration: none;
+    transition: background .2s;
+  }
+  .cta-btn:hover { background: var(--gold-2); }
+  .ghost-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid rgba(255,255,255,0.45); color:#fff; font-weight:700; font-size:14px;
+    padding: 12px 22px; border-radius: 999px; text-decoration: none;
+  }
+  .ghost-btn:hover { background: #fff; color: var(--navy); }
+
+  /* Hero */
+  .hero {
+    position: relative; color: #fff; overflow: hidden;
+    background:
+      radial-gradient(1200px 500px at 90% -10%, rgba(201,162,74,0.35), transparent 60%),
+      linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+    padding: 96px 0 80px;
+  }
+  .eyebrow { color: var(--gold); font-size: 12px; font-weight: 700; letter-spacing: 0.24em; text-transform: uppercase; }
+  .hero h1 { font-size: clamp(36px, 5vw, 60px); font-weight: 800; line-height: 1.05; margin: 18px 0 20px; max-width: 820px; }
+  .hero h1 .accent { display:block; color: var(--gold); }
+  .hero p.lead { max-width: 640px; font-size: 17px; color: rgba(255,255,255,0.8); }
+  .hero .actions { margin-top: 32px; display: flex; flex-wrap: wrap; gap: 12px; }
+  .meta-grid { margin-top: 44px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; max-width: 720px; }
+  .meta-card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); padding: 16px; border-radius: 10px; }
+  .meta-card .lbl { font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(255,255,255,0.65); }
+  .meta-card .val { margin-top: 6px; font-weight: 600; font-size: 14px; }
+  @media (max-width: 700px) { .meta-grid { grid-template-columns: 1fr; } }
+
+  /* Sections */
+  section.block { padding: 80px 0; }
+  section.block.alt { background: #fff; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .section-head { text-align: center; max-width: 720px; margin: 0 auto 56px; }
+  .section-head h2 { color: var(--navy); font-size: clamp(28px, 3.4vw, 40px); margin: 14px 0 16px; }
+  .section-head p { color: var(--muted); font-size: 16px; }
+
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 900px) { .grid-3 { grid-template-columns: 1fr; } .grid-2 { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--bg); border: 1px solid var(--border); padding: 26px;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.02);
+  }
+  .card .num { font-family: 'Playfair Display', serif; font-size: 40px; font-weight: 800; color: rgba(201,162,74,0.55); }
+  .card h3 { color: var(--navy); font-size: 20px; margin: 10px 0 8px; }
+  .card p { color: var(--muted); font-size: 14px; margin: 0; }
+
+  .prog {
+    background: #fff; border: 1px solid var(--border); border-radius: 10px; padding: 22px;
+    display: flex; gap: 18px;
+  }
+  .prog .badge {
+    flex: 0 0 48px; height: 48px; border-radius: 10px; background: var(--navy); color: var(--gold);
+    display: flex; align-items: center; justify-content: center; font-weight: 700;
+  }
+  .prog h3 { color: var(--navy); font-size: 17px; margin: 0 0 4px; }
+  .prog p { color: var(--muted); font-size: 14px; margin: 0; }
+
+  /* Registration */
+  .reg-wrap { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 32px; }
+  @media (max-width: 900px) { .reg-wrap { grid-template-columns: 1fr; } }
+  .reg-aside {
+    background: var(--navy); color: #fff; padding: 32px; border-radius: 16px; align-self: start;
+  }
+  .reg-aside h2 { font-size: 28px; margin: 12px 0 12px; }
+  .reg-aside ul { list-style: none; padding: 0; margin: 22px 0 0; display: grid; gap: 12px; font-size: 14px; color: rgba(255,255,255,0.9); }
+  .reg-aside ul li::before { content: "✓"; color: var(--gold); font-weight: 700; margin-right: 10px; }
+  .reg-form {
+    background: #fff; border: 1px solid var(--border); border-radius: 16px; padding: 32px;
+  }
+  .reg-form h3 { color: var(--navy); font-size: 22px; margin: 0 0 6px; }
+  .reg-form .hint { color: var(--muted); font-size: 14px; margin: 0 0 22px; }
+
+  /* Brevo form container styling — overrides the default Brevo widget look */
+  #brevo-slot .sib-form,
+  #brevo-slot [class*="sib-form"] {
+    padding: 0 !important; background: transparent !important;
+  }
+  #brevo-slot input[type="text"],
+  #brevo-slot input[type="email"],
+  #brevo-slot input[type="tel"],
+  #brevo-slot select,
+  #brevo-slot textarea {
+    width: 100%; padding: 12px 14px; font: inherit; color: var(--text);
+    border: 1px solid var(--border); background: #fff; border-radius: 8px; outline: none;
+  }
+  #brevo-slot input:focus,
+  #brevo-slot select:focus,
+  #brevo-slot textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,162,74,0.15); }
+  #brevo-slot label { font-size: 13px; font-weight: 600; color: var(--navy); }
+  #brevo-slot button[type="submit"],
+  #brevo-slot .sib-form-block__button {
+    background: var(--gold) !important; color: #1a1200 !important; border: 0 !important;
+    border-radius: 999px !important; padding: 14px 28px !important; font-weight: 700 !important;
+    cursor: pointer;
+  }
+  #brevo-slot button[type="submit"]:hover { background: var(--gold-2) !important; }
+
+  /* Footer */
+  footer.site { background: var(--navy); color: rgba(255,255,255,0.75); padding: 40px 0; margin-top: 40px; }
+  footer.site .row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; }
+  footer.site a { color: var(--gold); text-decoration: none; }
+  footer.site small { color: rgba(255,255,255,0.55); }
+
+  /* Floating WhatsApp */
+  .wa {
+    position: fixed; right: 20px; bottom: 20px; z-index: 50;
+    background: var(--gold); color: #1a1200; font-weight: 700; font-size: 14px;
+    padding: 12px 18px; border-radius: 999px; text-decoration: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+  .wa:hover { background: var(--gold-2); }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="container row">
+    <div class="brand">Kay-Steph <span>Group</span></div>
+    <nav>
+      <a href="#about">About</a>
+      <a href="#programme">Programme</a>
+      <a href="#register">Register</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="container">
+    <div class="eyebrow">Youth Network · Workshop 2.0</div>
+    <h1>Own your future:<span class="accent">real estate as a career, a skill and a wealth tool.</span></h1>
+    <p class="lead">The journey continues. A practical real estate and sales workshop for young people ready to learn, network and discover new income opportunities.</p>
+    <div class="actions">
+      <a href="#register" class="cta-btn">Register for the workshop →</a>
+      <a href="#programme" class="ghost-btn">Explore the programme</a>
+    </div>
+    <div class="meta-grid">
+      <div class="meta-card"><div class="lbl">Date</div><div class="val">Saturday, 8 August 2026</div></div>
+      <div class="meta-card"><div class="lbl">Venue</div><div class="val">Phoenix Apartment, Katampe, Abuja</div></div>
+      <div class="meta-card"><div class="lbl">Admission</div><div class="val">Registration required</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="about">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow" style="color:var(--gold-2)">About the workshop</div>
+      <h2>Practical knowledge for real estate, sales and entrepreneurship.</h2>
+      <p>The Kay-Steph Youth Network Workshop equips NYSC corps members, young adults and aspiring entrepreneurs with practical real estate product knowledge, marketing skills, sales confidence and a pathway into the Kay-Steph sales or referral network.</p>
+    </div>
+  </div>
+</section>
+
+<section class="block alt">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow" style="color:var(--gold-2)">What you will gain</div>
+      <h2>Turn interest into practical capability.</h2>
+    </div>
+    <div class="grid-3">
+      <div class="card"><div class="num">01</div><h3>Real Estate Knowledge</h3><p>Understand property products, locations, documentation and the sales journey.</p></div>
+      <div class="card"><div class="num">02</div><h3>Marketing Skills</h3><p>Learn practical approaches to social media promotion, lead generation and follow-up.</p></div>
+      <div class="card"><div class="num">03</div><h3>Sales Confidence</h3><p>Improve pitching, objection handling, relationship building and closing techniques.</p></div>
+      <div class="card"><div class="num">04</div><h3>Professional Network</h3><p>Connect with young professionals, mentors and the Kay-Steph community.</p></div>
+      <div class="card"><div class="num">05</div><h3>Income Pathway</h3><p>Discover opportunities in referrals, affiliate marketing and property sales.</p></div>
+      <div class="card"><div class="num">06</div><h3>Personal Action Plan</h3><p>Leave with clear next steps for applying your knowledge after the workshop.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="programme">
+  <div class="container">
+    <div class="section-head">
+      <div class="eyebrow" style="color:var(--gold-2)">Workshop programme</div>
+      <h2>A focused learning and networking experience.</h2>
+    </div>
+    <div class="grid-2" style="max-width:960px;margin:0 auto;">
+      <div class="prog"><div class="badge">01</div><div><h3>Welcome and Introduction</h3><p>Meet the Kay-Steph team and understand the purpose of the Youth Network.</p></div></div>
+      <div class="prog"><div class="badge">02</div><div><h3>Real Estate Fundamentals</h3><p>Property products, locations, titles, documentation and the sales process.</p></div></div>
+      <div class="prog"><div class="badge">03</div><div><h3>Digital Lead Generation</h3><p>How to attract, capture and follow up with potential property buyers.</p></div></div>
+      <div class="prog"><div class="badge">04</div><div><h3>Pitching and Closing</h3><p>Presenting opportunities clearly, handling objections and closing responsibly.</p></div></div>
+      <div class="prog"><div class="badge">05</div><div><h3>Career and Affiliate Pathways</h3><p>Learn how qualified participants can join the Kay-Steph network.</p></div></div>
+      <div class="prog"><div class="badge">06</div><div><h3>Networking and Q&amp;A</h3><p>Ask questions, build relationships and define your next steps.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="block alt" id="register">
+  <div class="container">
+    <div class="reg-wrap">
+      <aside class="reg-aside">
+        <div class="eyebrow">Reserve your place</div>
+        <h2>Register for the next workshop.</h2>
+        <p style="color:rgba(255,255,255,0.8);font-size:14px;">Saturday, 8 August 2026 at Phoenix Apartment, Katampe, Abuja. Complete the form and the Kay-Steph team will confirm your place and send the arrival details.</p>
+        <ul>
+          <li>Practical workshop sessions</li>
+          <li>Networking with ambitious young people</li>
+          <li>Access to Kay-Steph opportunities</li>
+          <li>Email confirmation and event reminders</li>
+        </ul>
+      </aside>
+      <div class="reg-form">
+        <h3>Workshop registration</h3>
+        <p class="hint">Your details are used only for this workshop. We do not share your information.</p>
+
+        <!--
+          ================= BREVO FORM SLOT =================
+          Paste the embed HTML that Brevo gives you (Contacts → Forms → Share → HTML)
+          between the two markers below. The styling above will make the fields
+          match the Kay-Steph brand automatically.
+        -->
+        <div id="brevo-slot">
+          <!-- BEGIN BREVO EMBED -->
+          <!-- Paste Brevo <form>…</form> here -->
+          <!-- END BREVO EMBED -->
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site">
+  <div class="container row">
+    <div>
+      <div style="font-family:'Playfair Display',serif;font-weight:800;color:#fff;font-size:20px;">Kay-Steph <span style="color:var(--gold)">Group</span></div>
+      <small>© <span id="yr"></span> Kay-Steph Group. All rights reserved.</small>
+    </div>
+    <div>
+      <a href="https://kaystephgroup.com">kaystephgroup.com</a>
+    </div>
+  </div>
+</footer>
+
+<a class="wa" href="https://wa.me/2348000000000" target="_blank" rel="noreferrer">Chat on WhatsApp →</a>
+
+<script>
+  document.getElementById('yr').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
