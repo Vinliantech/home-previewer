@@ -129,14 +129,20 @@
   .field { display: grid; gap: 6px; }
   .field label { font-size: 13px; font-weight: 600; color: var(--navy); }
   .field input,
-  .field select {
+  .field select,
+  .field textarea {
     width: 100%; padding: 12px 14px; font: inherit; color: var(--text);
     border: 1px solid var(--border); background: #fff; border-radius: 8px; outline: none;
+    resize: vertical;
   }
   .field input:focus,
-  .field select:focus {
+  .field select:focus,
+  .field textarea:focus {
     border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,162,74,0.15);
   }
+  .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text); line-height: 1.5; }
+  .consent input { margin-top: 3px; }
+
   .submit-btn {
     justify-self: start;
     display: inline-flex; align-items: center; gap: 8px;
