@@ -56,7 +56,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Premium residences, estate plots and structured property investments across Abuja.",
+          "Discover premium homes, estate plots and transparent co-investment opportunities from Kay-Steph Group across Abuja.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
