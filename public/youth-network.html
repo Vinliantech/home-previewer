@@ -262,32 +262,55 @@
         </ul>
       </aside>
       <div class="reg-form">
-        <h3>Workshop registration</h3>
-        <p class="hint">Your details are used only for this workshop. We do not share your information.</p>
+        <h3>Participant registration</h3>
+        <p class="hint">Complete the full form below. Your details go securely to the Kay-Steph registration system and Brevo confirmation service.</p>
 
         <form id="workshop-form" class="ks-form" novalidate>
           <div class="field">
-            <label for="full-name">Full name</label>
+            <label for="full-name">Full name *</label>
             <input id="full-name" name="fullName" type="text" required placeholder="e.g. John Doe" />
           </div>
 
-          <div class="field">
-            <label for="email">Email address</label>
-            <input id="email" name="email" type="email" required placeholder="john@example.com" />
+          <div class="grid-2">
+            <div class="field">
+              <label for="location">Location *</label>
+              <input id="location" name="location" type="text" required placeholder="e.g. Abuja" />
+            </div>
+            <div class="field">
+              <label for="gender">Gender *</label>
+              <select id="gender" name="gender" required>
+                <option value="">Select…</option>
+                <option>Male</option>
+                <option>Female</option>
+                <option>Prefer not to say</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="phone">Phone number *</label>
+              <input id="phone" name="phone" type="tel" required placeholder="+234 801 234 5678" />
+            </div>
+            <div class="field">
+              <label for="email">Email address *</label>
+              <input id="email" name="email" type="email" required placeholder="john@example.com" />
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="field">
+              <label for="whatsapp">WhatsApp number</label>
+              <input id="whatsapp" name="whatsapp" type="tel" placeholder="If different from phone" />
+            </div>
+            <div class="field">
+              <label for="occupation">Occupation</label>
+              <input id="occupation" name="occupation" type="text" placeholder="e.g. Student, NYSC, Entrepreneur" />
+            </div>
           </div>
 
           <div class="field">
-            <label for="phone">Phone number</label>
-            <input id="phone" name="phone" type="tel" required placeholder="e.g. 0801 234 5678" />
-          </div>
-
-          <div class="field">
-            <label for="location">City / Area</label>
-            <input id="location" name="location" type="text" required placeholder="e.g. Abuja" />
-          </div>
-
-          <div class="field">
-            <label for="interest">Area of interest</label>
+            <label for="interest">Area of interest *</label>
             <select id="interest" name="interest" required>
               <option value="">Select an option</option>
               <option>Real Estate Sales</option>
@@ -301,6 +324,16 @@
             </select>
           </div>
 
+          <div class="field">
+            <label for="expectation">What do you hope to gain?</label>
+            <textarea id="expectation" name="expectation" rows="4" placeholder="Tell us briefly what you'd like to take away from the workshop."></textarea>
+          </div>
+
+          <label class="consent">
+            <input type="checkbox" id="consent" name="consent" checked />
+            <span>I agree that Kay-Steph Group may use the information provided to manage my registration and send me event updates.</span>
+          </label>
+
           <div class="field" style="position:absolute;left:-9999px;" aria-hidden="true">
             <label for="company">Company</label>
             <input id="company" name="company" type="text" tabindex="-1" autocomplete="off" />
@@ -309,6 +342,7 @@
           <div id="form-error" class="form-error" style="display:none;color:#b91c1c;font-size:14px;margin-bottom:12px;"></div>
           <button type="submit" class="submit-btn" id="submit-btn">Register for the workshop →</button>
         </form>
+
 
         <div id="form-success" class="form-success" style="display:none;">
           <div class="success-icon">✓</div>
