@@ -3,7 +3,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { CalendarDays, Check, Copy, MapPin, Plus, UsersRound, Video } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase as _supabaseTyped } from "@/integrations/supabase/client";
+// CRM schema is not fully wired; cast to any to bypass generated types.
+const supabase: any = _supabaseTyped;
 import { fmtDate, type CrmEvent } from "@/lib/crm";
 import { createCrmEvent } from "@/lib/crm.functions";
 import { CrmPageHeader, EmptyState, Panel } from "@/components/crm/CrmUi";

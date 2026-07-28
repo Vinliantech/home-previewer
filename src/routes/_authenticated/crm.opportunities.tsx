@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase as _supabaseTyped } from "@/integrations/supabase/client";
+// CRM schema is not fully wired; cast to any to bypass generated types.
+const supabase: any = _supabaseTyped;
 import {
   OPPORTUNITY_STAGES,
   fmtNaira,

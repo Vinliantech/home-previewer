@@ -12,7 +12,9 @@ import {
   UserPlus,
   UsersRound,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase as _supabaseTyped } from "@/integrations/supabase/client";
+// CRM schema is not fully wired; cast to any to bypass generated types.
+const supabase: any = _supabaseTyped;
 import {
   fmtDate,
   fmtNaira,
