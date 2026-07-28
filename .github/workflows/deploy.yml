@@ -35,7 +35,7 @@ jobs:
         with:
           server: ${{ dk3.host-ww.net }}
           username: ${{ githubdeploy@kaystephgroup.com }}
-          password: ${{ Abuja2050@ }}
+          password: ${{ Abuja2222# }}
           port: 21
           protocol: ftp
           local-dir: dist/
