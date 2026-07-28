@@ -93,7 +93,7 @@ function CrmShell() {
     (async () => {
       const { data } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
       if (!active) return;
-      const roles = (data ?? []).map((row) => row.role as string);
+      const roles = (data ?? []).map((row: any) => row.role as string);
       // Mirrors public.is_crm_admin: CRM managers run the workspace without
       // holding platform admin rights.
       const admin =
