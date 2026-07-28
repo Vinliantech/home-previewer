@@ -124,11 +124,11 @@ export function StaffModule() {
     setLoading(true);
     try {
       const [staff, changeRequests] = await Promise.all([
-        listStaff() as Promise<StaffRow[]>,
-        listStaffChangeRequests() as Promise<StaffRow[]>,
+        listStaff() as unknown as Promise<StaffRow[]>,
+        listStaffChangeRequests() as unknown as Promise<StaffRow[]>,
       ]);
-      setRows(staff);
-      setRequests(changeRequests);
+      setRows(((staff as any)?.staff ?? staff) as StaffRow[]);
+      setRequests(((changeRequests as any)?.requests ?? changeRequests) as StaffRow[]);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not load the staff directory.");
     }
