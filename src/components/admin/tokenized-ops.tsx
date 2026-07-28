@@ -603,7 +603,7 @@ function unitsText(value: unknown) {
     .join("\n");
 }
 
-function formFromProperty(property: Database["public"]["Tables"]["tokenized_properties"]["Row"]) {
+function formFromProperty(property: any) {
   const fallback = publicPropertyFallbacks.find(
     (item) =>
       item.id === property.public_slug ||
