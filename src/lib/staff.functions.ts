@@ -14,11 +14,11 @@ const notReady = () => {
   throw new Error("The staff directory is not connected in this environment yet.");
 };
 
-const anyInput = (input: unknown) => (input ?? {}) as Record<string, unknown>;
+const anyInput = (input: unknown) => (input ?? {}) as any;
 
 export const listStaff = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async () => ({ staff: [] as Array<Record<string, unknown>> }));
+  .handler(async () => ({ staff: [] as any[] }));
 
 export const inviteStaff = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -47,7 +47,7 @@ export const rejectStaff = createServerFn({ method: "POST" })
 
 export const listStaffChangeRequests = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async () => ({ requests: [] as Array<Record<string, unknown>> }));
+  .handler(async () => ({ requests: [] as any[] }));
 
 export const reviewStaffChangeRequest = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -56,7 +56,7 @@ export const reviewStaffChangeRequest = createServerFn({ method: "POST" })
 
 export const myStaffProfile = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async () => ({ staff: null as Record<string, unknown> | null }));
+  .handler(async () => ({ staff: null as any }));
 
 export const updateMyStaffContact = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
