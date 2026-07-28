@@ -454,8 +454,8 @@ export function TokenizedKycModule() {
                 status={profile.kyc_status}
                 label={KYC_STATUS_LABEL[profile.kyc_status]}
               />
-              {profile.kyc_notes && (
-                <div className="mt-1 max-w-52 text-xs text-amber-600">{profile.kyc_notes}</div>
+              {(profile as any).kyc_notes && (
+                <div className="mt-1 max-w-52 text-xs text-amber-600">{(profile as any).kyc_notes}</div>
               )}
             </Td>
             <Td>
@@ -785,7 +785,7 @@ export function TokenizedPropertiesModule() {
             </>
           }
         >
-          {(data?.properties ?? []).map((property) => (
+          {(data?.properties ?? []).map((property: any) => (
             <tr key={property.id} className="border-b border-slate-50 last:border-0">
               <Td>
                 <div className="font-medium text-navy">{property.name}</div>
