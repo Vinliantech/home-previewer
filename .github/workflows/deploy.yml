@@ -1,34 +1,75 @@
-name: Build & Deploy to HostAfrica
+name: Build & Deploy to HostAfrica (Node.js)
+
+# This project is a TanStack Start SSR app. It is NOT a static site.
+# The build produces `.output/` (Nitro node-server preset).
+# The Node application startup file is: .output/server/index.mjs
+#
+# HostAfrica cPanel "Setup Node.js App" requirements:
+#   - Node.js version: 22 (ask HostAfrica support to enable Node 22 if the
+#     panel currently caps at 20.x — the project deps require >= 22.12).
+#   - Application mode: Production
+#   - Application root: the folder where this workflow uploads (e.g. ~/kaysteph-app)
+#   - Application startup file: .output/server/index.mjs
+#   - Environment variables: set every value from `.env.example` in the
+#     panel's "Environment variables" section (Passenger does NOT read a
+#     .env file automatically).
+#
+# After each deploy, click "Restart" on the Node.js App in cPanel (or run
+# `touch tmp/restart.txt` in the app root) so Passenger picks up the new build.
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node
+      - name: Setup Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: "22"
           cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci || npm install
 
-      - name: Build project
+      - name: Build (Nitro node-server preset)
+        env:
+          # Force Nitro to emit a self-contained Node server instead of
+          # the default Cloudflare Worker bundle.
+          NITRO_PRESET: node-server
         run: npm run build
 
-      - name: Confirm build output
+      - name: Verify Node server build output
         run: |
-          test -f dist/index.html
-          ls -la dist
+          test -f .output/server/index.mjs || { echo "Missing .output/server/index.mjs — Nitro did not produce a Node server."; exit 1; }
+          ls -la .output
+          ls -la .output/server | head -20
+
+      - name: Stage deployment payload
+        run: |
+          rm -rf deploy
+          mkdir -p deploy
+          cp -r .output deploy/.output
+          cp package.json deploy/package.json
+          [ -f package-lock.json ] && cp package-lock.json deploy/package-lock.json || true
+          # A tiny passenger shim so cPanel "Application startup file" can
+          # point at either .output/server/index.mjs directly OR at app.mjs.
+          cat > deploy/app.mjs <<'EOF'
+          // Passenger entry — re-exports the Nitro server.
+          import "./.output/server/index.mjs";
+          EOF
+          # Ensure Passenger has a restart directory it can touch.
+          mkdir -p deploy/tmp
+          touch deploy/tmp/restart.txt
+          ls -la deploy
 
       - name: Deploy to HostAfrica via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
@@ -38,13 +79,12 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           protocol: ftp
-          local-dir: dist/
-          server-dir: ./
+          local-dir: deploy/
+          # IMPORTANT: set this repo secret to the Node app root on the
+          # server (NOT public_html). Example: /kaysteph-app/
+          server-dir: ${{ secrets.FTP_APP_DIR }}
           dangerous-clean-slate: false
           exclude: |
             **/.git*
             **/.github/**
             **/node_modules/**
-            .well-known/**
-            cgi-bin/**
-            .htaccess
