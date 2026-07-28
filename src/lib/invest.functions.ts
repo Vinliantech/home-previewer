@@ -61,11 +61,12 @@ export const listOpenProperties = createServerFn({ method: "GET" }).handler(asyn
     .order("created_at", { ascending: false });
   if (error) throw new Error(error.message);
 
-  const ids = (data ?? []).map((property) => property.id);
+  const ids = (data ?? []).map((property: any) => property.id);
   const funding: Record<string, { approved: number; pending: number; investors: number }> = {};
-  for (const property of data ?? []) {
+  for (const property of (data ?? []) as any[]) {
     funding[property.id] = { approved: 0, pending: 0, investors: 0 };
   }
+
   if (ids.length) {
     const { data: rows, error: fundingError } = await sb.rpc("get_public_property_funding", {
       _property_ids: ids,
