@@ -187,13 +187,34 @@ export async function sendBrevoConfirmation(
   config: BrevoConfig,
   contact: WorkshopContact,
 ): Promise<BrevoResult> {
-  if (!config.templateId) {
-    return { ok: false, error: "BREVO_TEMPLATE_ID is not set." };
+  if (config.templateId) {
+    return brevoFetch(config, "/smtp/email", {
+      to: [{ email: contact.email, name: contact.fullName }],
+      templateId: config.templateId,
+      params: templateParams(contact),
+      sender: { name: config.senderName, email: config.senderEmail },
+      tags: ["workshop-registration"],
+    });
   }
+
+  // Fallback: no Brevo template configured, send a branded plain HTML email
+  // so participants still receive a confirmation.
+  const html = `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#111827">
+  <h1 style="font-family:Georgia,serif;color:#0f172a;margin:0 0 12px">You're registered, ${escapeHtml(contact.firstName)}!</h1>
+  <p style="font-size:15px;line-height:1.6">Thank you for registering for the <strong>${escapeHtml(contact.eventName)}</strong>. We've saved your seat and our team will be in touch shortly with the schedule and joining details.</p>
+  <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin:20px 0">
+    <p style="margin:0 0 6px;font-size:13px;color:#64748b">Your registration reference</p>
+    <p style="margin:0;font-size:20px;font-weight:700;letter-spacing:1px;color:#0f172a">${escapeHtml(contact.reference)}</p>
+  </div>
+  <p style="font-size:14px;line-height:1.6">Area of interest: <strong>${escapeHtml(contact.interest)}</strong><br/>Location: <strong>${escapeHtml(contact.location)}</strong></p>
+  <p style="font-size:14px;line-height:1.6;margin-top:20px">If you have questions, simply reply to this email or reach us on WhatsApp.</p>
+  <p style="font-size:14px;line-height:1.6;margin-top:24px">Warm regards,<br/><strong>Kay-Steph Group</strong></p>
+</div>`;
+
   return brevoFetch(config, "/smtp/email", {
     to: [{ email: contact.email, name: contact.fullName }],
-    templateId: config.templateId,
-    params: templateParams(contact),
+    subject: `You're registered — ${contact.eventName} (${contact.reference})`,
+    htmlContent: html,
     sender: { name: config.senderName, email: config.senderEmail },
     tags: ["workshop-registration"],
   });
