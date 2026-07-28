@@ -332,6 +332,23 @@
 
 <script>
   document.getElementById('yr').textContent = new Date().getFullYear();
+
+  const form = document.getElementById('workshop-form');
+  const success = document.getElementById('form-success');
+  if (form && success) {
+    form.addEventListener('submit', function (e) {
+      // Show the local success message immediately for a smooth UX.
+      // If the action URL is still the placeholder, prevent submit and show the help message.
+      const action = form.getAttribute('action');
+      if (action.indexOf('YOUR_BREVO_FORM_ACTION_URL') !== -1) {
+        e.preventDefault();
+        alert('This form is not yet connected to Brevo.\n\nPaste your Brevo form action URL into the action attribute of the <form> tag (search for YOUR_BREVO_FORM_ACTION_URL).');
+        return;
+      }
+      form.style.display = 'none';
+      success.style.display = 'block';
+    });
+  }
 </script>
 </body>
 </html>
