@@ -1899,6 +1899,92 @@ export type Database = {
         }
         Relationships: []
       }
+      workshop_registrations: {
+        Row: {
+          admin_email_status: string
+          brevo_contact_status: string
+          confirmation_email_status: string
+          consent_at: string | null
+          consent_given: boolean
+          created_at: string
+          email: string
+          event_key: string
+          event_name: string
+          expectation: string | null
+          full_name: string
+          gender: string
+          id: string
+          interest: string
+          last_attempt_at: string | null
+          last_error: string | null
+          lead_id: string | null
+          location: string
+          occupation: string | null
+          phone: string
+          reference: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          admin_email_status?: string
+          brevo_contact_status?: string
+          confirmation_email_status?: string
+          consent_at?: string | null
+          consent_given?: boolean
+          created_at?: string
+          email: string
+          event_key: string
+          event_name: string
+          expectation?: string | null
+          full_name: string
+          gender: string
+          id?: string
+          interest: string
+          last_attempt_at?: string | null
+          last_error?: string | null
+          lead_id?: string | null
+          location: string
+          occupation?: string | null
+          phone: string
+          reference?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          admin_email_status?: string
+          brevo_contact_status?: string
+          confirmation_email_status?: string
+          consent_at?: string | null
+          consent_given?: boolean
+          created_at?: string
+          email?: string
+          event_key?: string
+          event_name?: string
+          expectation?: string | null
+          full_name?: string
+          gender?: string
+          id?: string
+          interest?: string
+          last_attempt_at?: string | null
+          last_error?: string | null
+          lead_id?: string | null
+          location?: string
+          occupation?: string | null
+          phone?: string
+          reference?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workshop_registrations_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       available_properties: {
