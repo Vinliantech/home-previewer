@@ -50,7 +50,7 @@ function AdminAuth() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }: any) => {
       if (!session) return;
       const destination = await staffDestination(session.user.id);
       if (destination) navigate({ to: destination });
