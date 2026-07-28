@@ -30,7 +30,7 @@ jobs:
           test -f dist/index.html
           ls -la dist
 
-            - name: Deploy to HostAfrica via FTP
+      - name: Deploy to HostAfrica via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
           server: ${{ secrets.FTP_SERVER }}
