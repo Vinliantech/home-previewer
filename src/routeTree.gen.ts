@@ -48,6 +48,7 @@ import { Route as AuthenticatedCrmIndexRouteImport } from './routes/_authenticat
 import { Route as AuthenticatedContentIndexRouteImport } from './routes/_authenticated/content.index'
 import { Route as BlogCategorySlugRouteImport } from './routes/blog.category.$slug'
 import { Route as BlogAuthorSlugRouteImport } from './routes/blog.author.$slug'
+import { Route as ApiPublicYouthNetworkRouteImport } from './routes/api/public/youth-network'
 import { Route as AuthenticatedPortfolioWalletRouteImport } from './routes/_authenticated/portfolio.wallet'
 import { Route as AuthenticatedPortfolioTransactionsRouteImport } from './routes/_authenticated/portfolio.transactions'
 import { Route as AuthenticatedPortfolioTokensRouteImport } from './routes/_authenticated/portfolio.tokens'
@@ -283,6 +284,11 @@ const BlogAuthorSlugRoute = BlogAuthorSlugRouteImport.update({
   id: '/author/$slug',
   path: '/author/$slug',
   getParentRoute: () => BlogRoute,
+} as any)
+const ApiPublicYouthNetworkRoute = ApiPublicYouthNetworkRouteImport.update({
+  id: '/api/public/youth-network',
+  path: '/api/public/youth-network',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedPortfolioWalletRoute =
   AuthenticatedPortfolioWalletRouteImport.update({
@@ -575,6 +581,7 @@ export interface FileRoutesByFullPath {
   '/portfolio/tokens': typeof AuthenticatedPortfolioTokensRoute
   '/portfolio/transactions': typeof AuthenticatedPortfolioTransactionsRoute
   '/portfolio/wallet': typeof AuthenticatedPortfolioWalletRoute
+  '/api/public/youth-network': typeof ApiPublicYouthNetworkRoute
   '/blog/author/$slug': typeof BlogAuthorSlugRoute
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/content/': typeof AuthenticatedContentIndexRoute
@@ -650,6 +657,7 @@ export interface FileRoutesByTo {
   '/portfolio/tokens': typeof AuthenticatedPortfolioTokensRoute
   '/portfolio/transactions': typeof AuthenticatedPortfolioTransactionsRoute
   '/portfolio/wallet': typeof AuthenticatedPortfolioWalletRoute
+  '/api/public/youth-network': typeof ApiPublicYouthNetworkRoute
   '/blog/author/$slug': typeof BlogAuthorSlugRoute
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/content': typeof AuthenticatedContentIndexRoute
@@ -730,6 +738,7 @@ export interface FileRoutesById {
   '/_authenticated/portfolio/tokens': typeof AuthenticatedPortfolioTokensRoute
   '/_authenticated/portfolio/transactions': typeof AuthenticatedPortfolioTransactionsRoute
   '/_authenticated/portfolio/wallet': typeof AuthenticatedPortfolioWalletRoute
+  '/api/public/youth-network': typeof ApiPublicYouthNetworkRoute
   '/blog/author/$slug': typeof BlogAuthorSlugRoute
   '/blog/category/$slug': typeof BlogCategorySlugRoute
   '/_authenticated/content/': typeof AuthenticatedContentIndexRoute
@@ -810,6 +819,7 @@ export interface FileRouteTypes {
     | '/portfolio/tokens'
     | '/portfolio/transactions'
     | '/portfolio/wallet'
+    | '/api/public/youth-network'
     | '/blog/author/$slug'
     | '/blog/category/$slug'
     | '/content/'
@@ -885,6 +895,7 @@ export interface FileRouteTypes {
     | '/portfolio/tokens'
     | '/portfolio/transactions'
     | '/portfolio/wallet'
+    | '/api/public/youth-network'
     | '/blog/author/$slug'
     | '/blog/category/$slug'
     | '/content'
@@ -964,6 +975,7 @@ export interface FileRouteTypes {
     | '/_authenticated/portfolio/tokens'
     | '/_authenticated/portfolio/transactions'
     | '/_authenticated/portfolio/wallet'
+    | '/api/public/youth-network'
     | '/blog/author/$slug'
     | '/blog/category/$slug'
     | '/_authenticated/content/'
@@ -1002,6 +1014,7 @@ export interface RootRouteChildren {
   AffiliateIndexRoute: typeof AffiliateIndexRoute
   InvestIndexRoute: typeof InvestIndexRoute
   PropertiesIndexRoute: typeof PropertiesIndexRoute
+  ApiPublicYouthNetworkRoute: typeof ApiPublicYouthNetworkRoute
   ApiPublicMetaWebhookRoute: typeof ApiPublicMetaWebhookRoute
 }
 
@@ -1279,6 +1292,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/blog/author/$slug'
       preLoaderRoute: typeof BlogAuthorSlugRouteImport
       parentRoute: typeof BlogRoute
+    }
+    '/api/public/youth-network': {
+      id: '/api/public/youth-network'
+      path: '/api/public/youth-network'
+      fullPath: '/api/public/youth-network'
+      preLoaderRoute: typeof ApiPublicYouthNetworkRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/_authenticated/portfolio/wallet': {
       id: '/_authenticated/portfolio/wallet'
@@ -1742,6 +1762,7 @@ const rootRouteChildren: RootRouteChildren = {
   AffiliateIndexRoute: AffiliateIndexRoute,
   InvestIndexRoute: InvestIndexRoute,
   PropertiesIndexRoute: PropertiesIndexRoute,
+  ApiPublicYouthNetworkRoute: ApiPublicYouthNetworkRoute,
   ApiPublicMetaWebhookRoute: ApiPublicMetaWebhookRoute,
 }
 export const routeTree = rootRouteImport
