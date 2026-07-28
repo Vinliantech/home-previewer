@@ -1,187 +1,226 @@
-# Kay-Steph Group — Deployment Guide
+# Kay-Steph Group — HostAfrica Self-Hosting Guide
 
-This is a **TanStack Start** application: a React front end with a Node server
-side (Supabase auth and data, server functions, the Meta Lead Ads webhook,
-Resend transactional email). It is **not a static site** — copying the files
-into `public_html` will not run it. Use one of the two paths below.
+This is a **TanStack Start SSR** application (React + Node server). It is
+**not a static site** — copying files into `public_html` will not run it.
+
+Domain: **kaystephgroup.com**
+Hosting: **HostAfrica cPanel / DirectAdmin — "Setup Node.js App"**
+Startup file: **`.output/server/index.mjs`**
 
 ---
 
-## 0. What you need before deploying
+## 0. Prerequisites (once)
 
-| Requirement | Why |
+| Requirement | Notes |
 |---|---|
-| Node.js 20+ | Build and run the server |
-| A Supabase project | Database, auth, storage — the entire backend |
-| Resend account + API key | CRM acknowledgement emails and staff invites |
-| Brevo account + API key | Workshop registration confirmations and event lists |
-| Meta app credentials (optional at launch) | Facebook Lead Ads capture |
-| The `.env` values | Copy `.env.example` to `.env` and fill every value |
+| Node.js **22.12+** on the server | The current HostAfrica panel offers 20.x — open a support ticket asking them to enable Node.js 22 (or the newest LTS) for your account. The build refuses to run on Node 20. |
+| A Supabase project | Database, auth, storage — the entire backend. |
+| Resend account + API key | CRM acknowledgement emails and staff invites. |
+| Brevo account + API key | Workshop registration confirmations. |
+| Meta app credentials (optional at launch) | Facebook Lead Ads capture. |
+| SSH or FTP access to the account | The GitHub Action deploys via FTP. |
 
-**Never commit or upload `.env` anywhere public. The
-`SUPABASE_SERVICE_ROLE_KEY` bypasses all row-level security.**
-
----
-
-## 1. Set up the database (run once per Supabase project)
-
-Run every file in `supabase/migrations/` **in filename order** (they are
-timestamped — sort ascending). In the Supabase Dashboard: SQL Editor → paste →
-run, one after another. All 31 are forward-only and idempotent; re-running is
-safe.
-
-```
-20260711174903…  roles, profiles, signup trigger
-20260711175858…  affiliate programme
-20260711175918…  affiliate extras
-20260711181717…  sales_agent role
-20260711181824…  CRM core (leads, tasks, opportunities, fb tables)
-20260711183201…  tokenized investment engine
-20260711184007…  investment extras
-20260712010000…  production hardening
-20260715120000…  group pools
-20260715130000…  estate operations
-20260716090000…  CRM workspace (grading, events, email queue)
-20260717090000…  CRM lead matching (dedupe keys)  ← code depends on this
-20260717100000…  crm_manager role
-20260717110000…  staff directory
-20260717120000…  staff approval flow
-20260717130000…  client detail sync
-20260717143000…  social/blog content system
-20260719090000…  security hardening (role RPCs, audit)
-20260723010000…  real property catalogue (replaces the placeholder seed)
-20260723020000…  connected portal controls (plot holds, payment plans,
-                 affiliate supervisors)
-20260723030000…  staff-directory role grants
-20260723040000…  unified property catalogue  ← the public site, portals and
-                 admin all read this; skipping it leaves the catalogue broken
-20260725010000…  affiliate referrals into the CRM (links client_leads to the
-                 lead pipeline; backfills past referrals where the match is
-                 unambiguous)
-20260726010000…  affiliates cannot be activated without a staff supervisor
-20260726020000…  client documentation numbers (KS-C-#####) and the reviewed
-                 client/admin document exchange  ← needs a PRIVATE storage
-                 bucket named "client-documents" created in the dashboard
-20260726030000…  admin review of client identity verification, and a guard
-                 stopping clients writing their own verification status
-20260726040000…  group-buy membership (claims invitations on sign-up,
-                 reveals co-members and their contributions)
-20260726050000…  lead capture reliability (queues any inbound lead whose
-                 capture failed, so none is lost)
-20260727010000…  CRM advisers are created from the staff directory, and their
-                 contact details follow their staff record
-20260727020000…  workshop registrations (reference numbers, per-event email
-                 de-duplication, Brevo delivery tracking)
-20260727030000…  write-only integration credential store, so the Brevo key can
-                 be set from the CRM without any account being able to read it
-```
-
-Then, in Supabase Dashboard → Authentication → URL Configuration, set the Site
-URL to your domain so invite/recovery links point at production.
+**Never commit `.env` or upload it to a public folder.** The
+`SUPABASE_SERVICE_ROLE_KEY` bypasses row-level security.
 
 ---
 
-## 2A. Path A — cPanel with "Setup Node.js App"
+## 1. Set up the Node.js application in cPanel
 
-Your host must offer the Node.js application feature (Passenger). Shared plans
-without it cannot run this site — use Path B instead.
-
-1. Upload this zip and extract it to a folder **outside** `public_html`, e.g.
-   `~/kaysteph-app`.
-2. cPanel → **Setup Node.js App** → Create application:
-   - Node version: 20+
-   - Application root: `kaysteph-app`
-   - Application mode: Production
+1. cPanel → **Setup Node.js App** → **Create application**.
+2. Fill in:
+   - **Node.js version:** `22.x` (must be ≥ 22.12).
+   - **Application mode:** `Production`.
+   - **Application root:** e.g. `kaysteph-app` (created outside `public_html`).
+   - **Application URL:** attach it to `kaystephgroup.com` (and `www`).
    - **Application startup file:** `.output/server/index.mjs`
-3. In the app's environment-variables panel, add every value from `.env`
-   (Passenger does not read `.env` files automatically).
-4. In the app's terminal (or cPanel terminal):
-   ```bash
-   cd ~/kaysteph-app
-   npm install
-   npm run build        # produces .output/  (needs ~2GB RAM; see note)
-   ```
-5. Restart the application. The site now serves on the domain the app is
-   attached to.
-
-> **If the build dies on the server** (shared hosts often cap memory): run
-> `npm install && npm run build` on your own machine, then upload the whole
-> folder *including* `.output/`, and skip step 4.
-
-## 2B. Path B — keep Lovable (or any Node host) and point your domain
-
-1. Import/sync this source into Lovable (it builds and hosts it).
-2. Set the same environment variables in the host's settings panel.
-3. In cPanel → Zone Editor, point your domain at the host:
-   - either a `CNAME` for `www` to the host's domain, and an `A`/`ALIAS` for
-     the apex per their instructions,
-   - keep everything else (email MX records) untouched.
-
-This also works for Render / Railway / Fly / Vercel — anything that runs Node.
+     *(or `app.mjs` — the workflow uploads a shim that re-exports the same server).*
+3. Click **Create**. cPanel prints an `Enter to the virtual environment`
+   command — you don't need it for GitHub Actions deploys.
+4. Under **Environment variables**, add every key from `.env.example`
+   (see §4). Passenger does **not** read `.env` files.
+5. Leave the app **Started** — GitHub Actions will restart it via the
+   `tmp/restart.txt` file the workflow uploads.
 
 ---
 
-## 3. After first deploy — go-live checklist
+## 2. DNS — point kaystephgroup.com at HostAfrica
 
-- [ ] Sign in at `/admin/auth` with the first super-admin account (create the
-      user in Supabase Auth, then grant `super_admin` in User Roles or SQL).
-- [ ] `RESEND_API_KEY` + `CRM_EMAIL_FROM` set → submit the contact form and
-      confirm the acknowledgement email arrives.
-- [ ] `SITE_URL` set → invite a staff member, confirm the email link returns
-      to your domain.
-- [ ] Meta webhook (when ready): subscribe the app to
-      `https://<your-domain>/api/public/meta/webhook` with your
-      `META_WEBHOOK_VERIFY_TOKEN`; send a test lead from Meta's testing tool.
-- [ ] Meta already has leads? The webhook only hears about submissions made
-      while it is subscribed. CRM → Settings → Integrations → **Meta lead
-      recovery**: paste the lead form id and Import to pull the leads the
-      form already holds (Meta keeps them 90 days). Safe to re-run — leads
-      are matched on their Meta id and never duplicated.
-- [ ] Check that panel occasionally: any lead whose capture failed is
-      queued there with a Retry button, and is NOT in the CRM until retried.
-      The card also shows when the last Facebook lead was captured — a long
-      silence usually means the page access token has expired.
-- [ ] Add at least one sales adviser (CRM → Settings → Team) BEFORE the first
-      campaign runs. With none, auto-assignment has nobody to route to and
-      every lead lands unassigned with no follow-up task. The CRM dashboard
-      shows an Unassigned count for exactly this.
-- [ ] Optional: set `META_AD_ACCOUNT_ID` and press "Sync campaign spend" to
-      populate cost-per-lead and ROI on Reports. Lead capture works without it.
-- [ ] Brevo: set it up in **CRM → Settings → Integrations → Brevo** — API key,
-      list id, template id, sender and admin address. The key is stored where
-      no signed-in account can read it back, so it can be rotated there
-      without a redeploy. The environment variables still work and are the
-      fallback when the CRM row is empty, which is how a first deployment
-      gets going before anyone can sign in.
-      The confirmation template must define FIRST_NAME, FULL_NAME, EMAIL,
-      PHONE, LOCATION, GENDER, OCCUPATION, INTEREST, EVENT_NAME and
-      REGISTRATION_REFERENCE.
-- [ ] Submit a test registration at `/events/youth-network`, then check
-      **CRM → Settings → Integrations → Workshop registrations**. A
-      registration is never lost when Brevo fails: undelivered confirmations
-      are listed there with the error and a Retry button.
-- [ ] There is no demo mode. Every portal requires a real Supabase account,
-      so create the accounts you need before a walkthrough.
-- [ ] Investment bank details (`VITE_INVESTMENT_*`) only after finance
-      verifies the production account.
+At your domain registrar (or in cPanel → Zone Editor if DNS is hosted at
+HostAfrica), set:
+
+| Type  | Host  | Value |
+|-------|-------|-------|
+| A     | `@`   | HostAfrica server IP (from your welcome email / cPanel sidebar) |
+| CNAME | `www` | `kaystephgroup.com.` |
+
+Leave MX / mail records untouched. DNS propagation is usually 15 min – 2 h.
+
+In cPanel → **Domains**, make sure `kaystephgroup.com` (and `www`) is
+attached to the Node.js app. Then cPanel → **SSL/TLS Status** → run
+**AutoSSL** to issue Let's Encrypt certificates for both.
 
 ---
 
-## 4. What's in this archive
+## 3. GitHub Actions deploy — required repo secrets
+
+Set these in the repo → **Settings → Secrets and variables → Actions**:
+
+| Secret | Value |
+|---|---|
+| `FTP_SERVER` | HostAfrica FTP hostname (e.g. `ftp.kaystephgroup.com` or the server hostname from your welcome email). |
+| `FTP_USERNAME` | Your cPanel FTP user. |
+| `FTP_PASSWORD` | That user's password. |
+| `FTP_APP_DIR` | **The Node app root**, NOT `public_html`. Example: `/kaysteph-app/`. |
+
+Push to `main` (or click **Run workflow**) and the action will:
+1. Install Node.js 22 on the runner.
+2. `npm install`.
+3. `NITRO_PRESET=node-server npm run build` → produces `.output/`.
+4. Package `.output/`, `package.json`, `package-lock.json`, `app.mjs`, and
+   `tmp/restart.txt`.
+5. Upload the payload via FTP into `FTP_APP_DIR`.
+
+After the workflow finishes, click **Restart** on the Node.js app in cPanel
+(the touched `tmp/restart.txt` also triggers Passenger to reload).
+
+---
+
+## 4. Files that must live in the Node app root on the server
+
+After a successful deploy, the app root (e.g. `~/kaysteph-app/`) contains:
 
 ```
-src/                  application code, web-optimised images, tests
-supabase/migrations/  the 31 SQL files above
-public/               favicon, robots, static files
-docs/                 Lovable instruction documents (reference)
-source-images/        original full-resolution property renders
-.env.example          every variable the app reads — copy to .env and fill
-package.json, vite.config.ts, vitest.config.ts, tsconfig…, tailwind…
+kaysteph-app/
+├── .output/                 # Nitro node-server build (uploaded)
+│   ├── server/
+│   │   ├── index.mjs        # ← Application startup file
+│   │   └── ...              # bundled server + node_modules
+│   └── public/              # static assets served by the Node server
+├── package.json             # uploaded (for reference / npm scripts)
+├── package-lock.json        # uploaded
+├── app.mjs                  # small shim → imports .output/server/index.mjs
+└── tmp/
+    └── restart.txt          # touch to reload Passenger
 ```
 
-Not included, on purpose: `node_modules/` (recreate with `npm install`),
-`.env` (secrets never travel in archives), `.output/` (recreate with
-`npm run build`).
+**You do NOT need to run `npm install` on the server** — the Nitro
+`node-server` preset bundles all runtime dependencies inside
+`.output/server/node_modules/`.
 
-Local commands: `npm install` → `npm test` (54 tests) → `npm run dev`
-(http://localhost:8080) → `npm run build`.
+---
+
+## 5. Required production environment variables
+
+Copy every value into cPanel → Node.js App → **Environment variables**:
+
+```
+# --- Supabase (backend) ---
+SUPABASE_PROJECT_ID=
+SUPABASE_URL=
+SUPABASE_PUBLISHABLE_KEY=
+SUPABASE_SERVICE_ROLE_KEY=      # server-only — never expose to browser
+VITE_SUPABASE_PROJECT_ID=
+VITE_SUPABASE_URL=
+VITE_SUPABASE_PUBLISHABLE_KEY=
+
+# --- Site identity ---
+SITE_URL=https://kaystephgroup.com
+PUBLIC_SITE_URL=https://kaystephgroup.com
+
+# --- Investment bank details (client portal) ---
+VITE_INVESTMENT_BANK_NAME=
+VITE_INVESTMENT_ACCOUNT_NAME=
+VITE_INVESTMENT_ACCOUNT_NUMBER=
+
+# --- Meta Lead Ads (server-only) ---
+META_APP_SECRET=
+META_WEBHOOK_VERIFY_TOKEN=
+META_PAGE_ACCESS_TOKEN=
+META_PAGE_ID=
+META_GRAPH_API_VERSION=
+META_AD_ACCOUNT_ID=
+
+# --- Resend (CRM transactional email) ---
+RESEND_API_KEY=
+CRM_EMAIL_FROM=Kay-Steph Group <enquiries@kaystephgroup.com>
+
+# --- Brevo (workshop registration email) ---
+BREVO_API_KEY=
+BREVO_LIST_ID=
+BREVO_TEMPLATE_ID=
+BREVO_SENDER_NAME=Kay-Steph Group
+BREVO_SENDER_EMAIL=events@kaystephgroup.com
+KAYSTEPH_ADMIN_EMAIL=
+
+# --- WhatsApp Business (optional) ---
+WHATSAPP_ACCESS_TOKEN=
+WHATSAPP_PHONE_NUMBER_ID=
+```
+
+Any `VITE_*` variable must ALSO be present at build time on the GitHub
+Actions runner if you use it in client code — add those as repo secrets
+and reference them under an `env:` block on the `Build` step. Server-only
+keys (Supabase service role, Meta, Resend, Brevo, WhatsApp) only need to
+exist on the HostAfrica side.
+
+---
+
+## 6. Database migrations (once per Supabase project)
+
+Run every file in `supabase/migrations/` **in filename order** via the
+Supabase SQL editor. They are idempotent — re-running is safe. See the
+in-repo history for the full list; the ones that matter for a new
+environment:
+
+- roles / profiles / signup trigger
+- affiliate programme + extras
+- CRM core (leads, tasks, opportunities, FB tables)
+- tokenized investment engine + extras
+- group pools
+- estate operations
+- CRM workspace, lead matching, staff directory
+- security hardening (role RPCs, audit)
+- unified property catalogue
+- client documentation (needs a **private** storage bucket called
+  `client-documents` created in the dashboard)
+- workshop registrations
+- write-only integration credential store
+
+Then Supabase Dashboard → **Authentication → URL Configuration** → set the
+Site URL to `https://kaystephgroup.com`.
+
+---
+
+## 7. Go-live checklist
+
+- [ ] cPanel Node.js app shows **Running** with startup file
+      `.output/server/index.mjs`.
+- [ ] `https://kaystephgroup.com` returns the homepage over HTTPS.
+- [ ] `/admin/auth` loads and the first super-admin can sign in.
+- [ ] Contact form → acknowledgement email arrives (Resend key OK).
+- [ ] Workshop registration → confirmation email arrives (Brevo key OK).
+- [ ] Meta webhook subscribed to
+      `https://kaystephgroup.com/api/public/meta/webhook`.
+- [ ] Existing Meta leads imported via CRM → Settings → Integrations →
+      Meta lead recovery.
+- [ ] At least one sales adviser exists BEFORE marketing goes live.
+
+---
+
+## 8. Troubleshooting
+
+**"Application failed to start"** — cPanel shows this if the Node version is
+too low. Confirm the panel version selector says 22.x. If only 20.x is
+available, open a HostAfrica support ticket asking them to enable Node 22.
+
+**Site loads but every server function 500s** — an env var is missing. Open
+the app's log in cPanel (Node.js App → Logs) and check which key is
+`undefined`.
+
+**Deploy uploaded but old code still serves** — Passenger caches the
+process. Click **Restart** in cPanel, or in File Manager touch
+`tmp/restart.txt` inside the app root.
+
+**Build fails on the runner with `EBADENGINE`** — the workflow already pins
+Node 22. If you're building locally, run `nvm use 22` first.
