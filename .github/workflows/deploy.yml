@@ -30,12 +30,12 @@ jobs:
           test -f dist/index.html
           ls -la dist
 
-      - name: Deploy to HostAfrica via FTP
+            - name: Deploy to HostAfrica via FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
-          server: ${{ dk3.host-ww.net }}
-          username: ${{ githubdeploy@kaystephgroup.com }}
-          password: ${{ Abuja3333@ }}
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
           port: 21
           protocol: ftp
           local-dir: dist/
