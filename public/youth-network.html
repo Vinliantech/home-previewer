@@ -409,11 +409,15 @@
         email: (fd.get('email') || '').toString().trim(),
         phone: (fd.get('phone') || '').toString().trim(),
         location: (fd.get('location') || '').toString().trim(),
+        gender: (fd.get('gender') || 'Prefer not to say').toString(),
+        whatsapp: (fd.get('whatsapp') || '').toString().trim(),
+        occupation: (fd.get('occupation') || '').toString().trim(),
         interest: (fd.get('interest') || 'Other').toString(),
-        gender: 'Prefer not to say',
-        consentGiven: true,
+        expectation: (fd.get('expectation') || '').toString().trim(),
+        consentGiven: document.getElementById('consent').checked,
         company: (fd.get('company') || '').toString(),
       };
+
 
       try {
         const res = await fetch(API_ENDPOINT, {
