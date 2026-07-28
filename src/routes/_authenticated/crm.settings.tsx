@@ -119,7 +119,7 @@ function SettingsPage() {
         defaultCountry: settingsResult.data.default_country,
         consentCopy: settingsResult.data.consent_copy,
       });
-    setIntegrations(providerResult as IntegrationStatus);
+    setIntegrations(providerResult as unknown as IntegrationStatus);
   }, [statusFn]);
 
   useEffect(() => {

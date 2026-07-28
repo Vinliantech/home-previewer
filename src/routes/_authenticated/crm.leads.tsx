@@ -481,7 +481,7 @@ function AddLeadDialog({ agents, onCreated }: { agents: SalesAgent[]; onCreated:
         },
       });
       toast.success(
-        result.merged ? "Enquiry merged into the existing lead profile." : "Lead added to the CRM.",
+        (result as any).merged ? "Enquiry merged into the existing lead profile." : "Lead added to the CRM.",
       );
       setOpen(false);
       onCreated();

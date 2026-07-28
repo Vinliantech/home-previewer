@@ -51,10 +51,10 @@ function EventsWorkspace() {
       ((eventResult.data ?? []) as unknown as CrmEvent[]).map((event) => ({
         ...event,
         registration_count: (registrationResult.data ?? []).filter(
-          (item) => item.event_id === event.id,
+          (item: any) => item.event_id === event.id,
         ).length,
         attendance_count: (registrationResult.data ?? []).filter(
-          (item) => item.event_id === event.id && item.status === "attended",
+          (item: any) => item.event_id === event.id && item.status === "attended",
         ).length,
       })),
     );

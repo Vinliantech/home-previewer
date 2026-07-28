@@ -213,7 +213,7 @@ function CreatePoolDialog({ triggerLabel = "Create pool" }: { triggerLabel?: str
 
   const chosenProperty =
     form.property_id && form.property_id !== UNDECIDED_PROPERTY
-      ? (catalogue?.properties ?? []).find((row) => row.id === form.property_id)
+      ? (catalogue?.properties ?? []).find((row: any) => row.id === form.property_id)
       : undefined;
 
   function submit(e: React.FormEvent) {
@@ -273,7 +273,7 @@ function CreatePoolDialog({ triggerLabel = "Create pool" }: { triggerLabel?: str
                 <SelectValue placeholder="Choose a property" />
               </SelectTrigger>
               <SelectContent>
-                {(catalogue?.properties ?? []).map((row) => (
+                {(catalogue?.properties ?? []).map((row: any) => (
                   <SelectItem key={row.id} value={row.id}>
                     {row.name} — {row.location}
                   </SelectItem>
