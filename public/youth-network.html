@@ -124,30 +124,38 @@
   .reg-form h3 { color: var(--navy); font-size: 22px; margin: 0 0 6px; }
   .reg-form .hint { color: var(--muted); font-size: 14px; margin: 0 0 22px; }
 
-  /* Brevo form container styling — overrides the default Brevo widget look */
-  #brevo-slot .sib-form,
-  #brevo-slot [class*="sib-form"] {
-    padding: 0 !important; background: transparent !important;
-  }
-  #brevo-slot input[type="text"],
-  #brevo-slot input[type="email"],
-  #brevo-slot input[type="tel"],
-  #brevo-slot select,
-  #brevo-slot textarea {
+  /* Registration form */
+  .ks-form { display: grid; gap: 18px; }
+  .field { display: grid; gap: 6px; }
+  .field label { font-size: 13px; font-weight: 600; color: var(--navy); }
+  .field input,
+  .field select {
     width: 100%; padding: 12px 14px; font: inherit; color: var(--text);
     border: 1px solid var(--border); background: #fff; border-radius: 8px; outline: none;
   }
-  #brevo-slot input:focus,
-  #brevo-slot select:focus,
-  #brevo-slot textarea:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,162,74,0.15); }
-  #brevo-slot label { font-size: 13px; font-weight: 600; color: var(--navy); }
-  #brevo-slot button[type="submit"],
-  #brevo-slot .sib-form-block__button {
-    background: var(--gold) !important; color: #1a1200 !important; border: 0 !important;
-    border-radius: 999px !important; padding: 14px 28px !important; font-weight: 700 !important;
-    cursor: pointer;
+  .field input:focus,
+  .field select:focus {
+    border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,162,74,0.15);
   }
-  #brevo-slot button[type="submit"]:hover { background: var(--gold-2) !important; }
+  .submit-btn {
+    justify-self: start;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--gold); color: #1a1200; font-weight: 700; font-size: 14px;
+    padding: 14px 28px; border: 0; border-radius: 999px; cursor: pointer;
+    transition: background .2s;
+  }
+  .submit-btn:hover { background: var(--gold-2); }
+  .form-success {
+    text-align: center; padding: 32px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg);
+  }
+  .form-success .success-icon {
+    width: 56px; height: 56px; margin: 0 auto 14px; border-radius: 50%;
+    background: var(--navy); color: var(--gold); display: flex; align-items: center; justify-content: center;
+    font-size: 28px; font-weight: 700;
+  }
+  .form-success h4 { color: var(--navy); font-size: 20px; margin: 0 0 8px; }
+  .form-success p { color: var(--muted); font-size: 14px; margin: 0; }
+  @media (max-width: 600px) { .submit-btn { width: 100%; justify-self: stretch; } }
 
   /* Footer */
   footer.site { background: var(--navy); color: rgba(255,255,255,0.75); padding: 40px 0; margin-top: 40px; }
@@ -258,15 +266,50 @@
         <p class="hint">Your details are used only for this workshop. We do not share your information.</p>
 
         <!--
-          ================= BREVO FORM SLOT =================
-          Paste the embed HTML that Brevo gives you (Contacts → Forms → Share → HTML)
-          between the two markers below. The styling above will make the fields
-          match the Kay-Steph brand automatically.
+          Replace the form action below with your Brevo form action URL:
+          Brevo → Contacts → Forms → Share → HTML → copy the action URL from
+          <form action="..."> and paste it into the action attribute below.
         -->
-        <div id="brevo-slot">
-          <!-- BEGIN BREVO EMBED -->
-          <!-- Paste Brevo <form>…</form> here -->
-          <!-- END BREVO EMBED -->
+        <form id="workshop-form" action="https://YOUR_BREVO_FORM_ACTION_URL" method="POST" class="ks-form">
+          <div class="field">
+            <label for="full-name">Full name</label>
+            <input id="full-name" name="FULLNAME" type="text" required placeholder="e.g. John Doe" />
+          </div>
+
+          <div class="field">
+            <label for="email">Email address</label>
+            <input id="email" name="EMAIL" type="email" required placeholder="john@example.com" />
+          </div>
+
+          <div class="field">
+            <label for="phone">Phone number</label>
+            <input id="phone" name="PHONE" type="tel" required placeholder="e.g. 0801 234 5678" />
+          </div>
+
+          <div class="field">
+            <label for="location">City / Area</label>
+            <input id="location" name="LOCATION" type="text" placeholder="e.g. Abuja" />
+          </div>
+
+          <div class="field">
+            <label for="referral">How did you hear about us?</label>
+            <select id="referral" name="REFERRAL">
+              <option value="">Select an option</option>
+              <option value="Instagram">Instagram</option>
+              <option value="Facebook">Facebook</option>
+              <option value="WhatsApp">WhatsApp</option>
+              <option value="Friend">A friend</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <button type="submit" class="submit-btn">Register for the workshop →</button>
+        </form>
+
+        <div id="form-success" class="form-success" style="display:none;">
+          <div class="success-icon">✓</div>
+          <h4>Registration received</h4>
+          <p>Thank you for registering. The Kay-Steph team will confirm your place and send the arrival details shortly.</p>
         </div>
       </div>
     </div>
@@ -289,6 +332,23 @@
 
 <script>
   document.getElementById('yr').textContent = new Date().getFullYear();
+
+  const form = document.getElementById('workshop-form');
+  const success = document.getElementById('form-success');
+  if (form && success) {
+    form.addEventListener('submit', function (e) {
+      // Show the local success message immediately for a smooth UX.
+      // If the action URL is still the placeholder, prevent submit and show the help message.
+      const action = form.getAttribute('action');
+      if (action.indexOf('YOUR_BREVO_FORM_ACTION_URL') !== -1) {
+        e.preventDefault();
+        alert('This form is not yet connected to Brevo.\n\nPaste your Brevo form action URL into the action attribute of the <form> tag (search for YOUR_BREVO_FORM_ACTION_URL).');
+        return;
+      }
+      form.style.display = 'none';
+      success.style.display = 'block';
+    });
+  }
 </script>
 </body>
 </html>
