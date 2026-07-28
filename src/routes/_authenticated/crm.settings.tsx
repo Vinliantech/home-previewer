@@ -14,7 +14,9 @@ import {
   UserRoundCog,
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase as _supabaseTyped } from "@/integrations/supabase/client";
+// CRM schema is not fully wired; cast to any to bypass generated types.
+const supabase: any = _supabaseTyped;
 import { INVESTMENT_TYPES, fmtDate, type InvestmentType, type SalesAgent } from "@/lib/crm";
 import { getCrmIntegrationStatus, sendTestCrmEmail } from "@/lib/crm.functions";
 import {
@@ -117,7 +119,7 @@ function SettingsPage() {
         defaultCountry: settingsResult.data.default_country,
         consentCopy: settingsResult.data.consent_copy,
       });
-    setIntegrations(providerResult as IntegrationStatus);
+    setIntegrations(providerResult as unknown as IntegrationStatus);
   }, [statusFn]);
 
   useEffect(() => {

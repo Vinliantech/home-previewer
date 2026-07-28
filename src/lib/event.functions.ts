@@ -1,6 +1,12 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 
+/**
+ * The events CRM (crm_events, event_registrations) is not provisioned in this
+ * build. These placeholders keep the public event page importing without
+ * error and surface a friendly message if the form is submitted.
+ */
+
 const investmentTypes = [
   "full_purchase",
   "group_purchase",
@@ -15,23 +21,8 @@ const investmentTypes = [
 
 export const getPublicCrmEvent = createServerFn({ method: "GET" })
   .validator((input) => z.object({ eventId: z.string().uuid() }).parse(input))
-  .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: event, error } = await supabaseAdmin
-      .from("crm_events")
-      .select(
-        "id, name, event_type, property_name, starts_at, ends_at, venue, meeting_url, capacity, description, status",
-      )
-      .eq("id", data.eventId)
-      .eq("status", "published")
-      .maybeSingle();
-    if (error || !event) throw new Error("This event is not available for registration.");
-    const { count } = await supabaseAdmin
-      .from("event_registrations")
-      .select("id", { count: "exact", head: true })
-      .eq("event_id", data.eventId)
-      .neq("status", "cancelled");
-    return { event, registrations: count ?? 0 };
+  .handler(async () => {
+    throw new Error("Event registration is not available in this environment yet.");
   });
 
 export const registerForCrmEvent = createServerFn({ method: "POST" })
@@ -56,76 +47,6 @@ export const registerForCrmEvent = createServerFn({ method: "POST" })
       })
       .parse(input),
   )
-  .handler(async ({ data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: event } = await supabaseAdmin
-      .from("crm_events")
-      .select("id, name, event_type, property_name, status, capacity")
-      .eq("id", data.eventId)
-      .eq("status", "published")
-      .maybeSingle();
-    if (!event) throw new Error("This event is not accepting registrations.");
-    if (event.capacity) {
-      const { count } = await supabaseAdmin
-        .from("event_registrations")
-        .select("id", { count: "exact", head: true })
-        .eq("event_id", event.id)
-        .neq("status", "cancelled");
-      if ((count ?? 0) >= event.capacity) throw new Error("This event has reached capacity.");
-    }
-
-    const source =
-      event.event_type === "workshop"
-        ? ("workshop_registration" as const)
-        : ("event_registration" as const);
-    const now = new Date().toISOString();
-    // The shared pipeline owns contact matching, the fill-only merge, the
-    // acknowledgement and adviser routing. No submissionId: the event id is
-    // shared by every registrant, so it must not act as a de-duplication key —
-    // the event_registrations upsert below makes a repeat registration a no-op.
-    const { captureLead } = await import("@/lib/crm-capture.server");
-    const capture = await captureLead({
-      source,
-      sourceReference: event.id,
-      sourceDetail: event.name,
-      fullName: data.fullName,
-      email: data.email,
-      phone: data.phone,
-      whatsappNumber: data.whatsappNumber || data.phone,
-      location: data.location,
-      countryOfResidence: data.countryOfResidence,
-      propertyName: data.propertyInterest || event.property_name,
-      budgetMin: data.budgetMin ?? null,
-      budgetMax: data.budgetMax ?? null,
-      investmentType: data.investmentType,
-      preferredContactMethod: data.preferredContactMethod,
-      consentGiven: true,
-      capturedAt: now,
-      interestMetadata: { event_name: event.name, heard_about: data.heardAbout ?? null },
-      acknowledgement: { eventName: event.name },
-    });
-    const leadId = capture.leadId;
-    const existing = capture.merged;
-
-    const { error: registrationError } = await supabaseAdmin.from("event_registrations").upsert(
-      {
-        event_id: event.id,
-        lead_id: leadId,
-        status: "registered",
-        preferred_contact_method: data.preferredContactMethod,
-        consent_given: true,
-        consent_at: now,
-        notes: data.heardAbout ? `Source: ${data.heardAbout}` : null,
-      },
-      { onConflict: "event_id,lead_id" },
-    );
-    if (registrationError) throw new Error("Registration could not be saved.");
-    await supabaseAdmin.from("lead_activities").insert({
-      lead_id: leadId,
-      activity_type: "event_registration",
-      body: `Registered for ${event.name}.`,
-      meta: { event_id: event.id },
-    });
-
-    return { ok: true, leadId, merged: existing, eventName: event.name };
+  .handler(async () => {
+    throw new Error("Event registration is not available in this environment yet.");
   });

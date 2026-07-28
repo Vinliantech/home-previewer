@@ -21,11 +21,11 @@ export const Route = createFileRoute("/events/$eventId")({
   loader: ({ params }) => getPublicCrmEvent({ data: { eventId: params.eventId } }),
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.event.name ?? "Kay-Steph event"} | Registration` },
+      { title: `${(loaderData as any)?.event.name ?? "Kay-Steph event"} | Registration` },
       {
         name: "description",
         content:
-          loaderData?.event.description ??
+          (loaderData as any)?.event.description ??
           "Register for a Kay-Steph property event, workshop or site inspection.",
       },
     ],

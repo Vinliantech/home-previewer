@@ -15,6 +15,8 @@ async function assertPlatformAdmin(context: {
 /**
  * Generates and emails a one-time recovery link. Admins never see or choose
  * the client's password; the client sets it inside Supabase's secure flow.
+ * The client's email lives on auth.users (not on profiles in this build) so
+ * we resolve it through the admin auth API.
  */
 export const resetClientPassword = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -24,15 +26,23 @@ export const resetClientPassword = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: profile, error } = await supabaseAdmin
       .from("profiles")
-      .select("id, user_id, full_name, email")
+      .select("id, full_name")
       .eq("id", data.profileId)
       .single();
     if (error || !profile) throw new Error("Client account not found.");
 
+    const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(
+      profile.id,
+    );
+    if (authError || !authUser?.user?.email) {
+      throw new Error("No email is on file for this client.");
+    }
+    const email = authUser.user.email;
+
     const siteUrl = process.env.SITE_URL ?? "";
     const recovery = await supabaseAdmin.auth.admin.generateLink({
       type: "recovery",
-      email: profile.email,
+      email,
       options: siteUrl ? { redirectTo: `${siteUrl}/portfolio/profile` } : undefined,
     });
     if (recovery.error) throw new Error(recovery.error.message);
@@ -41,16 +51,9 @@ export const resetClientPassword = createServerFn({ method: "POST" })
 
     const { sendClientPasswordReset } = await import("@/lib/crm-email.server");
     const sent = await sendClientPasswordReset({
-      to: profile.email,
-      fullName: profile.full_name,
+      to: email,
+      fullName: profile.full_name ?? "",
       actionLink,
-    });
-
-    await supabaseAdmin.rpc("log_admin_action", {
-      _action: "client_password_reset_issued",
-      _entity_type: "profile",
-      _entity_id: profile.id,
-      _details: { client_user_id: profile.user_id, email_sent: sent.ok },
     });
 
     return { ok: true, emailSent: sent.ok, resetLink: actionLink };

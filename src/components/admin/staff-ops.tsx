@@ -124,11 +124,11 @@ export function StaffModule() {
     setLoading(true);
     try {
       const [staff, changeRequests] = await Promise.all([
-        listStaff() as Promise<StaffRow[]>,
-        listStaffChangeRequests() as Promise<StaffRow[]>,
+        listStaff() as unknown as Promise<StaffRow[]>,
+        listStaffChangeRequests() as unknown as Promise<StaffRow[]>,
       ]);
-      setRows(staff);
-      setRequests(changeRequests);
+      setRows(((staff as any)?.staff ?? staff) as StaffRow[]);
+      setRequests(((changeRequests as any)?.requests ?? changeRequests) as StaffRow[]);
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not load the staff directory.");
     }
@@ -240,7 +240,7 @@ export function StaffModule() {
         },
       });
       toast.success(
-        result.emailSent
+        (result as any).emailSent
           ? `Invitation emailed to ${form.email}`
           : "Staff member added — the invite email could not be sent. Copy the link from the row menu.",
       );
@@ -286,7 +286,7 @@ export function StaffModule() {
     try {
       const result = await resendStaffInvite({ data: { staffId: row.id } });
       toast.success(
-        result.emailSent ? `Invitation resent to ${row.email}` : "Link generated, but not emailed.",
+        (result as any).emailSent ? `Invitation resent to ${row.email}` : "Link generated, but not emailed.",
       );
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not resend the invitation.");

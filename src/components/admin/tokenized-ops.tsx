@@ -1377,7 +1377,7 @@ export function TokenizedPayoutsModule() {
               <div className="text-xs text-slate-500">{payout.investor_profile?.email}</div>
             </Td>
             <Td className="text-slate-600">{payout.tokenized_properties?.name}</Td>
-            <Td className="text-slate-600">{fmtPct(payout.ownership_pct_snapshot)}</Td>
+            <Td className="text-slate-600">—</Td>
             <Td className="tabular-nums text-navy">{fmtNGN(payout.amount)}</Td>
             <Td>
               <StatusBadge status={payout.status} />

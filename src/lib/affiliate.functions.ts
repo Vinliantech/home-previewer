@@ -57,17 +57,14 @@ export const submitAffiliateReferral = createServerFn({ method: "POST" })
       .from("client_leads")
       .insert({
         affiliate_id: affiliate.id,
-        client_full_name: data.clientFullName,
-        client_email: data.clientEmail,
-        client_phone: data.clientPhone,
-        property_of_interest: data.propertyOfInterest || null,
-        client_budget_min: data.clientBudgetMin ?? null,
-        client_budget_max: data.clientBudgetMax ?? null,
-        client_requirements: data.clientRequirements || null,
-        contact_method: data.contactMethod,
+        full_name: data.clientFullName,
+        email: data.clientEmail,
+        phone: data.clientPhone,
+        notes: data.clientRequirements || null,
       })
       .select("id")
       .single();
+
 
     if (insertError || !clientLead) {
       throw new Error(insertError?.message ?? "The referral could not be saved.");

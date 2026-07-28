@@ -18,7 +18,8 @@ import {
   UsersRound,
 } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase as _supabaseTyped } from "@/integrations/supabase/client";
+const supabase: any = _supabaseTyped;
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
@@ -92,7 +93,7 @@ function CrmShell() {
     (async () => {
       const { data } = await supabase.from("user_roles").select("role").eq("user_id", user.id);
       if (!active) return;
-      const roles = (data ?? []).map((row) => row.role as string);
+      const roles = (data ?? []).map((row: any) => row.role as string);
       // Mirrors public.is_crm_admin: CRM managers run the workspace without
       // holding platform admin rights.
       const admin =

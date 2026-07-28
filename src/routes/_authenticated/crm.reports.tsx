@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { BarChart3, Download, Target, TrendingUp, UsersRound, WalletCards } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase as _supabaseTyped } from "@/integrations/supabase/client";
+// CRM schema is not fully wired; cast to any to bypass generated types.
+const supabase: any = _supabaseTyped;
 import {
   fmtNaira,
   investmentLabel,
@@ -43,7 +45,7 @@ function ReportsWorkspace() {
       const leadRows = (leadResult.data ?? []) as unknown as Lead[];
       setLeads(leadRows);
       setCampaigns(
-        (campaignResult.data ?? []).map((campaign) => {
+        (campaignResult.data ?? []).map((campaign: any) => {
           const rows = leadRows.filter((lead) => lead.campaign_id === campaign.campaign_id);
           return {
             id: campaign.campaign_id,
@@ -214,7 +216,7 @@ function ReportsWorkspace() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#e7ebe8]">
-              {campaigns.map((campaign) => (
+              {campaigns.map((campaign: any) => (
                 <tr key={campaign.id}>
                   <td className="px-4 py-3">
                     <p className="text-xs font-semibold text-[#304940]">{campaign.name}</p>

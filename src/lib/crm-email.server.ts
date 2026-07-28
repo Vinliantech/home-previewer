@@ -1,4 +1,6 @@
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
+// The `email_deliveries` audit table is not present in the current schema.
+// Delivery attempts are logged to the console so the app still ships email
+// without pretending we persisted an audit record.
 
 type SendCrmEmailInput = {
   leadId?: string | null;
@@ -26,18 +28,13 @@ async function logDelivery(values: {
   error_message?: string | null;
   sent_at?: string | null;
 }) {
-  const { error } = await supabaseAdmin.from("email_deliveries").insert({
+  console.info("[crm-email]", values.status, values.recipient_email, values.subject, {
     lead_id: values.lead_id ?? null,
-    provider: "resend",
-    recipient_email: values.recipient_email,
-    subject: values.subject,
-    status: values.status,
-    provider_message_id: values.provider_message_id ?? null,
-    error_message: values.error_message ?? null,
-    sent_at: values.sent_at ?? null,
+    error: values.error_message ?? null,
+    message_id: values.provider_message_id ?? null,
   });
-  if (error) console.warn("[crm-email] delivery log unavailable:", error.message);
 }
+
 
 export async function sendCrmEmail(
   input: SendCrmEmailInput,
